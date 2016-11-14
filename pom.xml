@@ -4,7 +4,7 @@
   <name>IBM Application Security on Cloud</name>
   <organization>
   	<name>IBM</name>
-  	<url>www.ibm.com</url>
+  	<url>www.ibm.com/security</url>
   </organization>
   
   <licenses>
@@ -22,7 +22,7 @@
   </parent>
 
   <groupId>com.ibm</groupId>
-  	<artifactId>appscan</artifactId>
+  	<artifactId>ibm-application-security</artifactId>
   	<version>1.0</version>
   <packaging>hpi</packaging>
 
