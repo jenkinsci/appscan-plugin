@@ -1,0 +1,3 @@
+<div>
+	${%The target of the scan.  For example, a Static Analyzer scan should specify a directory, while a Mobile Analyzer scan should specify a .apk or .ipa file.}
+</div>

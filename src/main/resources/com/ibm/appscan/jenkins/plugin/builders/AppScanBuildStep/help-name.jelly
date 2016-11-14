@@ -1,0 +1,3 @@
+<div>
+	${%An optional name for the scan.  This name is used to differentiate results on the Build and Project pages.}
+</div>

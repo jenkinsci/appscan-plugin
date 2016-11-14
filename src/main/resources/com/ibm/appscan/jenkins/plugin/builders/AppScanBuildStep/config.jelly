@@ -1,0 +1,40 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<!--
+© Copyright IBM Corporation 2016.
+LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+-->
+	<script type="text/javascript" src="${app.rootUrl}plugin/appscan/js/util.js"></script>
+
+	<f:entry title="${%Credentials}" field="credentials">
+		<f:select />
+	</f:entry>
+	
+	<f:entry title="${%Application}" field="application">
+		<f:select />
+	</f:entry>
+	
+	<f:entry title="${%Test Type}" field="type">
+		<f:select />
+	</f:entry>
+	
+	<f:entry title="${%Target}" field="target">
+	    <f:textbox />
+	</f:entry>
+	
+	<f:entry title="${%Name}" field="name">
+	    <f:textbox />
+	</f:entry>
+
+	<f:entry field="wait">
+		<f:checkbox title="${%Suspend job until security analysis completes}" onclick="waitClicked(this);" name="waitCheckbox"/>
+	</f:entry>
+
+	<f:entry field="failBuild">
+		<f:checkbox title="${%Fail build if:}" onclick="failBuildClicked(this);" name="failCheckbox"/>
+	</f:entry>
+	
+	<f:entry field="failureConditions">
+		<f:repeatableProperty field="failureConditions" minimum="0" add="${%Add Condition}"/>
+	</f:entry>
+
+</j:jelly>
