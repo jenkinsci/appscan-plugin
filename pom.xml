@@ -22,8 +22,8 @@
   </parent>
 
   <groupId>com.ibm</groupId>
-  	<artifactId>ibm-application-security</artifactId>
-  	<version>1.0</version>
+  <artifactId>ibm-application-security</artifactId>
+  <version>1.0</version>
   <packaging>hpi</packaging>
 
   <repositories>
