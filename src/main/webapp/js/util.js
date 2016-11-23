@@ -6,7 +6,7 @@
 function getAncestorByType(elem, type) {
 	while(elem) {
 		elem = elem.parentNode;
-		if(elem.tagName.toLowerCase() == 'table') {
+		if(elem.tagName.toLowerCase() == type) {
 			return elem;
 		}
 	}
