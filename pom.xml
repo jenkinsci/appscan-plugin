@@ -27,10 +27,14 @@
   <packaging>hpi</packaging>
 
   <repositories>
-    <repository>
-      <id>repo.jenkins-ci.org</id>
-      <url>http://repo.jenkins-ci.org/public/</url>
-    </repository>
+    	<repository>
+      		<id>repo.jenkins-ci.org</id>
+      		<url>http://repo.jenkins-ci.org/public/</url>
+    	</repository>
+    	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
   </repositories>
 
   <pluginRepositories>
@@ -61,14 +65,14 @@
   
   <dependencies>
 	<dependency>
-	  	<groupId>com.ibm.appscan</groupId>
-  		<artifactId>com.ibm.appscan.plugin.core</artifactId>
-  		<version>1.0</version>
-  	</dependency>
+		<groupId>com.github.AppSecDev</groupId>
+		<artifactId>asoc-core</artifactId>
+		<version>master-SNAPSHOT</version>
+	</dependency>
 	<dependency>
-	  	<groupId>com.ibm.appscan</groupId>
-  		<artifactId>com.ibm.appscan.plugin.core.scanners</artifactId>
-  		<version>1.0</version>
+		<groupId>com.github.AppSecDev</groupId>
+		<artifactId>asoc-scanners</artifactId>
+		<version>master-SNAPSHOT</version>
   		<scope>runtime</scope>
   	</dependency>
   	<dependency>
