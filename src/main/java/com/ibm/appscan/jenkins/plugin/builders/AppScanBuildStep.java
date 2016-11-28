@@ -73,7 +73,7 @@ public class AppScanBuildStep extends Builder {
 		m_application = application;
 		m_credentials = credentials;
 		m_failureConditions = failureConditions;
-		m_wait = wait || failBuild;
+		m_wait = wait;
 		m_failBuild = failBuild;
 		m_authProvider = new JenkinsAuthenticationProvider(m_credentials);
 	}
