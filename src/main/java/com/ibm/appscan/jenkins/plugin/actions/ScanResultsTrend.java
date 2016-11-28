@@ -70,7 +70,7 @@ public class ScanResultsTrend extends AppScanAction {
 	 */
 	public int getBuildCount() {
 		int count = 0;
-		for(Run run : m_project.getBuilds()) {
+		for(Run<?,?> run : m_project.getBuilds()) {
 			for(ResultsRetriever retriever : run.getActions(ResultsRetriever.class))
 				retriever.checkResults(run);
 	
@@ -90,13 +90,7 @@ public class ScanResultsTrend extends AppScanAction {
 		JSONObject builds = new JSONObject();
 		
 		//Loop through the builds to find those with ScanResults.
-		for(Run run : m_project.getBuilds()) {
-			
-			//If there are any active ResultsRetriever's, get the ScanResults.
-			for(ResultsRetriever retriever : run.getActions(ResultsRetriever.class)) {
-				retriever.checkResults(run);
-			}
-			
+		for(Run<?,?> run : m_project.getBuilds()) {			
 			//Loop through the ScanResults to get each set.
 			for(ScanResults results : run.getActions(ScanResults.class)) {
 				String scanType = results.getScanType() + "-" + results.getName();
@@ -131,7 +125,7 @@ public class ScanResultsTrend extends AppScanAction {
 	}
 	
 	private ScanResults getLatestResults() {
-		for(Run run : m_project.getBuilds()) {
+		for(Run<?,?> run : m_project.getBuilds()) {
 			for(ScanResults results : run.getActions(ScanResults.class)) {
 				if(results.getScanType().equalsIgnoreCase(m_type) && results.getName().equalsIgnoreCase(m_name) && results.getHasResults()) {
 					return results;
