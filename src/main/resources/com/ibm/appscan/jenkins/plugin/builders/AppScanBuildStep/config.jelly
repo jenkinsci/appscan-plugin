@@ -26,11 +26,11 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	</f:entry>
 
 	<f:entry field="wait">
-		<f:checkbox title="${%Suspend job until security analysis completes}" onclick="waitClicked(this);" name="waitCheckbox"/>
+		<f:checkbox title="${%Suspend job until security analysis completes}" onclick="waitClicked(this);" name="wait"/>
 	</f:entry>
 
 	<f:entry field="failBuild">
-		<f:checkbox title="${%Fail build if:}" onclick="failBuildClicked(this);" name="failCheckbox"/>
+		<f:checkbox title="${%Fail build if:}" onclick="failBuildClicked(this);" name="failBuild"/>
 	</f:entry>
 	
 	<f:entry field="failureConditions">
