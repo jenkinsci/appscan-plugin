@@ -16,7 +16,7 @@ function getAncestorByType(elem, type) {
 function failBuildClicked(e) {
 	if(e.checked) {
 		var table = getAncestorByType(e, 'table');
-		var waitCheckbox = table.querySelector('input[name=waitCheckbox]');
+		var waitCheckbox = table.querySelector('input[name=wait]');
 		waitCheckbox.checked = true;
 	}
 }
@@ -24,7 +24,7 @@ function failBuildClicked(e) {
 function waitClicked(e) {
 	if(!e.checked) {
 		var table = getAncestorByType(e, 'table');
-		var failCheckbox = table.querySelector('input[name=failCheckbox]');
+		var failCheckbox = table.querySelector('input[name=failBuild]');
 		failCheckbox.checked = false;
 	}
 }
