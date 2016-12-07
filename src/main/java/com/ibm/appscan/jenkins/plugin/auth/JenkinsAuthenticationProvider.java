@@ -1,14 +1,15 @@
 /**
- * © Copyright IBM Corporation 2016.
+ * @ Copyright IBM Corporation 2016.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
 package com.ibm.appscan.jenkins.plugin.auth;
 
-import hudson.model.Item;
+import hudson.model.ItemGroup;
 import hudson.util.Secret;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,9 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 
 	private ASoCCredentials m_credentials;
 	
-	public JenkinsAuthenticationProvider(String id) {
-		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, (Item)null,
-				null, (List<DomainRequirement>)null);
+	public JenkinsAuthenticationProvider(String id, ItemGroup context) {
+		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
+				null, Collections.<DomainRequirement>emptyList());
 		for(ASoCCredentials creds : credentialsList) {
 			if(creds.getId().equals(id)) {
 				m_credentials = creds;

@@ -1,5 +1,5 @@
 /**
- * © Copyright IBM Corporation 2016.
+ * @ Copyright IBM Corporation 2016.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -10,9 +10,10 @@ import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.Action;
 import hudson.model.BuildListener;
-import hudson.model.Item;
+import hudson.model.ItemGroup;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +31,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import jenkins.model.Jenkins;
 
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
 import com.ibm.appscan.jenkins.plugin.actions.ResultsRetriever;
@@ -75,7 +79,6 @@ public class AppScanBuildStep extends Builder {
 		m_failureConditions = failureConditions;
 		m_wait = wait;
 		m_failBuild = failBuild;
-		m_authProvider = new JenkinsAuthenticationProvider(m_credentials);
 	}
 	
 	public String getName() {
@@ -119,6 +122,7 @@ public class AppScanBuildStep extends Builder {
 	
     @Override
     public boolean prebuild(AbstractBuild<?,?> build, BuildListener listener) {
+    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getProject().getParent());
     	File pluginDir = new File(Jenkins.getInstance().getPluginManager().rootDir, "appscan"); //$NON-NLS-1$
     	System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, pluginDir.getAbsolutePath());
     	return true;
@@ -192,10 +196,11 @@ public class AppScanBuildStep extends Builder {
     		return model;
     	}
     	
-    	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials) {
+    	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
     		//We could just use listCredentials() to get the ListBoxModel, but need to work around JENKINS-12802.
     		ListBoxModel model = new ListBoxModel();
-    		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, (Item)null, null, null, null);
+    		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
+    				ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
     		boolean hasSelected = false;
     		
     		for(ASoCCredentials creds : credentialsList) {
@@ -208,8 +213,8 @@ public class AppScanBuildStep extends Builder {
     		return model;
     	}
     	
-    	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials) {
-    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials);
+    	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
+    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
     		ListBoxModel model = new ListBoxModel();
     		
