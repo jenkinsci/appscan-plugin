@@ -7,6 +7,8 @@
   	<url>www.ibm.com/security</url>
   </organization>
   
+  <url>https://wiki.jenkins-ci.org/display/JENKINS/IBM+Application+Security+On+Cloud+Plugin</url>
+	
   <licenses>
   	<license>
   		<name>Apache License, Version 2.0</name>
@@ -14,6 +16,14 @@
   	</license>
   </licenses>
   
+  <developers>
+  	<developer>
+      		<id>mattmurp</id>
+      		<name>Matt Murphy</name>
+      		<email>mattmurp@us.ibm.com</email>
+    	</developer>
+  </developers>
+	
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
