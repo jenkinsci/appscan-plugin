@@ -123,7 +123,9 @@ public class AppScanBuildStep extends Builder {
     @Override
     public boolean prebuild(AbstractBuild<?,?> build, BuildListener listener) {
     	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getProject().getParent());
-    	File pluginDir = new File(Jenkins.getInstance().getPluginManager().rootDir, "appscan"); //$NON-NLS-1$
+    	Jenkins jenkins = Jenkins.getInstance();
+    	String rootDir = jenkins == null ? System.getProperty("java.io.tmpdir") : jenkins.getPluginManager().rootDir.getAbsolutePath(); //$NON-NLS-1$
+    	File pluginDir = new File(rootDir, "appscan"); //$NON-NLS-1$
     	System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, pluginDir.getAbsolutePath());
     	return true;
     }
