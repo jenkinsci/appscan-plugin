@@ -10,8 +10,8 @@ import hudson.model.AbstractProject;
 
 public abstract class AppScanAction implements Action {
 
-	protected final String ICON = "/plugin/ibm-application-security/images/ASoC.ico"; //$NON-NLS-1$
-	protected final String URL = "https://appscan.ibmcloud.com"; //$NON-NLS-1$
+	protected static final String ICON = "/plugin/ibm-application-security/images/ASoC.ico"; //$NON-NLS-1$
+	protected static final String URL = "https://appscan.ibmcloud.com"; //$NON-NLS-1$
 	protected final AbstractProject<?,?> m_project;
 	
 	public AppScanAction (AbstractProject<?,?> project) {
