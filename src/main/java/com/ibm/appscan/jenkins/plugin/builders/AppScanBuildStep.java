@@ -221,8 +221,8 @@ public class AppScanBuildStep extends Builder {
     		ListBoxModel model = new ListBoxModel();
     		
     		if(applications != null) {
-	    		for(String key : applications.keySet())
-	    			model.add(applications.get(key), key);
+	    		for(Map.Entry<String, String> entry : applications.entrySet())
+	    			model.add(entry.getValue(), entry.getKey());
     		}
     		return model;
     	}
