@@ -97,10 +97,10 @@
 
   </dependencies>
   
-
   <scm>
-    <connection>scm:svn:https://svn.jenkins-ci.org/tags/ibm-application-security-1.0</connection>
-    <developerConnection>scm:svn:https://svn.jenkins-ci.org/tags/ibm-application-security-1.0</developerConnection>
-    <url>https://svn.jenkins-ci.org/tags/ibm-application-security-1.0</url>
+  	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin-1.0.git</connection>
+  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin-1.0.git</developerConnection>
+  	<url>https://github.com/jenkinsci/ibm-asoc-plugin</url>
   </scm>
+
 </project>
