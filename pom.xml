@@ -98,8 +98,8 @@
   </dependencies>
   
   <scm>
-  	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin-1.0.git</connection>
-  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin-1.0.git</developerConnection>
+  	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin.git</connection>
+  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/ibm-asoc-plugin</url>
   </scm>
 
