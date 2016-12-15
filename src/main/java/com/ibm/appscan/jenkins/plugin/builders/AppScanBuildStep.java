@@ -208,7 +208,9 @@ public class AppScanBuildStep extends Builder {
     		for(ASoCCredentials creds : credentialsList) {
     			if(creds.getId().equals(credentials))
     				hasSelected = true;
-    			model.add(new ListBoxModel.Option(creds.getUsername() + "/******", creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
+    			String displayName = creds.getDescription();
+    			displayName = displayName == null || displayName.equals("") ? creds.getUsername() + "/******" : displayName; //$NON-NLS-1$
+    			model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
     		}
     		if(!hasSelected)
     			model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
