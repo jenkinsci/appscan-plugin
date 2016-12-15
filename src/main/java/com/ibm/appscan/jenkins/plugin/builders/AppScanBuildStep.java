@@ -229,9 +229,14 @@ public class AppScanBuildStep extends Builder {
     		return model;
     	}
     	
-    	public FormValidation doCheckCredentials(@QueryParameter String credentials) {
+    	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
     		if(credentials.trim().equals("")) //$NON-NLS-1$
     			return FormValidation.errorWithMarkup(Messages.error_no_creds("/credentials")); //$NON-NLS-1$
+    		
+    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+    		if(authProvider.isTokenExpired())
+    			return FormValidation.errorWithMarkup(Messages.error_token_expired("/credentials")); //$NON-NLS-1$
+    			
     		return FormValidation.ok();
     	}
     	
