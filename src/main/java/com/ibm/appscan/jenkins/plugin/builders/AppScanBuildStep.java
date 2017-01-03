@@ -208,7 +208,9 @@ public class AppScanBuildStep extends Builder {
     		for(ASoCCredentials creds : credentialsList) {
     			if(creds.getId().equals(credentials))
     				hasSelected = true;
-    			model.add(new ListBoxModel.Option(creds.getUsername() + "/******", creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
+    			String displayName = creds.getDescription();
+    			displayName = displayName == null || displayName.equals("") ? creds.getUsername() + "/******" : displayName; //$NON-NLS-1$
+    			model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
     		}
     		if(!hasSelected)
     			model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -227,9 +229,14 @@ public class AppScanBuildStep extends Builder {
     		return model;
     	}
     	
-    	public FormValidation doCheckCredentials(@QueryParameter String credentials) {
+    	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
     		if(credentials.trim().equals("")) //$NON-NLS-1$
     			return FormValidation.errorWithMarkup(Messages.error_no_creds("/credentials")); //$NON-NLS-1$
+    		
+    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+    		if(authProvider.isTokenExpired())
+    			return FormValidation.errorWithMarkup(Messages.error_token_expired("/credentials")); //$NON-NLS-1$
+    			
     		return FormValidation.ok();
     	}
     	

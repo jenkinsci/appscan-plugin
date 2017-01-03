@@ -3,11 +3,18 @@
 <!--
 © Copyright IBM Corporation 2016.
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
--->		
-	<f:entry title="${%Username}" field="username">
+-->
+	
+	<f:entry title="${%ID}" field="username">
 	    <f:textbox />
 	</f:entry>
-	<f:entry title="${%Password}" field="password">
+	
+	<f:entry title="${%Secret}" field="password">
 	    <f:password />
 	</f:entry>
+	
+	<f:entry title="${%Label}" field="description">
+		<f:textbox />
+	</f:entry>
+	
 </j:jelly>

@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+	${%An optional label used to identify this set of credentials.  This label will appear in the} <b>${%Credentials}</b> ${%drop-down list when adding a} <b>${%Run Security Test}</b> ${%build step.}
+</div>

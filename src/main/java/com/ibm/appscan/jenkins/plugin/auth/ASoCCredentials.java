@@ -16,13 +16,14 @@ import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.ibm.appscan.jenkins.plugin.Messages;
+import com.ibm.appscan.plugin.core.CoreConstants;
 import com.ibm.appscan.plugin.core.utils.SystemUtil;
 
 public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 
 	private static final long serialVersionUID = 1L;
 	private Secret m_token;
-	
+
 	@DataBoundConstructor
 	public ASoCCredentials(String id, String description, String username, String password) {
 		this(CredentialsScope.GLOBAL, id, description, username, password);
@@ -56,12 +57,20 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		public String getDisplayName() {
 			return Messages.label_asoc();
 		}
+		
+		public String getApiKeyUrl() {
+			return SystemUtil.getDefaultServer() + CoreConstants.API_KEY_PATH;
+		}
 
 		public FormValidation doCheckUsername(@QueryParameter String username) {
+			if(username.trim().equals("")) //$NON-NLS-1$
+				return FormValidation.errorWithMarkup(Messages.need_api_key(getApiKeyUrl())); //$NON-NLS-1$
 			return FormValidation.ok();
 		}
 		
 		public FormValidation doCheckPassword(@QueryParameter String password) {
+			if(password.trim().equals("")) //$NON-NLS-1$
+				return FormValidation.errorWithMarkup(Messages.need_api_key(getApiKeyUrl())); //$NON-NLS-1$
 			return FormValidation.ok();
 		}
     }

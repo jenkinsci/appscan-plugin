@@ -81,7 +81,7 @@
 	<dependency>
 		<groupId>com.github.AppSecDev</groupId>
 		<artifactId>asoc-core</artifactId>
-		<version>82139d3</version>
+		<version>FederatedLogin-SNAPSHOT</version>
 	</dependency>
 	<dependency>
 		<groupId>com.github.AppSecDev</groupId>
