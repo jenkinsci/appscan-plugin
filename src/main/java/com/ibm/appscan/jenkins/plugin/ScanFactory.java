@@ -19,8 +19,7 @@ import com.ibm.appscan.plugin.core.scan.IScanFactory;
 
 public final class ScanFactory {
 
-	private static final ServiceLoader<IScanFactory> LOADER = ServiceLoader.load(IScanFactory.class,
-			Jenkins.getInstance().getPluginManager().uberClassLoader);
+	private static final ServiceLoader<IScanFactory> LOADER = createServiceLoader();
 	
 	public static List<String> getScanTypes() {
 		ArrayList<String> types = new ArrayList<String>();
@@ -36,5 +35,10 @@ public final class ScanFactory {
 			}
 		}
 		return null;
+	}
+	
+	private static ServiceLoader<IScanFactory> createServiceLoader() {
+		Jenkins jenkins = Jenkins.getInstance();
+		return jenkins == null ? ServiceLoader.load(IScanFactory.class) : ServiceLoader.load(IScanFactory.class, jenkins.getPluginManager().uberClassLoader); 
 	}
 }

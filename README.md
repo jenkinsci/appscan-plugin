@@ -4,7 +4,7 @@ Easily integrate security testing into your Jenkins builds using the IBM Applica
 
 # Prerequisites
 
-- An account on the [IBM Application Security on Cloud](https://appscan.ibmcloud.com) service. You'll need to [create an application](http://www.ibm.com/support/knowledgecenter/SSYJJF_1.0.0/ApplicationSecurityonCloud/ent_create_application.html) on the service to associate your scans with.
+- An account on the [IBM Application Security on Cloud](https://www.ibm.com/marketplace/cloud/application-security-on-cloud/) service. You'll need to [create an application](http://www.ibm.com/support/knowledgecenter/SSYJJF_1.0.0/ApplicationSecurityonCloud/ent_create_application.html) on the service to associate your scans with.
 
 # Usage
 

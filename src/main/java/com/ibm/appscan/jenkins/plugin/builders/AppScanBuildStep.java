@@ -123,7 +123,9 @@ public class AppScanBuildStep extends Builder {
     @Override
     public boolean prebuild(AbstractBuild<?,?> build, BuildListener listener) {
     	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getProject().getParent());
-    	File pluginDir = new File(Jenkins.getInstance().getPluginManager().rootDir, "appscan"); //$NON-NLS-1$
+    	Jenkins jenkins = Jenkins.getInstance();
+    	String rootDir = jenkins == null ? System.getProperty("java.io.tmpdir") : jenkins.getPluginManager().rootDir.getAbsolutePath(); //$NON-NLS-1$
+    	File pluginDir = new File(rootDir, "appscan"); //$NON-NLS-1$
     	System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, pluginDir.getAbsolutePath());
     	return true;
     }
@@ -206,7 +208,9 @@ public class AppScanBuildStep extends Builder {
     		for(ASoCCredentials creds : credentialsList) {
     			if(creds.getId().equals(credentials))
     				hasSelected = true;
-    			model.add(new ListBoxModel.Option(creds.getUsername() + "/******", creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
+    			String displayName = creds.getDescription();
+    			displayName = displayName == null || displayName.equals("") ? creds.getUsername() + "/******" : displayName; //$NON-NLS-1$
+    			model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
     		}
     		if(!hasSelected)
     			model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
@@ -219,15 +223,20 @@ public class AppScanBuildStep extends Builder {
     		ListBoxModel model = new ListBoxModel();
     		
     		if(applications != null) {
-	    		for(String key : applications.keySet())
-	    			model.add(applications.get(key), key);
+	    		for(Map.Entry<String, String> entry : applications.entrySet())
+	    			model.add(entry.getValue(), entry.getKey());
     		}
     		return model;
     	}
     	
-    	public FormValidation doCheckCredentials(@QueryParameter String credentials) {
+    	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
     		if(credentials.trim().equals("")) //$NON-NLS-1$
     			return FormValidation.errorWithMarkup(Messages.error_no_creds("/credentials")); //$NON-NLS-1$
+    		
+    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+    		if(authProvider.isTokenExpired())
+    			return FormValidation.errorWithMarkup(Messages.error_token_expired("/credentials")); //$NON-NLS-1$
+    			
     		return FormValidation.ok();
     	}
     	

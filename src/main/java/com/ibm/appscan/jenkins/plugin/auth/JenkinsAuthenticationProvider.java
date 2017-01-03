@@ -20,6 +20,7 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.ibm.appscan.plugin.core.auth.AuthenticationHandler;
 import com.ibm.appscan.plugin.core.auth.IAuthenticationProvider;
+import com.ibm.appscan.plugin.core.auth.LoginType;
 
 public final class JenkinsAuthenticationProvider implements IAuthenticationProvider {
 
@@ -39,12 +40,15 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 	
 	@Override
 	public boolean isTokenExpired() {
+		boolean isExpired = false;
 		AuthenticationHandler handler = new AuthenticationHandler(this);
+
 		try {
-			return handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true);
+			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated);
 		} catch (IOException | JSONException e) {
-			return false;
+			isExpired = false;
 		}
+		return isExpired;
 	}
 
 	@Override
