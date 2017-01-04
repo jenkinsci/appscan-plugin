@@ -1,4 +1,0 @@
-<?jelly escape-by-default='true'?>
-<div>
-	${%Suspend the job until the security analysis results are available.}
-</div>

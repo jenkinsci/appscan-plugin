@@ -81,12 +81,12 @@
 	<dependency>
 		<groupId>com.github.AppSecDev</groupId>
 		<artifactId>asoc-core</artifactId>
-		<version>FederatedLogin-SNAPSHOT</version>
+		<version>Add-Dynamic-Scanner-SNAPSHOT</version>
 	</dependency>
 	<dependency>
 		<groupId>com.github.AppSecDev</groupId>
 		<artifactId>asoc-scanners</artifactId>
-		<version>44eb8cd</version>
+		<version>Add-Dynamic-Scanner-SNAPSHOT</version>
   		<scope>runtime</scope>
   	</dependency>
   	<dependency>

@@ -1,0 +1,40 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<!--
+© Copyright IBM Corporation 2016.
+LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+-->
+
+	<f:entry title="${%Starting URL}" field="target">
+		<f:textbox />
+	</f:entry>
+
+	<f:optionalBlock title="${%Additional Options}" field="hasOptions" inline="true">
+
+		<f:entry title="${%Scan Type}" field="scanType">
+			<f:select />
+		</f:entry>
+
+		<f:entry title="${%Login User}" field="loginUser">
+			<f:textbox />
+		</f:entry>
+
+		<f:entry title="${%Login Password}" field="loginPassword">
+			<f:password />
+		</f:entry>
+
+                <f:entry title="${%Extra Field}" field="extraField">
+                        <f:textbox />
+                </f:entry>
+
+		<f:entry title="${%Presence ID}" field="presenceId">
+			<f:textbox />
+		</f:entry>
+		
+		<f:entry title="${%Scan File}" field="scanFile">
+			<f:textbox />
+		</f:entry>
+						
+	</f:optionalBlock>
+
+</j:jelly>
