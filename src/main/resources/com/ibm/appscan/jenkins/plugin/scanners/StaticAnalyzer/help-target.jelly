@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <div>
 	${%The directory containing the files to scan.}
 </div>
