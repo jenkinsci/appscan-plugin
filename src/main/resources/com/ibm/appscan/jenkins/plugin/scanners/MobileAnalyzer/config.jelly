@@ -21,7 +21,11 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 		<f:entry title="${%Extra Field}" field="extraField">
 			<f:textbox />
 		</f:entry>
-		
+
+		<f:entry title="${%Presence ID}" field="presenceId">
+			<f:textbox />
+		</f:entry>
+	
 	</f:optionalBlock>
 
 </j:jelly>

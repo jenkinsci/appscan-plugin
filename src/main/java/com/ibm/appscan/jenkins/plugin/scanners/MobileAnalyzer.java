@@ -14,17 +14,19 @@ public class MobileAnalyzer extends Scanner {
 	private String m_loginUser;
 	private Secret m_loginPassword;
 	private String m_extraField;
+	private String m_presenceId;
 	
 	public MobileAnalyzer(String target) {
-		this(target, false, EMPTY, EMPTY, EMPTY);
+		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY);
 	}
 	
 	@DataBoundConstructor
-	public MobileAnalyzer(String target, boolean hasOptions, String loginUser, String loginPassword, String extraField) {
+	public MobileAnalyzer(String target, boolean hasOptions, String loginUser, String loginPassword, String extraField, String presenceId) {
 		super(target, hasOptions);
 		m_loginUser = loginUser;
 		m_loginPassword = Secret.fromString(loginPassword);
 		m_extraField = extraField;
+		m_presenceId = presenceId;
 	}
 	
 	public String getLoginUser() {
@@ -38,6 +40,10 @@ public class MobileAnalyzer extends Scanner {
 	public String getExtraField() {
 		return m_extraField;
 	}
+
+	public String getPresenceId() {
+		return m_presenceId;
+	}
 	
 	@Override
 	public String getType() {
@@ -50,6 +56,7 @@ public class MobileAnalyzer extends Scanner {
 		properties.put(LOGIN_USER, m_loginUser);
 		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 		properties.put(EXTRA_FIELD, m_extraField);
+		properties.put(PRESENCE_ID, m_presenceId);
 		return properties;
 	}
 
