@@ -1,5 +1,4 @@
-/**
- * @ Copyright IBM Corporation 2016.
+/* Copyright IBM Corporation 2016.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -45,6 +44,8 @@ import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials;
 import com.ibm.appscan.jenkins.plugin.results.ResultsInspector;
 import com.ibm.appscan.jenkins.plugin.results.FailureCondition;
+import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
+import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.ibm.appscan.plugin.core.CoreConstants;
 import com.ibm.appscan.plugin.core.app.CloudApplicationProvider;
 import com.ibm.appscan.plugin.core.auth.IAuthenticationProvider;
@@ -59,26 +60,34 @@ import com.ibm.appscan.plugin.core.utils.SystemUtil;
 
 public class AppScanBuildStep extends Builder {
 	
+	private Scanner m_scanner;
 	private String m_name;
 	private String m_type;
 	private String m_target;
 	private String m_application;
 	private String m_credentials;
 	private List<FailureCondition> m_failureConditions;
+	private boolean m_emailNotification;
 	private boolean m_wait;
 	private boolean m_failBuild;
 	private IAuthenticationProvider m_authProvider;
 	
 	@DataBoundConstructor
-	public AppScanBuildStep(String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuild, boolean wait) {
-		m_name = (name == null || name.trim().equals("")) ? type.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		m_type = type;
+	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuild, boolean wait, boolean email) {
+		m_scanner = scanner;
+		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		m_type = scanner.getType();
 		m_target = target;
 		m_application = application;
 		m_credentials = credentials;
 		m_failureConditions = failureConditions;
+		m_emailNotification = email;
 		m_wait = wait;
 		m_failBuild = failBuild;
+	}
+	
+	public Scanner getScanner() {
+		return m_scanner;
 	}
 	
 	public String getName() {
@@ -113,6 +122,10 @@ public class AppScanBuildStep extends Builder {
 	
 	public boolean getWait() {
 		return m_wait;
+	}
+
+	public boolean getEmail() {
+		return m_emailNotification;
 	}
 	
     @Override
@@ -163,12 +176,19 @@ public class AppScanBuildStep extends Builder {
     	return actions;
     }
     
+    //To retain backward compatibility
+    protected Object readResolve() {
+    	if(m_scanner == null && m_type != null)
+    		m_scanner = ScannerFactory.getScanner(m_type, m_target);
+    	return this;
+    }
+    
     private IScan getScan(IProgress progress) {
-		HashMap<String, String> properties = new HashMap<String, String>();
-		properties.put(CoreConstants.TARGET,  m_target);
-		properties.put(CoreConstants.ID,  m_application);
-		properties.put(CoreConstants.NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
-		return ScanFactory.getScan(m_type, properties, progress, m_authProvider);
+	Map<String, String> properties = m_scanner.getProperties();
+	properties.put(CoreConstants.APP_ID,  m_application);
+	properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+	properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
+	return ScanFactory.getScan(m_scanner.getType(), properties, progress, m_authProvider);
     }
     
     private boolean shouldFailBuild(IResultsProvider provider) {
@@ -187,16 +207,8 @@ public class AppScanBuildStep extends Builder {
 
     	@Override
         public String getDisplayName() {
-            return Messages.label_build_step();
+            	return Messages.label_build_step();
         }
-    	
-    	public ListBoxModel doFillTypeItems() {
-    		ListBoxModel model = new ListBoxModel();
-    		
-    		for(String scanType : ScanFactory.getScanTypes())
-    			model.add(scanType);
-    		return model;
-    	}
     	
     	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
     		//We could just use listCredentials() to get the ListBoxModel, but need to work around JENKINS-12802.
@@ -249,3 +261,4 @@ public class AppScanBuildStep extends Builder {
     	}
     }
 }
+

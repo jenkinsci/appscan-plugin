@@ -69,9 +69,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		}
 		
 		public FormValidation doCheckPassword(@QueryParameter String password) {
-			if(password.trim().equals("")) //$NON-NLS-1$
-				return FormValidation.errorWithMarkup(Messages.need_api_key(getApiKeyUrl())); //$NON-NLS-1$
-			return FormValidation.ok();
+			return FormValidation.validateRequired(password);
 		}
     }
 }

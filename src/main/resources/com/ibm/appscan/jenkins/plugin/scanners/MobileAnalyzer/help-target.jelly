@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+	${%The .apk or .ipa file to be scanned.}
+</div>
