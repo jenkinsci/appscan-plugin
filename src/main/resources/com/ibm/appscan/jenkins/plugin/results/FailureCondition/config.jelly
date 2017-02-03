@@ -9,13 +9,13 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 			<f:select field="failureType"/>
 		</div>
 		<div style="display:inline-block;vertical-align:middle;padding-left:1em;padding-right:1em">
-			<label>${% security issues greater than }</label>
+			<label> ${%label.greater.than} </label>
 		</div>
 		<div style="display:inline-block;vertical-align:middle">
 			<input type="number" min="0" name="threshold" value="${instance.threshold}"/>
 		</div>
 		<div style="display:inline-block;vertical-align:middle;padding-left:2em">
-			<f:repeatableDeleteButton value="${%Remove}"/>
+			<f:repeatableDeleteButton value="${%label.remove}"/>
 		</div>
 	</div>
 </j:jelly>
