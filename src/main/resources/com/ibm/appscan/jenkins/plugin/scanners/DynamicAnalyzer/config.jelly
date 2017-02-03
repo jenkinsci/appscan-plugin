@@ -5,33 +5,33 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 
-	<f:entry title="${%Starting URL}" field="target">
+	<f:entry title="${%label.starting.url}" field="target">
 		<f:textbox />
 	</f:entry>
 
-	<f:optionalBlock title="${%Additional Options}" field="hasOptions" inline="true">
+	<f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
 
-		<f:entry title="${%Scan Type}" field="scanType">
+		<f:entry title="${%label.scan.type}" field="scanType">
 			<f:select />
 		</f:entry>
 
-		<f:entry title="${%Login User}" field="loginUser">
+		<f:entry title="${%label.login.user}" field="loginUser">
 			<f:textbox />
 		</f:entry>
 
-		<f:entry title="${%Login Password}" field="loginPassword">
+		<f:entry title="${%label.login.password}" field="loginPassword">
 			<f:password />
 		</f:entry>
 
-                <f:entry title="${%Extra Field}" field="extraField">
+                <f:entry title="${%label.extra.field}" field="extraField">
                         <f:textbox />
                 </f:entry>
 
-		<f:entry title="${%Presence ID}" field="presenceId">
+		<f:entry title="${%label.presence.id}" field="presenceId">
 			<f:textbox />
 		</f:entry>
 		
-		<f:entry title="${%Scan File}" field="scanFile">
+		<f:entry title="${%label.scan.file}" field="scanFile">
 			<f:textbox />
 		</f:entry>
 						

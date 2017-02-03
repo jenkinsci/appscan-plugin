@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-	Fail the job if the number of security issues equals or exceeds the specified limit.
+	${%description.failure.criteria}
 </div>

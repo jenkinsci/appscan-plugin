@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-	${%The type of test to run.}
+	${%description.test.type}
 </div>

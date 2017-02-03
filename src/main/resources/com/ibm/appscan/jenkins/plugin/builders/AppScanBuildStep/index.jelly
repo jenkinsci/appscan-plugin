@@ -5,16 +5,11 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 	<div>
-		<p>${%IBM Application Security on Cloud bolsters your organization’s Web, mobile and desktop application security protection. 
-		Powered by IBM’s Dynamic Analyzer, Static Analyzer and Mobile Analyzer capabilities, the service permits you to perform comprehensive 
-		and convenient automated application security testing in the Cloud.}</p>
+		<p>${%overview.paragraph.one}</p> 
+
+		<p>${%overview.paragraph.two}</p>
 	
-		<p>${%The service also helps you to prioritize remediation of high-priority vulnerabilities and improve the effectiveness of your application 
-		security program. You’ll have the peace of mind that’s derived from eliminating security vulnerabilities from applications before they’re 
-		placed into production and deployed.}</p>
-	
-		<p>${%For more information visit }<a target="_blank" href="http://www.ibm.com/software/products/en/ibm-application-security-on-cloud">
-		IBM Application Security on Cloud</a></p>
+		<p>${%overview.paragraph.three}</p>
 	</div>
 
 </j:jelly>

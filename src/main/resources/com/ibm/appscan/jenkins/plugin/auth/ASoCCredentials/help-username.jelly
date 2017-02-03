@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-	${%The API key ID.}
+	${%description.id}
 </div>

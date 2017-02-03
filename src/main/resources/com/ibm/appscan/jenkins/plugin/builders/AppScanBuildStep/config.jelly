@@ -6,34 +6,34 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 	<script type="text/javascript" src="${app.rootUrl}plugin/ibm-application-security/js/util.js"></script>
 
-	<f:entry title="${%Credentials}" field="credentials">
+	<f:entry title="${%label.credentials}" field="credentials">
 		<f:select />
 	</f:entry>
 	
-	<f:entry title="${%Application}" field="application">
+	<f:entry title="${%label.application}" field="application">
 		<f:select />
 	</f:entry>
 	
-        <f:entry title="${%Test Name}" field="name">
+        <f:entry title="${%label.name}" field="name">
             <f:textbox />
         </f:entry>
 
-	<f:dropdownDescriptorSelector title="${%Test Type}" field="scanner"/>
+	<f:dropdownDescriptorSelector title="${%label.type}" field="scanner"/>
 
 	<f:entry field="email">
-		<f:checkbox title="${%Email Notification}"/>
+		<f:checkbox title="${%label.email}"/>
 	</f:entry>
 
 	<f:entry field="wait">
-		<f:checkbox title="${%Suspend job until security analysis completes}" onclick="waitClicked(this);" name="wait"/>
+		<f:checkbox title="${%label.wait}" onclick="waitClicked(this);" name="wait"/>
 	</f:entry>
 
 	<f:entry field="failBuild">
-		<f:checkbox title="${%Fail build if:}" onclick="failBuildClicked(this);" name="failBuild"/>
+		<f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" name="failBuild"/>
 	</f:entry>
 	
 	<f:entry field="failureConditions">
-		<f:repeatableProperty field="failureConditions" minimum="0" add="${%Add Condition}"/>
+		<f:repeatableProperty field="failureConditions" minimum="0" add="${%label.add.condition}"/>
 	</f:entry>
 
 </j:jelly>
