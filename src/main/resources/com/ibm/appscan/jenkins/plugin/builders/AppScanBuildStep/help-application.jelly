@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-	${%The IBM Application Security on Cloud application that this scan will be associated with. If the list is empty, add IBM ASoC credentials } <a target="_blank" href="${app.rootUrl}credentials">${%on the Credentials page}</a>
+	${%description.application} <a target="_blank" href="${app.rootUrl}credentials">${%credentials.link.text}</a>.
 </div>

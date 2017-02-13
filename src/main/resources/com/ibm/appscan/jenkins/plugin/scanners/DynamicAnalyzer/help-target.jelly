@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-	${%The starting URL for the scan.}
+	${%description.starting.url}
 </div>
