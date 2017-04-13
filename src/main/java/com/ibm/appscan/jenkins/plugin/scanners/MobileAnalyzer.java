@@ -1,11 +1,20 @@
+/**
+ * @ Copyright IBM Corporation 2016.
+ * @ Copyright HCL Technologies Ltd. 2017.
+ * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package com.ibm.appscan.jenkins.plugin.scanners;
 
 import hudson.Extension;
+import hudson.util.FormValidation;
 import hudson.util.Secret;
+import hudson.util.VariableResolver;
 
 import java.util.Map;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 public class MobileAnalyzer extends Scanner {
 
@@ -51,8 +60,8 @@ public class MobileAnalyzer extends Scanner {
 	}
 	
 	@Override
-	public Map<String, String> getProperties() {
-		Map<String, String> properties = super.getProperties();
+	public Map<String, String> getProperties(VariableResolver<String> resolver) {
+		Map<String, String> properties = super.getProperties(resolver);
 		properties.put(LOGIN_USER, m_loginUser);
 		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 		properties.put(EXTRA_FIELD, m_extraField);
@@ -67,5 +76,9 @@ public class MobileAnalyzer extends Scanner {
 		public String getDisplayName() {
 			return MOBILE_ANALYZER;
 		}
+		
+    	public FormValidation doCheckTarget(@QueryParameter String target) {
+    		return FormValidation.validateRequired(target);
+    	}
 	}
 }

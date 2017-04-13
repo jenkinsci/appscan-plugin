@@ -81,12 +81,12 @@
 	<dependency>
 		<groupId>com.github.AppSecDev</groupId>
 		<artifactId>asoc-core</artifactId>
-		<version>1.0.1</version>
+		<version>serializable_update-SNAPSHOT</version>
 	</dependency>
 	<dependency>
 		<groupId>com.github.AppSecDev</groupId>
 		<artifactId>asoc-scanners</artifactId>
-		<version>1.1.1</version>
+		<version>master-SNAPSHOT</version>
   		<scope>runtime</scope>
   	</dependency>
   	<dependency>
