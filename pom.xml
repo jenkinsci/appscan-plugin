@@ -20,7 +20,7 @@
   	<developer>
       		<id>mattmurp</id>
       		<name>Matt Murphy</name>
-      		<email>mattmurp@us.ibm.com</email>
+      		<email>matthew.murphy@hcl.com</email>
     	</developer>
   </developers>
 	
@@ -36,7 +36,7 @@
   </properties>
 	
   <groupId>com.ibm</groupId>
-  <artifactId>ibm-application-security</artifactId>
+  <artifactId>ibm-asoc-plugin</artifactId>
   <version>1.2-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
