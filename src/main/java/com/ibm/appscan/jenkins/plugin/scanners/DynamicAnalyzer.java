@@ -1,8 +1,15 @@
+/**
+ * @ Copyright IBM Corporation 2016.
+ * @ Copyright HCL Technologies Ltd. 2017.
+ * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package com.ibm.appscan.jenkins.plugin.scanners;
 
 import hudson.Extension;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
+import hudson.util.VariableResolver;
 import hudson.util.ListBoxModel;
 
 import java.util.Map;
@@ -75,12 +82,12 @@ public class DynamicAnalyzer extends Scanner {
 	}
 	
 	@Override
-	public Map<String, String> getProperties() {
-		Map<String, String> properties = super.getProperties();
+	public Map<String, String> getProperties(VariableResolver<String> resolver) {
+		Map<String, String> properties = super.getProperties(resolver);
 		properties.put(LOGIN_USER, m_loginUser);
 		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 		properties.put(PRESENCE_ID, m_presenceId);
-		properties.put(SCAN_FILE, m_scanFile);
+		properties.put(SCAN_FILE, resolver.resolve(m_scanFile));
 		properties.put(TEST_POLICY, m_testPolicy);
 		properties.put(SCAN_TYPE, m_scanType);
 		properties.put(EXTRA_FIELD, m_extraField);
@@ -106,6 +113,10 @@ public class DynamicAnalyzer extends Scanner {
     		if(!scanFile.trim().equals(EMPTY) && !scanFile.endsWith(TEMPLATE_EXTENSION)) //$NON-NLS-1$
     			return FormValidation.error(Messages.error_invalid_template_file());
     		return FormValidation.ok();
+    	}
+    	
+    	public FormValidation doCheckTarget(@QueryParameter String target) {
+    		return FormValidation.validateRequired(target);
     	}
 	}
 }

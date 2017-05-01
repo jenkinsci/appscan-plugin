@@ -1,5 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
+ * @ Copyright HCL Technologies Ltd. 2017.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,6 +10,7 @@ import hudson.model.ItemGroup;
 import hudson.util.Secret;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +24,13 @@ import com.ibm.appscan.plugin.core.auth.AuthenticationHandler;
 import com.ibm.appscan.plugin.core.auth.IAuthenticationProvider;
 import com.ibm.appscan.plugin.core.auth.LoginType;
 
-public final class JenkinsAuthenticationProvider implements IAuthenticationProvider {
+public final class JenkinsAuthenticationProvider implements IAuthenticationProvider, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private ASoCCredentials m_credentials;
 	
-	public JenkinsAuthenticationProvider(String id, ItemGroup context) {
+	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
 		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
 		for(ASoCCredentials creds : credentialsList) {

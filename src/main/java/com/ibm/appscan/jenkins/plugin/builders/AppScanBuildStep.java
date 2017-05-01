@@ -1,4 +1,6 @@
-/* Copyright IBM Corporation 2016.
+/**
+ * @ Copyright IBM Corporation 2016.
+ * @ Copyright HCL Technologies Ltd. 2017.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -12,24 +14,23 @@ import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.remoting.Callable;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import jenkins.model.Jenkins;
-
+import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -40,25 +41,28 @@ import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
 import com.ibm.appscan.jenkins.plugin.actions.ResultsRetriever;
 import com.ibm.appscan.jenkins.plugin.actions.ScanResultsTrend;
-import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials;
-import com.ibm.appscan.jenkins.plugin.results.ResultsInspector;
+import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.ibm.appscan.jenkins.plugin.results.FailureCondition;
+import com.ibm.appscan.jenkins.plugin.results.ResultsInspector;
 import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
 import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
+import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
+import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
 import com.ibm.appscan.plugin.core.CoreConstants;
 import com.ibm.appscan.plugin.core.app.CloudApplicationProvider;
 import com.ibm.appscan.plugin.core.auth.IAuthenticationProvider;
 import com.ibm.appscan.plugin.core.error.InvalidTargetException;
 import com.ibm.appscan.plugin.core.error.ScannerException;
-import com.ibm.appscan.plugin.core.logging.DefaultProgress;
 import com.ibm.appscan.plugin.core.logging.IProgress;
 import com.ibm.appscan.plugin.core.logging.Message;
 import com.ibm.appscan.plugin.core.results.IResultsProvider;
 import com.ibm.appscan.plugin.core.scan.IScan;
 import com.ibm.appscan.plugin.core.utils.SystemUtil;
 
-public class AppScanBuildStep extends Builder {
+public class AppScanBuildStep extends Builder implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private Scanner m_scanner;
 	private String m_name;
@@ -136,35 +140,51 @@ public class AppScanBuildStep extends Builder {
     @Override
     public boolean prebuild(AbstractBuild<?,?> build, BuildListener listener) {
     	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getProject().getParent());
-    	Jenkins jenkins = Jenkins.getInstance();
-    	String rootDir = jenkins == null ? System.getProperty("java.io.tmpdir") : jenkins.getPluginManager().rootDir.getAbsolutePath(); //$NON-NLS-1$
-    	File pluginDir = new File(rootDir, "appscan"); //$NON-NLS-1$
-    	System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, pluginDir.getAbsolutePath());
     	return true;
     }
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-    	IProgress progress = new DefaultProgress(listener.getLogger());
-    	IScan scan = getScan(progress);
+    	final IProgress progress = new ScanProgress(listener);
+    	final boolean suspend = m_wait;
+    	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
+
+    	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void checkRoles(RoleChecker arg0) {
+			}
+
+			@Override
+			public IResultsProvider call() throws AbortException {
+				try {
+		    		scan.run();
+		    		IResultsProvider provider = scan.getResultsProvider();
+		    		
+		    		if(suspend) {
+		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
+		    			String status = provider.getStatus();
+		    			
+		    			while(status != null && status.equalsIgnoreCase(CoreConstants.RUNNING)) {
+		    				Thread.sleep(60000);
+		    				status = provider.getStatus();
+		    			}
+		    		}
+		    		
+		    		return provider;
+		    	}
+		    	catch(ScannerException | InvalidTargetException | InterruptedException e) {
+		    		throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
+		    	}
+			}
+
+		});
     	
-    	try {
-    		scan.run();
-    	}
-    	catch(ScannerException | InvalidTargetException e) {
-    		throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
-    	}
-    	
-    	IResultsProvider provider = scan.getResultsProvider();
     	build.addAction(new ResultsRetriever(build, provider, m_name));
     	
-		if(m_wait) {
-			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
-			while(!provider.hasResults())
-				Thread.sleep(60000);
-			if(shouldFailBuild(provider))
-				throw new AbortException(Messages.error_threshold_exceeded());
-		}
+		if(m_wait && shouldFailBuild(provider))
+			throw new AbortException(Messages.error_threshold_exceeded());
 		
 		return true;
     }
@@ -183,19 +203,24 @@ public class AppScanBuildStep extends Builder {
     	return this;
     }
     
-    private IScan getScan(IProgress progress) {
-	Map<String, String> properties = m_scanner.getProperties();
-	properties.put(CoreConstants.APP_ID,  m_application);
-	properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
-	properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-	return ScanFactory.getScan(m_scanner.getType(), properties, progress, m_authProvider);
+    private Map<String, String> getScanProperties(AbstractBuild<?,?> build, BuildListener listener) {
+		Map<String, String> properties = m_scanner.getProperties(new BuildVariableResolver(build, listener));
+		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
+		properties.put(CoreConstants.APP_ID,  m_application);
+		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
+		return properties;
     }
     
-    private boolean shouldFailBuild(IResultsProvider provider) {
+    private boolean shouldFailBuild(IResultsProvider provider) throws AbortException{
     	if(!m_failBuild)
     		return false;
-    	return new ResultsInspector(m_failureConditions, provider).shouldFail();
-    }
+		try {
+	    	return new ResultsInspector(m_failureConditions, provider).shouldFail();
+	    } catch(NullPointerException e) {
+	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
+	    }
+	}
 
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
@@ -210,7 +235,7 @@ public class AppScanBuildStep extends Builder {
             	return Messages.label_build_step();
         }
     	
-    	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
+    	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
     		//We could just use listCredentials() to get the ListBoxModel, but need to work around JENKINS-12802.
     		ListBoxModel model = new ListBoxModel();
     		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
@@ -229,7 +254,7 @@ public class AppScanBuildStep extends Builder {
     		return model;
     	}
     	
-    	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
+    	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
     		ListBoxModel model = new ListBoxModel();
@@ -241,7 +266,7 @@ public class AppScanBuildStep extends Builder {
     		return model;
     	}
     	
-    	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup context) {
+    	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
     		if(credentials.trim().equals("")) //$NON-NLS-1$
     			return FormValidation.errorWithMarkup(Messages.error_no_creds("/credentials")); //$NON-NLS-1$
     		
@@ -254,10 +279,6 @@ public class AppScanBuildStep extends Builder {
     	
     	public FormValidation doCheckApplication(@QueryParameter String application) {
     		return FormValidation.validateRequired(application);
-    	}
-    	
-    	public FormValidation doCheckTarget(@QueryParameter String target) {
-    		return FormValidation.validateRequired(target);
     	}
     }
 }
