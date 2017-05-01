@@ -9,11 +9,14 @@ package com.ibm.appscan.jenkins.plugin.scanners;
 import hudson.model.AbstractDescribableImpl;
 import hudson.util.VariableResolver;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Scanner extends AbstractDescribableImpl<Scanner> implements ScannerConstants {
+public abstract class Scanner extends AbstractDescribableImpl<Scanner> implements ScannerConstants, Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	private String m_target;
 	private boolean m_hasOptions;
 	

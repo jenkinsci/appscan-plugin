@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class BuildVariableResolver implements VariableResolver<String>, Serializable {
 
@@ -34,7 +35,7 @@ public class BuildVariableResolver implements VariableResolver<String>, Serializ
 	public String resolve(String arg0) {
 		StringBuilder builder = new StringBuilder();
 		
-		for(String part : arg0.split(File.separator)) {
+		for(String part : arg0.split(Pattern.quote(File.separator))) {
 			if(part.startsWith(VAR_START) && part.endsWith(VAR_END))
 				builder.append(resolveVariable(part) + File.separator);
 			else

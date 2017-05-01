@@ -22,6 +22,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,7 +60,9 @@ import com.ibm.appscan.plugin.core.results.IResultsProvider;
 import com.ibm.appscan.plugin.core.scan.IScan;
 import com.ibm.appscan.plugin.core.utils.SystemUtil;
 
-public class AppScanBuildStep extends Builder {
+public class AppScanBuildStep extends Builder implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private Scanner m_scanner;
 	private String m_name;
@@ -144,7 +147,7 @@ public class AppScanBuildStep extends Builder {
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
-    	final ScanFactory factory = new ScanFactory(getScanProperties(build, listener), progress, m_authProvider);
+    	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
 
     	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
@@ -155,7 +158,6 @@ public class AppScanBuildStep extends Builder {
 
 			@Override
 			public IResultsProvider call() throws AbortException {
-				IScan scan = factory.createScan();
 				try {
 		    		scan.run();
 		    		IResultsProvider provider = scan.getResultsProvider();

@@ -5,6 +5,8 @@
 
 package com.ibm.appscan.jenkins.plugin.results;
 
+import java.io.Serializable;
+
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
@@ -16,7 +18,9 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.ibm.appscan.jenkins.plugin.Messages;
 
-public class FailureCondition extends AbstractDescribableImpl<FailureCondition> {
+public class FailureCondition extends AbstractDescribableImpl<FailureCondition> implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private String m_failureType;
 	private int m_threshold;
