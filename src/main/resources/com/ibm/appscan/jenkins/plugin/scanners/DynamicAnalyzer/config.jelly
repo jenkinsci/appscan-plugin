@@ -23,12 +23,12 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 			<f:password />
 		</f:entry>
 
-                <f:entry title="${%label.extra.field}" field="extraField">
-                        <f:textbox />
-                </f:entry>
+        <f:entry title="${%label.extra.field}" field="extraField">
+                <f:textbox />
+        </f:entry>
 
 		<f:entry title="${%label.presence.id}" field="presenceId">
-			<f:textbox />
+			<f:select />
 		</f:entry>
 		
 		<f:entry title="${%label.scan.file}" field="scanFile">

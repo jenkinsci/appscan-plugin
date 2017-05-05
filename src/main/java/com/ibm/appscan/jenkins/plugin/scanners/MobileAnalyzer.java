@@ -7,14 +7,22 @@
 package com.ibm.appscan.jenkins.plugin.scanners;
 
 import hudson.Extension;
+import hudson.RelativePath;
+import hudson.model.ItemGroup;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import hudson.util.VariableResolver;
 
 import java.util.Map;
 
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+
+import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+import com.ibm.appscan.plugin.core.auth.IAuthenticationProvider;
+import com.ibm.appscan.plugin.core.presence.CloudPresenceProvider;
 
 public class MobileAnalyzer extends Scanner {
 
@@ -76,6 +84,19 @@ public class MobileAnalyzer extends Scanner {
 		public String getDisplayName() {
 			return MOBILE_ANALYZER;
 		}
+		
+    	public ListBoxModel doFillPresenceIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) { //$NON-NLS-1$
+    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+    		Map<String, String> presences = new CloudPresenceProvider(authProvider).getPresences();
+    		ListBoxModel model = new ListBoxModel();
+    		model.add(""); //$NON-NLS-1$
+    		
+    		if(presences != null) {
+	    		for(Map.Entry<String, String> entry : presences.entrySet())
+	    			model.add(entry.getValue(), entry.getKey());
+    		}
+    		return model;
+    	}
 		
     	public FormValidation doCheckTarget(@QueryParameter String target) {
     		return FormValidation.validateRequired(target);
