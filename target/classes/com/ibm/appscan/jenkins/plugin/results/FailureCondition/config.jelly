@@ -1,0 +1,21 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<!--
+© Copyright IBM Corporation 2016.
+LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+-->
+	<div style="display:inline-block;border:solid;border-radius:5px;border-width:thin;padding:1px">
+		<div style="display:inline-block;vertical-align:middle">
+			<f:select field="failureType"/>
+		</div>
+		<div style="display:inline-block;vertical-align:middle;padding-left:1em;padding-right:1em">
+			<label> ${%label.greater.than} </label>
+		</div>
+		<div style="display:inline-block;vertical-align:middle">
+			<input type="number" min="0" name="threshold" value="${instance.threshold}"/>
+		</div>
+		<div style="display:inline-block;vertical-align:middle;padding-left:2em">
+			<f:repeatableDeleteButton value="${%label.remove}"/>
+		</div>
+	</div>
+</j:jelly>

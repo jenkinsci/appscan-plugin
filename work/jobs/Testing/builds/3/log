@@ -1,0 +1,91 @@
+Started by user [8mha:AAAAlh+LCAAAAAAAAP9b85aBtbiIQTGjNKU4P08vOT+vOD8nVc83PyU1x6OyILUoJzMv2y+/JJUBAhiZGBgqihhk0NSjKDWzXb3RdlLBUSYGJk8GtpzUvPSSDB8G5tKinBIGIZ+sxLJE/ZzEvHT94JKizLx0a6BxUmjGOUNodHsLgAzOEgYu/dLi1CL9vNKcHACFIKlWvwAAAA==[0manonymous
+Building in workspace /Users/MarkPreschern/Desktop/ibm-asoc-plugin/work/jobs/Testing/workspace
+Preparing the IRX file using SAClientUtil version 6.0.1088...
+A configuration file was found: /Users/MarkPreschern/Desktop/asoc-core/target/appscan-config.xml
+Processing configuration file...
+Discovering targets...
+Target added: target
+Validating...
+No problems found during validation.
+Generating IRX file...
+Processing target (1 of 2)
+Performing Framework Analysis for setting 'frameworksCLI'...
+READING PPF FILE: 
+Completed Framework Analysis
+Processing file CloudApplicationProvider.class (1 of 30)
+Processing file IApplicationProvider.class (2 of 30)
+Processing file AuthenticationHandler.class (3 of 30)
+Processing file IAuthenticationProvider.class (4 of 30)
+Processing file LoginType.class (5 of 30)
+Processing file CoreConstants.class (6 of 30)
+Processing file InvalidTargetException.class (7 of 30)
+Processing file ScannerException.class (8 of 30)
+Processing file DefaultHttpProgress.class (9 of 30)
+Processing file HttpClient$Method.class (10 of 30)
+Processing file HttpClient.class (11 of 30)
+Processing file HttpPart.class (12 of 30)
+Processing file HttpResponse.class (13 of 30)
+Processing file IHttpProgress.class (14 of 30)
+Processing file DefaultProgress.class (15 of 30)
+Processing file IProgress.class (16 of 30)
+Processing file Message.class (17 of 30)
+Processing file Messages.class (18 of 30)
+Processing file MessagesBundle.class (19 of 30)
+Processing file CloudPresenceProvider.class (20 of 30)
+Processing file IPresenceProvider.class (21 of 30)
+Processing file CloudResultsProvider.class (22 of 30)
+Processing file IResultsProvider.class (23 of 30)
+Processing file CloudScanServiceProvider.class (24 of 30)
+Processing file IScan.class (25 of 30)
+Processing file IScanFactory.class (26 of 30)
+Processing file IScanServiceProvider.class (27 of 30)
+Processing file ArchiveUtil.class (28 of 30)
+Processing file ServiceUtil.class (29 of 30)
+Processing file SystemUtil.class (30 of 30)
+Processing target (2 of 2)
+Performing Framework Analysis for setting 'frameworksCLI'...
+READING PPF FILE: 
+Completed Framework Analysis
+Processing file CloudApplicationProvider.class (1 of 30)
+Processing file IApplicationProvider.class (2 of 30)
+Processing file AuthenticationHandler.class (3 of 30)
+Processing file IAuthenticationProvider.class (4 of 30)
+Processing file LoginType.class (5 of 30)
+Processing file CoreConstants.class (6 of 30)
+Processing file InvalidTargetException.class (7 of 30)
+Processing file ScannerException.class (8 of 30)
+Processing file DefaultHttpProgress.class (9 of 30)
+Processing file HttpClient$Method.class (10 of 30)
+Processing file HttpClient.class (11 of 30)
+Processing file HttpPart.class (12 of 30)
+Processing file HttpResponse.class (13 of 30)
+Processing file IHttpProgress.class (14 of 30)
+Processing file DefaultProgress.class (15 of 30)
+Processing file IProgress.class (16 of 30)
+Processing file Message.class (17 of 30)
+Processing file Messages.class (18 of 30)
+Processing file MessagesBundle.class (19 of 30)
+Processing file CloudPresenceProvider.class (20 of 30)
+Processing file IPresenceProvider.class (21 of 30)
+Processing file CloudResultsProvider.class (22 of 30)
+Processing file IResultsProvider.class (23 of 30)
+Processing file CloudScanServiceProvider.class (24 of 30)
+Processing file IScan.class (25 of 30)
+Processing file IScanFactory.class (26 of 30)
+Processing file IScanServiceProvider.class (27 of 30)
+Processing file ArchiveUtil.class (28 of 30)
+Processing file ServiceUtil.class (29 of 30)
+Processing file SystemUtil.class (30 of 30)
+Writing the internal artifact...
+Completed writing the internal artifact
+/Users/MarkPreschern/Desktop/asoc-core/target/classes requires the following packages:
+	org.apache.wink.json4j.*
+/Users/MarkPreschern/Desktop/asoc-core/target/com.ibm.appscan.plugin.core-1.0.3.jar requires the following packages:
+	org.apache.wink.json4j.*
+An appscan-config.xml file already exists.
+Please update the file and rerun the command.
+
+Uploading /Users/markpreschern/desktop/asoc-core/target/test name_2017-05-17_13-20-43.irx to the analysis service...
+Creating and executing scan...
+Successfully submitted scan for analysis.
+Finished: SUCCESS

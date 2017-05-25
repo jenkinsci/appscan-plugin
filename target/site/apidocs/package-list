@@ -1,0 +1,7 @@
+com.ibm.appscan.jenkins.plugin
+com.ibm.appscan.jenkins.plugin.actions
+com.ibm.appscan.jenkins.plugin.auth
+com.ibm.appscan.jenkins.plugin.builders
+com.ibm.appscan.jenkins.plugin.results
+com.ibm.appscan.jenkins.plugin.scanners
+com.ibm.appscan.jenkins.plugin.util

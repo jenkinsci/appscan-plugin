@@ -1,0 +1,31 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<!--
+© Copyright IBM Corporation 2016.
+LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+-->
+	<table>
+    	<h3><a href="${it.urlName}">${it.displayName}</a></h3>
+		<tr>
+			<td style="width: 20%">${%Total Issues}</td>
+			<td style="width: 20%">${%High}</td>
+			<td style="width: 20%">${%Med}</td>
+			<td style="width: 20%">${%Low}</td>
+			<td style="width: 20%">${%Info}</td>
+		</tr>
+		<tr>
+			<td style="font-size: 200%">${it.totalFindings}</td>			
+			<td style="font-size: 200%">${it.highCount}</td>
+			<td style="font-size: 200%">${it.mediumCount}</td>
+			<td style="font-size: 200%">${it.lowCount}</td>
+			<td style="font-size: 200%">${it.infoCount}</td>
+		</tr>
+		<tr>
+			<td/>
+			<td style="background-color: #c91616;"/>
+			<td style="background-color: #ed7911;"/>
+			<td style="background-color: #ffcd09;"/>
+			<td style="background-color: #d2d2d2;"/>
+		</tr>		
+	</table>
+</j:jelly>
