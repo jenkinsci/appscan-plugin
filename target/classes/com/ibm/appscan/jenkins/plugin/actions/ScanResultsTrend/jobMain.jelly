@@ -1,0 +1,10 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<!--
+© Copyright IBM Corporation 2016.
+LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+-->
+	<j:if test="${it.buildCount gt 1}">
+		<st:include page="trendChart.jelly"/>
+    </j:if>
+</j:jelly>
