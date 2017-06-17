@@ -22,8 +22,8 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import com.ibm.appscan.plugin.core.auth.IAuthenticationProvider;
-import com.ibm.appscan.plugin.core.presence.CloudPresenceProvider;
+import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
+import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
 
 public class DynamicAnalyzer extends Scanner {
 

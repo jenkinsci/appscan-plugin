@@ -20,9 +20,9 @@ import org.apache.wink.json4j.JSONException;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.ibm.appscan.plugin.core.auth.AuthenticationHandler;
-import com.ibm.appscan.plugin.core.auth.IAuthenticationProvider;
-import com.ibm.appscan.plugin.core.auth.LoginType;
+import com.hcl.appscan.sdk.auth.AuthenticationHandler;
+import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
+import com.hcl.appscan.sdk.auth.LoginType;
 
 public final class JenkinsAuthenticationProvider implements IAuthenticationProvider, Serializable {
 
