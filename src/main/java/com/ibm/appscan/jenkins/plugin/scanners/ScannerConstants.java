@@ -1,6 +1,6 @@
 package com.ibm.appscan.jenkins.plugin.scanners;
 
-import com.ibm.appscan.plugin.core.CoreConstants;
+import com.hcl.appscan.sdk.CoreConstants;
 
 public interface ScannerConstants {
 	

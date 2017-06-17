@@ -13,11 +13,11 @@ import java.util.ServiceLoader;
 
 import jenkins.model.Jenkins;
 
-import com.ibm.appscan.plugin.core.CoreConstants;
-import com.ibm.appscan.plugin.core.auth.IAuthenticationProvider;
-import com.ibm.appscan.plugin.core.logging.IProgress;
-import com.ibm.appscan.plugin.core.scan.IScan;
-import com.ibm.appscan.plugin.core.scan.IScanFactory;
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
+import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.scan.IScan;
+import com.hcl.appscan.sdk.scan.IScanFactory;
 
 public final class ScanFactory {
 

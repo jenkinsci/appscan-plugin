@@ -18,8 +18,8 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import com.ibm.appscan.jenkins.plugin.Messages;
-import com.ibm.appscan.plugin.core.CoreConstants;
-import com.ibm.appscan.plugin.core.results.IResultsProvider;
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.results.IResultsProvider;
 
 public class ScanResults extends AppScanAction {
 

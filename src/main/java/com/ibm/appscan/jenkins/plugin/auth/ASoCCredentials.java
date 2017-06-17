@@ -16,8 +16,8 @@ import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.ibm.appscan.jenkins.plugin.Messages;
-import com.ibm.appscan.plugin.core.CoreConstants;
-import com.ibm.appscan.plugin.core.utils.SystemUtil;
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.utils.SystemUtil;
 
 public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 

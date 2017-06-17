@@ -7,7 +7,7 @@ package com.ibm.appscan.jenkins.plugin.results;
 
 import java.util.List;
 
-import com.ibm.appscan.plugin.core.results.IResultsProvider;
+import com.hcl.appscan.sdk.results.IResultsProvider;
 
 public class ResultsInspector {
 

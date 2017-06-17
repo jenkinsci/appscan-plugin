@@ -9,8 +9,8 @@ import hudson.model.BuildListener;
 
 import java.io.Serializable;
 
-import com.ibm.appscan.plugin.core.logging.IProgress;
-import com.ibm.appscan.plugin.core.logging.Message;
+import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.logging.Message;
 
 public class ScanProgress implements IProgress, Serializable {
 
