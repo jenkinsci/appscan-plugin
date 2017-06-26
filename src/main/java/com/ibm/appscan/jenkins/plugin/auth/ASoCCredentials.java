@@ -9,15 +9,16 @@ import hudson.Extension;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-import com.ibm.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.utils.SystemUtil;
+import com.ibm.appscan.jenkins.plugin.Messages;
 
 public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 
@@ -50,6 +51,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		m_token = Secret.fromString(connection);
 	}
 	
+	@Symbol("credentials") //$NON-NLS-1$
     @Extension
     public static final class DescriptorImpl extends CredentialsDescriptor {
     	

@@ -30,25 +30,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.ibm.appscan.jenkins.plugin.Messages;
-import com.ibm.appscan.jenkins.plugin.ScanFactory;
-import com.ibm.appscan.jenkins.plugin.actions.ResultsRetriever;
-import com.ibm.appscan.jenkins.plugin.actions.ScanResultsTrend;
-import com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials;
-import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import com.ibm.appscan.jenkins.plugin.results.FailureCondition;
-import com.ibm.appscan.jenkins.plugin.results.ResultsInspector;
-import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
-import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
-import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
-import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.app.CloudApplicationProvider;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
@@ -59,6 +49,18 @@ import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.sdk.scan.IScan;
 import com.hcl.appscan.sdk.utils.SystemUtil;
+import com.ibm.appscan.jenkins.plugin.Messages;
+import com.ibm.appscan.jenkins.plugin.ScanFactory;
+import com.ibm.appscan.jenkins.plugin.actions.ResultsRetriever;
+import com.ibm.appscan.jenkins.plugin.actions.ScanResultsTrend;
+import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+import com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials;
+import com.ibm.appscan.jenkins.plugin.results.ResultsInspector;
+import com.ibm.appscan.jenkins.plugin.results.FailureCondition;
+import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
+import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
+import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
+import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
 
 public class AppScanBuildStep extends Builder implements Serializable {
 	
@@ -76,7 +78,7 @@ public class AppScanBuildStep extends Builder implements Serializable {
 	private boolean m_failBuild;
 	private IAuthenticationProvider m_authProvider;
 	
-	@DataBoundConstructor
+	@Deprecated
 	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuild, boolean wait, boolean email) {
 		m_scanner = scanner;
 		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -88,6 +90,19 @@ public class AppScanBuildStep extends Builder implements Serializable {
 		m_emailNotification = email;
 		m_wait = wait;
 		m_failBuild = failBuild;
+	}
+	
+	@DataBoundConstructor
+	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
+		m_scanner = scanner;
+		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		m_type = scanner.getType();
+		m_target = "";
+		m_application = application;
+		m_credentials = credentials;
+		m_emailNotification = false;
+		m_wait = false;
+		m_failBuild = false;
 	}
 	
 	public Scanner getScanner() {
@@ -102,6 +117,11 @@ public class AppScanBuildStep extends Builder implements Serializable {
 		return m_type;
 	}
 	
+	@DataBoundSetter
+	public void setTarget(String target) {
+		m_target = target;
+	}
+	
 	public String getTarget() {
 		return m_target;
 	}
@@ -114,20 +134,40 @@ public class AppScanBuildStep extends Builder implements Serializable {
 		return m_credentials;
 	}
 
+	@DataBoundSetter
+	public void setFailureConditions(List<FailureCondition> failureConditions) {
+		m_failureConditions = failureConditions;
+	}
+	
 	public List<FailureCondition> getFailureConditions() {
 		if(m_failureConditions == null)
 			return new ArrayList<FailureCondition>();
 		return m_failureConditions;
 	}
 	
+	@DataBoundSetter
+	public void setFailBuild(boolean failBuild) {
+		m_failBuild = failBuild;
+	}
+	
 	public boolean getFailBuild() {
 		return m_failBuild;
+	}
+	
+	@DataBoundSetter
+	public void setWait(boolean wait) {
+		m_wait = wait;
 	}
 	
 	public boolean getWait() {
 		return m_wait;
 	}
 
+	@DataBoundSetter
+	public void setEmail(boolean emailNotification) {
+		m_emailNotification = emailNotification;
+	}
+	
 	public boolean getEmail() {
 		return m_emailNotification;
 	}
@@ -222,6 +262,7 @@ public class AppScanBuildStep extends Builder implements Serializable {
 	    }
 	}
 
+	@Symbol("appscan") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
     	

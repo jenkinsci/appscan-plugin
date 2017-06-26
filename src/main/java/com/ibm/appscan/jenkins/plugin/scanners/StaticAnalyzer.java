@@ -9,6 +9,7 @@ package com.ibm.appscan.jenkins.plugin.scanners;
 import hudson.Extension;
 import hudson.util.FormValidation;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -26,6 +27,7 @@ public class StaticAnalyzer extends Scanner {
 		return STATIC_ANALYZER;
 	}
 	
+	@Symbol("static") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends ScanDescriptor {
 		
