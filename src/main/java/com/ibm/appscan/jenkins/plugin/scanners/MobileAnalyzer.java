@@ -118,21 +118,21 @@ public class MobileAnalyzer extends Scanner {
 			return MOBILE_ANALYZER;
 		}
 		
-    	public ListBoxModel doFillPresenceIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) { //$NON-NLS-1$
-    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
-    		Map<String, String> presences = new CloudPresenceProvider(authProvider).getPresences();
-    		ListBoxModel model = new ListBoxModel();
-    		model.add(""); //$NON-NLS-1$
-    		
-    		if(presences != null) {
-	    		for(Map.Entry<String, String> entry : presences.entrySet())
-	    			model.add(entry.getValue(), entry.getKey());
-    		}
-    		return model;
-    	}
+	    	public ListBoxModel doFillPresenceIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) { //$NON-NLS-1$
+	    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+	    		Map<String, String> presences = new CloudPresenceProvider(authProvider).getPresences();
+	    		ListBoxModel model = new ListBoxModel();
+	    		model.add(""); //$NON-NLS-1$
+	
+    			if(presences != null) {
+		    		for(Map.Entry<String, String> entry : presences.entrySet())
+		    			model.add(entry.getValue(), entry.getKey());
+	    		}
+	    		return model;
+	    	}
 		
-    	public FormValidation doCheckTarget(@QueryParameter String target) {
-    		return FormValidation.validateRequired(target);
-    	}
+	    	public FormValidation doCheckTarget(@QueryParameter String target) {
+	    		return FormValidation.validateRequired(target);
+	    	}
 	}
 }
