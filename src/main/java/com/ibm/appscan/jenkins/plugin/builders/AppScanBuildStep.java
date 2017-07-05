@@ -183,11 +183,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl)super.getDescriptor();
     }
-	
-    @Override
-    public boolean prebuild(AbstractBuild<?,?> build, BuildListener listener) {
-    	return true;
-    }
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {

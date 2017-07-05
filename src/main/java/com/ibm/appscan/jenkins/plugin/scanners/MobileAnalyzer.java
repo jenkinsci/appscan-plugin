@@ -109,7 +109,7 @@ public class MobileAnalyzer extends Scanner {
 		return properties;
 	}
 
-	@Symbol("mobile") //$NON-NLS-1$
+	@Symbol("mobile-analyzer") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends ScanDescriptor {
 		

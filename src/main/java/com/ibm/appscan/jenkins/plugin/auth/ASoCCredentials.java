@@ -31,7 +31,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	}
 	
 	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password) {
-		super(scope, id, description, username, password);
+		super(scope, description, description, username, password);
 	}
 	
 	@Override
@@ -51,7 +51,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		m_token = Secret.fromString(connection);
 	}
 	
-	@Symbol("credentials") //$NON-NLS-1$
+	@Symbol("asoc-credentials") //$NON-NLS-1$
     @Extension
     public static final class DescriptorImpl extends CredentialsDescriptor {
     	
