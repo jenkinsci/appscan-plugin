@@ -53,7 +53,7 @@ public class MobileAnalyzer extends Scanner {
 	public MobileAnalyzer(String target, boolean hasOptions) {
 		super(target, hasOptions);
 		m_loginUser = EMPTY;
-		m_loginPassword = Secret.fromString(m_loginUser);
+		m_loginPassword = Secret.fromString(EMPTY);
 		m_extraField = EMPTY;
 		m_presenceId = EMPTY;
 	}

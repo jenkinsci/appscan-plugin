@@ -8,12 +8,15 @@ package com.ibm.appscan.jenkins.plugin.builders;
 
 import hudson.AbortException;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
+import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Run;
 import hudson.remoting.Callable;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -29,6 +32,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.Nonnull;
+
+import jenkins.tasks.SimpleBuildStep;
 
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
@@ -62,7 +69,7 @@ import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
 
-public class AppScanBuildStep extends Builder implements Serializable {
+public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -179,16 +186,60 @@ public class AppScanBuildStep extends Builder implements Serializable {
 	
     @Override
     public boolean prebuild(AbstractBuild<?,?> build, BuildListener listener) {
-    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getProject().getParent());
     	return true;
     }
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+    	perform((Run<?,?>)build, launcher, listener);
+		return true;
+    }
+    
+	@Override
+	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+		perform(run, launcher, listener);
+	}
+    
+    @Override
+    public Collection<? extends Action> getProjectActions(AbstractProject<?,?> project) {
+    	ArrayList<Action> actions = new ArrayList<Action>();
+    	actions.add(new ScanResultsTrend(project, m_type, m_name));
+    	return actions;
+    }
+    
+    //To retain backward compatibility
+    protected Object readResolve() {
+    	if(m_scanner == null && m_type != null)
+    		m_scanner = ScannerFactory.getScanner(m_type, m_target);
+    	return this;
+    }
+    
+    private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
+    	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+		Map<String, String> properties = m_scanner.getProperties(resolver);
+		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
+		properties.put(CoreConstants.APP_ID,  m_application);
+		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
+		return properties;
+    }
+    
+    private boolean shouldFailBuild(IResultsProvider provider) throws AbortException{
+    	if(!m_failBuild)
+    		return false;
+		try {
+	    	return new ResultsInspector(m_failureConditions, provider).shouldFail();
+	    } catch(NullPointerException e) {
+	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
+	    }
+	}
+    
+    private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
+    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
     	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
-
+    	
     	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
 
@@ -224,43 +275,8 @@ public class AppScanBuildStep extends Builder implements Serializable {
     	build.addAction(new ResultsRetriever(build, provider, m_name));
     	
 		if(m_wait && shouldFailBuild(provider))
-			throw new AbortException(Messages.error_threshold_exceeded());
-		
-		return true;
+			throw new AbortException(Messages.error_threshold_exceeded());	
     }
-    
-    @Override
-    public Collection<? extends Action> getProjectActions(AbstractProject<?,?> project) {
-    	ArrayList<Action> actions = new ArrayList<Action>();
-    	actions.add(new ScanResultsTrend(project, m_type, m_name));
-    	return actions;
-    }
-    
-    //To retain backward compatibility
-    protected Object readResolve() {
-    	if(m_scanner == null && m_type != null)
-    		m_scanner = ScannerFactory.getScanner(m_type, m_target);
-    	return this;
-    }
-    
-    private Map<String, String> getScanProperties(AbstractBuild<?,?> build, BuildListener listener) {
-		Map<String, String> properties = m_scanner.getProperties(new BuildVariableResolver(build, listener));
-		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-		properties.put(CoreConstants.APP_ID,  m_application);
-		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
-		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-		return properties;
-    }
-    
-    private boolean shouldFailBuild(IResultsProvider provider) throws AbortException{
-    	if(!m_failBuild)
-    		return false;
-		try {
-	    	return new ResultsInspector(m_failureConditions, provider).shouldFail();
-	    } catch(NullPointerException e) {
-	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
-	    }
-	}
 
 	@Symbol("appscan") //$NON-NLS-1$
     @Extension

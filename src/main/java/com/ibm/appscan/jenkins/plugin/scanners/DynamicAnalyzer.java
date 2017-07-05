@@ -61,7 +61,7 @@ public class DynamicAnalyzer extends Scanner {
 	public DynamicAnalyzer(String target, boolean hasOptions) {
 		super(target, hasOptions);
 		m_loginUser = EMPTY;
-		m_loginPassword = Secret.fromString(m_loginUser);
+		m_loginPassword = Secret.fromString(EMPTY);
 		m_presenceId = EMPTY;
 		m_scanFile = EMPTY;
 		m_testPolicy = EMPTY;
@@ -143,7 +143,7 @@ public class DynamicAnalyzer extends Scanner {
 		properties.put(LOGIN_USER, m_loginUser);
 		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 		properties.put(PRESENCE_ID, m_presenceId);
-		properties.put(SCAN_FILE, resolver.resolve(m_scanFile));
+		properties.put(SCAN_FILE, resolver == null ? m_scanFile : resolver.resolve(m_scanFile));
 		properties.put(TEST_POLICY, m_testPolicy);
 		properties.put(SCAN_TYPE, m_scanType);
 		properties.put(EXTRA_FIELD, m_extraField);

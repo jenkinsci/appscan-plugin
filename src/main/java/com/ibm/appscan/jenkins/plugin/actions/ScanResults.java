@@ -5,7 +5,7 @@
 
 package com.ibm.appscan.jenkins.plugin.actions;
 
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,15 +17,15 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-import com.ibm.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.results.IResultsProvider;
+import com.ibm.appscan.jenkins.plugin.Messages;
 
 public class ScanResults extends AppScanAction {
 
 	private static final String REPORT_SUFFIX = "_report"; //$NON-NLS-1$
 	
-	private final AbstractBuild<?,?> m_build;	
+	private final Run<?,?> m_build;	
 	private IResultsProvider m_provider;
 	private String m_name;
 	private String m_status;
@@ -36,9 +36,9 @@ public class ScanResults extends AppScanAction {
 	private int m_infoCount;
 	
 	@DataBoundConstructor
-	public ScanResults(AbstractBuild<?,?> build, IResultsProvider provider, String name, String status,
+	public ScanResults(Run<?,?> build, IResultsProvider provider, String name, String status,
 			int totalFindings, int highCount, int mediumCount, int lowCount, int infoCount) {
-		super(build.getProject());
+		super(build.getParent());
 		m_build = build;
 		m_provider = provider;
 		m_name = name;
@@ -60,7 +60,7 @@ public class ScanResults extends AppScanAction {
 		return Messages.label_results(m_name);
 	}
 	
-	public AbstractBuild<?,?> getBuild() {
+	public Run<?,?> getBuild() {
 		return m_build;
 	}
 	

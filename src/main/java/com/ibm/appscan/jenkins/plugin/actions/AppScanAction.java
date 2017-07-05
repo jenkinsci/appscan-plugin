@@ -6,15 +6,15 @@
 package com.ibm.appscan.jenkins.plugin.actions;
 
 import hudson.model.Action;
-import hudson.model.AbstractProject;
+import hudson.model.Job;
 
 public abstract class AppScanAction implements Action {
 
 	protected static final String ICON = "/plugin/ibm-application-security/images/ASoC.ico"; //$NON-NLS-1$
 	protected static final String URL = "https://appscan.ibmcloud.com"; //$NON-NLS-1$
-	protected final AbstractProject<?,?> m_project;
+	protected final Job<?,?> m_project;
 	
-	public AppScanAction (AbstractProject<?,?> project) {
+	public AppScanAction (Job<?,?> project) {
 		m_project = project;
 	}
 	
@@ -28,7 +28,7 @@ public abstract class AppScanAction implements Action {
 		return URL;
 	}
 	
-	public AbstractProject<?,?> getProject() {
+	public Job<?,?> getProject() {
 		return m_project;
 	}
 }

@@ -5,26 +5,26 @@
 
 package com.ibm.appscan.jenkins.plugin.actions;
 
+import hudson.model.Run;
+
 import java.io.IOException;
 
-import hudson.model.AbstractBuild;
-import hudson.model.Run;
 import jenkins.model.RunAction2;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import com.ibm.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.sdk.results.IResultsProvider;
+import com.ibm.appscan.jenkins.plugin.Messages;
 
 public class ResultsRetriever extends AppScanAction implements RunAction2 {
 
-	private final AbstractBuild<?,?> m_build;	
+	private final Run<?,?> m_build;	
 	private IResultsProvider m_provider;
 	private String m_name;
 
 	@DataBoundConstructor
-	public ResultsRetriever(AbstractBuild<?,?> build, IResultsProvider provider, String scanName) {
-		super(build.getProject());
+	public ResultsRetriever(Run<?,?> build, IResultsProvider provider, String scanName) {
+		super(build.getParent());
 		m_build = build;
 		m_provider = provider;
 		m_name = scanName;
