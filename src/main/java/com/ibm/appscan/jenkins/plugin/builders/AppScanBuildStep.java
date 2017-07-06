@@ -10,7 +10,6 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
 import hudson.model.TaskListener;
@@ -20,6 +19,7 @@ import hudson.model.Run;
 import hudson.remoting.Callable;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -27,7 +27,6 @@ import hudson.util.ListBoxModel;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +58,6 @@ import com.hcl.appscan.sdk.utils.SystemUtil;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
 import com.ibm.appscan.jenkins.plugin.actions.ResultsRetriever;
-import com.ibm.appscan.jenkins.plugin.actions.ScanResultsTrend;
 import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials;
 import com.ibm.appscan.jenkins.plugin.results.ResultsInspector;
@@ -196,10 +194,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
     
     @Override
-    public Collection<? extends Action> getProjectActions(AbstractProject<?,?> project) {
-    	ArrayList<Action> actions = new ArrayList<Action>();
-    	actions.add(new ScanResultsTrend(project, m_type, m_name));
-    	return actions;
+    public BuildStepMonitor getRequiredMonitorService() {
+    	return BuildStepMonitor.NONE;
     }
     
     //To retain backward compatibility

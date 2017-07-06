@@ -5,13 +5,18 @@
 
 package com.ibm.appscan.jenkins.plugin.actions;
 
+import hudson.model.Action;
 import hudson.model.Run;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collection;
+import java.util.HashSet;
 
 import javax.servlet.ServletException;
+
+import jenkins.tasks.SimpleBuildStep;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -21,7 +26,7 @@ import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.ibm.appscan.jenkins.plugin.Messages;
 
-public class ScanResults extends AppScanAction {
+public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBuildAction {
 
 	private static final String REPORT_SUFFIX = "_report"; //$NON-NLS-1$
 	
@@ -58,6 +63,13 @@ public class ScanResults extends AppScanAction {
 	@Override
 	public String getDisplayName() {
 		return Messages.label_results(m_name);
+	}
+	
+	@Override
+	public Collection<? extends Action> getProjectActions() {
+		HashSet<Action> actions = new HashSet<Action>();
+		actions.add(new ScanResultsTrend(m_build, m_provider.getType(), m_name));
+		return actions;
 	}
 	
 	public Run<?,?> getBuild() {

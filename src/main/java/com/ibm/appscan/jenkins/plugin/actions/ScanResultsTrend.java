@@ -5,7 +5,6 @@
 
 package com.ibm.appscan.jenkins.plugin.actions;
 
-import hudson.model.AbstractProject;
 import hudson.model.Run;
 
 import java.io.File;
@@ -28,8 +27,8 @@ public class ScanResultsTrend extends AppScanAction {
 	private String m_name;
 	
 	@DataBoundConstructor
-	public ScanResultsTrend(AbstractProject<?, ?> project, String type, String name) {
-		super(project);
+	public ScanResultsTrend(Run<?,?> project, String type, String name) {
+		super(project.getParent());
 		m_type = type;
 		m_name = name;
 	}

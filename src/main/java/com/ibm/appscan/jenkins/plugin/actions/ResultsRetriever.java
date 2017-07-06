@@ -5,18 +5,22 @@
 
 package com.ibm.appscan.jenkins.plugin.actions;
 
+import hudson.model.Action;
 import hudson.model.Run;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 
 import jenkins.model.RunAction2;
+import jenkins.tasks.SimpleBuildStep;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.ibm.appscan.jenkins.plugin.Messages;
 
-public class ResultsRetriever extends AppScanAction implements RunAction2 {
+public class ResultsRetriever extends AppScanAction implements RunAction2, SimpleBuildStep.LastBuildAction {
 
 	private final Run<?,?> m_build;	
 	private IResultsProvider m_provider;
@@ -49,13 +53,20 @@ public class ResultsRetriever extends AppScanAction implements RunAction2 {
 		checkResults(r);
 	}
 	
+	@Override
+	public Collection<? extends Action> getProjectActions() {
+		HashSet<Action> actions = new HashSet<Action>();
+		actions.add(new ScanResultsTrend(m_build, m_provider.getType(), m_name));
+		return actions;
+	}
+	
 	public boolean getHasResults() {
 		return checkResults(m_build);
 	}
 	
-	public boolean checkResults(Run<?, ?> r) {
+	public boolean checkResults(Run<?,?> r) {
 		if(r.getAllActions().contains(this) && m_provider.hasResults()) {
-			r.getActions().remove(this);  //We need to remove this action from the build, but getAllActions() returns a read-only list.
+			r.getActions().remove(this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
 			r.addAction(createResults());
 			try {
 				r.save();
