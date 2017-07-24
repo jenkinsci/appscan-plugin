@@ -14,7 +14,7 @@ import jenkins.model.RunAction2;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import com.ibm.appscan.jenkins.plugin.Messages;
-import com.ibm.appscan.plugin.core.results.IResultsProvider;
+import com.hcl.appscan.sdk.results.IResultsProvider;
 
 public class ResultsRetriever extends AppScanAction implements RunAction2 {
 
