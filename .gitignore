@@ -11,6 +11,7 @@ build.properties
 .settings/
 .loadpath
 .recommenders
+work
 
 # Eclipse Core
 .project
