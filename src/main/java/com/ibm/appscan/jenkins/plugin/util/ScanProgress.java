@@ -17,7 +17,7 @@ public class ScanProgress implements IProgress, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private PrintStream m_out;
+	private transient PrintStream m_out;
 	
 	public ScanProgress(BuildListener listener) {
 		m_out = listener.getLogger();
@@ -36,5 +36,10 @@ public class ScanProgress implements IProgress, Serializable {
 	@Override
 	public void setStatus(Message status, Throwable e) {
 		m_out.println(status.getSeverityString() + status.getText() + "\n" + e.getLocalizedMessage());
+	}
+	
+	private Object readResolve() {
+		m_out = System.out;
+		return this;
 	}
 }

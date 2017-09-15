@@ -9,9 +9,12 @@ package com.ibm.appscan.jenkins.plugin.builders;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.init.InitMilestone;
+import hudson.init.Initializer;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
+import hudson.model.Items;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.remoting.Callable;
@@ -224,6 +227,13 @@ public class AppScanBuildStep extends Builder implements Serializable {
 
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
+    	
+    	//Retain backward compatibility
+    	@Initializer(before = InitMilestone.PLUGINS_STARTED)
+    	public static void createAliases() {
+    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
+    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
+    	}
     	
     	@Override
         public boolean isApplicable(Class<? extends AbstractProject> projectType) {
