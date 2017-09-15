@@ -70,14 +70,16 @@ public class AppScanBuildStep extends Builder implements Serializable {
 	private String m_target;
 	private String m_application;
 	private String m_credentials;
+	private String m_reportLocation;
 	private List<FailureCondition> m_failureConditions;
 	private boolean m_emailNotification;
 	private boolean m_wait;
 	private boolean m_failBuild;
+	private boolean m_saveReport;
 	private IAuthenticationProvider m_authProvider;
 	
 	@DataBoundConstructor
-	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuild, boolean wait, boolean email) {
+	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuild, boolean wait, boolean email, boolean saveReport, String reportLocation) {
 		m_scanner = scanner;
 		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
@@ -88,6 +90,8 @@ public class AppScanBuildStep extends Builder implements Serializable {
 		m_emailNotification = email;
 		m_wait = wait;
 		m_failBuild = failBuild;
+		m_saveReport = saveReport;
+		m_reportLocation = reportLocation;
 	}
 	
 	public Scanner getScanner() {
@@ -130,6 +134,14 @@ public class AppScanBuildStep extends Builder implements Serializable {
 
 	public boolean getEmail() {
 		return m_emailNotification;
+	}
+	
+	public boolean getSaveReport() {
+		return m_saveReport;
+	}
+	
+	public String getReportLocation() {
+		return m_reportLocation;
 	}
 	
     @Override
@@ -181,7 +193,7 @@ public class AppScanBuildStep extends Builder implements Serializable {
 
 		});
     	
-    	build.addAction(new ResultsRetriever(build, provider, m_name));
+    	build.addAction(new ResultsRetriever(build, provider, m_name, m_reportLocation));
     	
 		if(m_wait && shouldFailBuild(provider))
 			throw new AbortException(Messages.error_threshold_exceeded());
