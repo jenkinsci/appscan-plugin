@@ -57,6 +57,7 @@ import com.hcl.appscan.sdk.app.CloudApplicationProvider;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.error.InvalidTargetException;
 import com.hcl.appscan.sdk.error.ScannerException;
+import com.hcl.appscan.sdk.logging.DefaultProgress;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.results.IResultsProvider;
@@ -183,7 +184,8 @@ public class AppScanBuildStep extends Builder implements Serializable {
 			}
 
 		});
-    	
+
+    	provider.setProgress(new DefaultProgress()); //Avoid serialization problem with StreamBuildListener.
     	build.addAction(new ResultsRetriever(build, provider, m_name));
     	
 		if(m_wait && shouldFailBuild(provider))
