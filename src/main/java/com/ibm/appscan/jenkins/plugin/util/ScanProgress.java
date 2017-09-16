@@ -6,7 +6,6 @@
 package com.ibm.appscan.jenkins.plugin.util;
 
 import hudson.model.BuildListener;
-import hudson.model.TaskListener;
 
 import java.io.Serializable;
 
