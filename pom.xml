@@ -79,7 +79,7 @@
   
   <dependencies>
 	<dependency>
-		<groupId>com.github.AppSecDev</groupId>
+		<groupId>com.github.hclproducts</groupId>
 		<artifactId>appscan-sdk</artifactId>
 		<version>cd13568</version>
   	</dependency>
