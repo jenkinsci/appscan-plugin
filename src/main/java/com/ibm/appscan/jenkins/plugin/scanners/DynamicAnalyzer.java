@@ -150,7 +150,7 @@ public class DynamicAnalyzer extends Scanner {
 		return properties;
 	}
 	
-	@Symbol("dynamic-analyzer") //$NON-NLS-1$
+	@Symbol("dynamic_analyzer") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends ScanDescriptor {
 		
