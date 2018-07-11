@@ -6,14 +6,6 @@
 
 package com.ibm.appscan.jenkins.plugin.scanners;
 
-import hudson.Extension;
-import hudson.RelativePath;
-import hudson.model.ItemGroup;
-import hudson.util.FormValidation;
-import hudson.util.Secret;
-import hudson.util.VariableResolver;
-import hudson.util.ListBoxModel;
-
 import java.util.Map;
 
 import org.jenkinsci.Symbol;
@@ -26,8 +18,14 @@ import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
-import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
+
+import hudson.Extension;
+import hudson.RelativePath;
+import hudson.model.ItemGroup;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import hudson.util.Secret;
+import hudson.util.VariableResolver;
 
 public class DynamicAnalyzer extends Scanner {
 
@@ -182,7 +180,7 @@ public class DynamicAnalyzer extends Scanner {
     	}
 		
     	public FormValidation doCheckScanFile(@QueryParameter String scanFile) {
-    		if(!scanFile.trim().equals(EMPTY) && !scanFile.endsWith(TEMPLATE_EXTENSION)) //$NON-NLS-1$
+    		if(!scanFile.trim().equals(EMPTY) && !scanFile.endsWith(TEMPLATE_EXTENSION) && !scanFile.endsWith(TEMPLATE_EXTENSION2))
     			return FormValidation.error(Messages.error_invalid_template_file());
     		return FormValidation.ok();
     	}
