@@ -6,24 +6,6 @@
 
 package com.ibm.appscan.jenkins.plugin.builders;
 
-import hudson.AbortException;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.ItemGroup;
-import hudson.model.TaskListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Run;
-import hudson.remoting.Callable;
-import hudson.security.ACL;
-import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Builder;
-import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,8 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.Nonnull;
-
-import jenkins.tasks.SimpleBuildStep;
 
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
@@ -50,6 +30,7 @@ import com.hcl.appscan.sdk.app.CloudApplicationProvider;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.error.InvalidTargetException;
 import com.hcl.appscan.sdk.error.ScannerException;
+import com.hcl.appscan.sdk.logging.DefaultProgress;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.results.IResultsProvider;
@@ -58,14 +39,36 @@ import com.hcl.appscan.sdk.utils.SystemUtil;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
 import com.ibm.appscan.jenkins.plugin.actions.ResultsRetriever;
-import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials;
-import com.ibm.appscan.jenkins.plugin.results.ResultsInspector;
+import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.ibm.appscan.jenkins.plugin.results.FailureCondition;
+import com.ibm.appscan.jenkins.plugin.results.ResultsInspector;
 import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
 import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
+
+import hudson.AbortException;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.init.InitMilestone;
+import hudson.init.Initializer;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.model.ItemGroup;
+import hudson.model.Items;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.remoting.Callable;
+import hudson.security.ACL;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Builder;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
 	
@@ -262,7 +265,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			}
 
 		});
-    	
+
+    	provider.setProgress(new DefaultProgress()); //Avoid serialization problem with StreamBuildListener.
     	build.addAction(new ResultsRetriever(build, provider, m_name));
     	
 		if(m_wait && shouldFailBuild(provider))
@@ -272,6 +276,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	@Symbol("appscan") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
+    	
+    	//Retain backward compatibility
+    	@Initializer(before = InitMilestone.PLUGINS_STARTED)
+    	public static void createAliases() {
+    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
+    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
+    	}
     	
     	@Override
         public boolean isApplicable(Class<? extends AbstractProject> projectType) {
