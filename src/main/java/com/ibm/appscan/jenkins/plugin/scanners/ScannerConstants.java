@@ -16,7 +16,7 @@ public interface ScannerConstants {
 	String TEST_POLICY				= "TestPolicy";				//$NON-NLS-1$
 	String TARGET					= CoreConstants.TARGET;			//$NON-NLS-1$
 	String TEMPLATE_EXTENSION			= ".scant";				//$NON-NLS-1$
-
+	String TEMPLATE_EXTENSION2			= ".scan";				//$NON-NLS-1$
 	
 	String DYNAMIC_ANALYZER				= "Dynamic Analyzer";			//$NON-NLS-1$
 	String MOBILE_ANALYZER				= "Mobile Analyzer";			//$NON-NLS-1$

@@ -129,7 +129,7 @@ public class DynamicAnalyzer extends Scanner {
     	}
 		
     	public FormValidation doCheckScanFile(@QueryParameter String scanFile) {
-    		if(!scanFile.trim().equals(EMPTY) && !scanFile.endsWith(TEMPLATE_EXTENSION)) //$NON-NLS-1$
+    		if(!scanFile.trim().equals(EMPTY) && !scanFile.endsWith(TEMPLATE_EXTENSION) && !scanFile.endsWith(TEMPLATE_EXTENSION2))
     			return FormValidation.error(Messages.error_invalid_template_file());
     		return FormValidation.ok();
     	}
