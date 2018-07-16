@@ -27,7 +27,7 @@ public class StaticAnalyzer extends Scanner {
 		return STATIC_ANALYZER;
 	}
 	
-	@Symbol("static-analyzer") //$NON-NLS-1$
+	@Symbol("static_analyzer") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends ScanDescriptor {
 		
