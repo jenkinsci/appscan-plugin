@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017.
+ * @ Copyright HCL Technologies Ltd. 2017,2018.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -12,7 +12,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
@@ -261,9 +264,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    	}
 		    	catch(ScannerException | InvalidTargetException | InterruptedException e) {
 		    		throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
-		    	}
+		    		}
 			}
-
 		});
 
     	provider.setProgress(new DefaultProgress()); //Avoid serialization problem with StreamBuildListener.
@@ -316,13 +318,29 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
+    		Set<Entry<String, String>> applicationsSet=applications.entrySet();
+    		List<Entry<String , String>> list=sortApplications(applicationsSet);
     		ListBoxModel model = new ListBoxModel();
     		
     		if(applications != null) {
-	    		for(Map.Entry<String, String> entry : applications.entrySet())
+	    		for(Map.Entry<String, String> entry : list)
 	    			model.add(entry.getValue(), entry.getKey());
     		}
     		return model;
+    	}
+    	
+    	public List<Entry<String , String>> sortApplications(Set<Entry<String , String>> set) {
+    		List<Entry<String , String>> list= new ArrayList<>(set);
+    		if (list.size()>1) {
+    			Collections.sort( list, new Comparator<Map.Entry<String, String>>()
+                {
+                    public int compare( Map.Entry<String, String> o1, Map.Entry<String, String> o2 )
+                    {
+                        return (o1.getValue().toLowerCase()).compareTo( o2.getValue().toLowerCase() );
+                    }
+                } );
+    		}
+		return list;
     	}
     	
     	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
