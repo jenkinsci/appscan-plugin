@@ -340,8 +340,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                     }
                 } );
     		}
-    		
-    		return list;
+		return list;
     	}
     	
     	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
