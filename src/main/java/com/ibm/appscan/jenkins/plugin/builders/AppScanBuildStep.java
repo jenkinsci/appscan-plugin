@@ -264,9 +264,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    	}
 		    	catch(ScannerException | InvalidTargetException | InterruptedException e) {
 		    		throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
-		    	}
+		    		}
 			}
-
 		});
 
     	provider.setProgress(new DefaultProgress()); //Avoid serialization problem with StreamBuildListener.
