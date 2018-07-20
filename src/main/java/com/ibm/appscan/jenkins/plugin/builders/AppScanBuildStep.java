@@ -332,13 +332,16 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	
     	public List<Entry<String , String>> sortApplications(Set<Entry<String , String>> set) {
     		List<Entry<String , String>> list= new ArrayList<>(set);
-    		Collections.sort( list, new Comparator<Map.Entry<String, String>>()
-            {
-                public int compare( Map.Entry<String, String> o1, Map.Entry<String, String> o2 )
+    		if (list.size()>1) {
+    			Collections.sort( list, new Comparator<Map.Entry<String, String>>()
                 {
-                    return (o1.getValue().toLowerCase()).compareTo( o2.getValue().toLowerCase() );
-                }
-            } );
+                    public int compare( Map.Entry<String, String> o1, Map.Entry<String, String> o2 )
+                    {
+                        return (o1.getValue().toLowerCase()).compareTo( o2.getValue().toLowerCase() );
+                    }
+                } );
+    		}
+    		
     		return list;
     	}
     	
