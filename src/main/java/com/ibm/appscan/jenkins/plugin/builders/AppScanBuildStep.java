@@ -318,18 +318,18 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
-    		Set<Entry<String, String>> applicationsSet=applications.entrySet();
-    		List<Entry<String , String>> list=sortApplications(applicationsSet);
     		ListBoxModel model = new ListBoxModel();
     		
     		if(applications != null) {
+        		List<Entry<String , String>> list=sortApplications(applications.entrySet());
+    			
 	    		for(Map.Entry<String, String> entry : list)
 	    			model.add(entry.getValue(), entry.getKey());
     		}
     		return model;
     	}
     	
-    	public List<Entry<String , String>> sortApplications(Set<Entry<String , String>> set) {
+    	private List<Entry<String , String>> sortApplications(Set<Entry<String , String>> set) {
     		List<Entry<String , String>> list= new ArrayList<>(set);
     		if (list.size()>1) {
     			Collections.sort( list, new Comparator<Map.Entry<String, String>>()
