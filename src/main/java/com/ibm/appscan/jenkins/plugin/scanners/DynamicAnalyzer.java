@@ -6,24 +6,26 @@
 
 package com.ibm.appscan.jenkins.plugin.scanners;
 
+import java.util.Map;
+
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+
+import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
+import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
+import com.ibm.appscan.jenkins.plugin.Messages;
+import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+
 import hudson.Extension;
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import hudson.util.VariableResolver;
-import hudson.util.ListBoxModel;
-
-import java.util.Map;
-
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
-
-import com.ibm.appscan.jenkins.plugin.Messages;
-import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
-import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
 
 public class DynamicAnalyzer extends Scanner {
 
@@ -37,11 +39,12 @@ public class DynamicAnalyzer extends Scanner {
 	private String m_scanType;
 	private String m_extraField;
 	
+	@Deprecated
 	public DynamicAnalyzer(String target) {
 		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
 	}
 	
-	@DataBoundConstructor
+	@Deprecated
 	public DynamicAnalyzer(String target, boolean hasOptions, String loginUser, String loginPassword, String presenceId, String scanFile, 
 			String testPolicy, String scanType, String extraField) {
 		super(target, hasOptions);
@@ -54,28 +57,75 @@ public class DynamicAnalyzer extends Scanner {
 		m_extraField = extraField;
 	}
 	
+	@DataBoundConstructor
+	public DynamicAnalyzer(String target, boolean hasOptions) {
+		super(target, hasOptions);
+		m_loginUser = EMPTY;
+		m_loginPassword = Secret.fromString(EMPTY);
+		m_presenceId = EMPTY;
+		m_scanFile = EMPTY;
+		m_testPolicy = EMPTY;
+		m_scanType = EMPTY;
+		m_extraField = EMPTY;
+	}
+	
+	@DataBoundSetter
+	public void setLoginUser(String loginUser) {
+		m_loginUser = loginUser;
+	}
+	
 	public String getLoginUser() {
 		return m_loginUser;
 	}
 	
+	@DataBoundSetter
+	public void setLoginPassword(String loginPassword) {
+		m_loginPassword = Secret.fromString(loginPassword);
+	}
+	
 	public String getLoginPassword() {
 		return Secret.toString(m_loginPassword);
+	}
+
+	@DataBoundSetter
+	public void setPresenceId(String presenceId) {
+		m_presenceId = presenceId;
 	}
 	
 	public String getPresenceId() {
 		return m_presenceId;
 	}
 	
+	@DataBoundSetter
+	public void setScanFile(String scanFile) {
+		m_scanFile = scanFile;
+	}
+	
 	public String getScanFile() {
 		return m_scanFile;
+	}
+	
+	@DataBoundSetter
+	public void setTestPolicy(String testPolicy) {
+		m_testPolicy = testPolicy;
 	}
 	
 	public String getTestPolicy() {
 		return m_testPolicy;
 	}
 	
+	@DataBoundSetter
+	public void setScanType(String scanType) {
+		m_scanType = m_scanFile != null && !m_scanFile.equals(EMPTY) ? CUSTOM : scanType;
+	}
+	
 	public String getScanType() {
 		return m_scanType;
+	}
+	
+	@DataBoundSetter
+	public void setExtraField(String extraField) {
+		m_extraField = extraField;
 	}
 	
 	public String getExtraField() {
@@ -93,13 +143,14 @@ public class DynamicAnalyzer extends Scanner {
 		properties.put(LOGIN_USER, m_loginUser);
 		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 		properties.put(PRESENCE_ID, m_presenceId);
-		properties.put(SCAN_FILE, resolver.resolve(m_scanFile));
+		properties.put(SCAN_FILE, resolver == null ? m_scanFile : resolver.resolve(m_scanFile));
 		properties.put(TEST_POLICY, m_testPolicy);
 		properties.put(SCAN_TYPE, m_scanType);
 		properties.put(EXTRA_FIELD, m_extraField);
 		return properties;
 	}
 	
+	@Symbol("dynamic_analyzer") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends ScanDescriptor {
 		

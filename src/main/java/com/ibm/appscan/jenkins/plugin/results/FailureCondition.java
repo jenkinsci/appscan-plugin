@@ -5,14 +5,15 @@
 
 package com.ibm.appscan.jenkins.plugin.results;
 
-import java.io.Serializable;
-
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
+import java.io.Serializable;
+
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -39,6 +40,7 @@ public class FailureCondition extends AbstractDescribableImpl<FailureCondition> 
 		return m_threshold;
 	}
 	
+	@Symbol("failure_condition") //$NON-NLS-1$
 	@Extension
 	public static class DescriptorImpl extends Descriptor<FailureCondition> {
 
