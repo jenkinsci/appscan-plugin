@@ -1,0 +1,16 @@
+com.hcl.appscan.sdk.app.CloudApplicationProvider
+com.hcl.appscan.sdk.auth.IAuthenticationProvider
+com.hcl.appscan.sdk.logging.StdOutProgress
+com.hcl.appscan.sdk.logging.IProgress
+com.hcl.appscan.sdk.results.IResultsProvider
+com.hcl.appscan.sdk.results.CloudResultsProvider
+com.hcl.appscan.sdk.scan.IScan
+com.hcl.appscan.sdk.scan.IScanServiceProvider
+com.hcl.appscan.sdk.scan.CloudScanServiceProvider
+com.ibm.appscan.jenkins.plugin.actions.ResultsRetriever
+com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials
+com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider
+com.ibm.appscan.jenkins.plugin.results.FailureCondition
+com.ibm.appscan.jenkins.plugin.results.ResultsInspector
+com.ibm.appscan.jenkins.plugin.scanners.Scanner
+com.ibm.appscan.jenkins.plugin.util.ScanProgress

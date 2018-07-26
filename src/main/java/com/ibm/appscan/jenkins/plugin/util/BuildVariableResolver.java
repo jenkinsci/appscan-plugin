@@ -5,7 +5,7 @@
 
 package com.ibm.appscan.jenkins.plugin.util;
 
-import hudson.model.BuildListener;
+import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
 import hudson.util.VariableResolver;
 
@@ -23,7 +23,7 @@ public class BuildVariableResolver implements VariableResolver<String>, Serializ
 	
 	private Map<String, String> m_variables;
 	
-	public BuildVariableResolver(AbstractBuild<?,?> build, BuildListener listener) {
+	public BuildVariableResolver(AbstractBuild<?,?> build, TaskListener listener) {
 		m_variables = build.getBuildVariables();
 		try {
 			m_variables.putAll(build.getEnvironment(listener));

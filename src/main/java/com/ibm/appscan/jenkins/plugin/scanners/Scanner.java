@@ -35,7 +35,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(TARGET,  resolver.resolve(m_target));
+		properties.put(TARGET, resolver == null ? m_target : resolver.resolve(m_target));
 		return properties;
 	}
 	

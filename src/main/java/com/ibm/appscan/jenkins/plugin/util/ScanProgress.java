@@ -5,7 +5,7 @@
 
 package com.ibm.appscan.jenkins.plugin.util;
 
-import hudson.model.BuildListener;
+import hudson.model.TaskListener;
 
 import java.io.Serializable;
 
@@ -16,9 +16,9 @@ public class ScanProgress implements IProgress, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private BuildListener m_listener;
+	private TaskListener m_listener;
 	
-	public ScanProgress(BuildListener listener) {
+	public ScanProgress(TaskListener listener) {
 		m_listener = listener;
 	}
 

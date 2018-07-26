@@ -10,19 +10,21 @@ import hudson.Extension;
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
 import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import hudson.util.VariableResolver;
+import hudson.util.ListBoxModel;
 
 import java.util.Map;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
-import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
+import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 
 public class MobileAnalyzer extends Scanner {
 
@@ -33,11 +35,12 @@ public class MobileAnalyzer extends Scanner {
 	private String m_extraField;
 	private String m_presenceId;
 	
+	@Deprecated
 	public MobileAnalyzer(String target) {
 		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY);
 	}
 	
-	@DataBoundConstructor
+	@Deprecated
 	public MobileAnalyzer(String target, boolean hasOptions, String loginUser, String loginPassword, String extraField, String presenceId) {
 		super(target, hasOptions);
 		m_loginUser = loginUser;
@@ -46,18 +49,47 @@ public class MobileAnalyzer extends Scanner {
 		m_presenceId = presenceId;
 	}
 	
+	@DataBoundConstructor
+	public MobileAnalyzer(String target, boolean hasOptions) {
+		super(target, hasOptions);
+		m_loginUser = EMPTY;
+		m_loginPassword = Secret.fromString(EMPTY);
+		m_extraField = EMPTY;
+		m_presenceId = EMPTY;
+	}
+	
+	@DataBoundSetter
+	public void setLoginUser(String loginUser) {
+		m_loginUser = loginUser;
+	}
+	
 	public String getLoginUser() {
 		return m_loginUser;
+	}
+	
+	@DataBoundSetter
+	public void setLoginPassword(String loginPassword) {
+		m_loginPassword = Secret.fromString(loginPassword);
 	}
 	
 	public String getLoginPassword() {
 		return Secret.toString(m_loginPassword);
 	}
 	
+	@DataBoundSetter
+	public void setExtraField(String extraField) {
+		m_extraField = extraField;
+	}
+	
 	public String getExtraField() {
 		return m_extraField;
 	}
 
+	@DataBoundSetter
+	public void setPresenceId(String presenceId) {
+		m_presenceId = presenceId;
+	}
+	
 	public String getPresenceId() {
 		return m_presenceId;
 	}
@@ -77,6 +109,7 @@ public class MobileAnalyzer extends Scanner {
 		return properties;
 	}
 
+	@Symbol("mobile_analyzer") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends ScanDescriptor {
 		
@@ -85,21 +118,21 @@ public class MobileAnalyzer extends Scanner {
 			return MOBILE_ANALYZER;
 		}
 		
-    	public ListBoxModel doFillPresenceIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) { //$NON-NLS-1$
-    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
-    		Map<String, String> presences = new CloudPresenceProvider(authProvider).getPresences();
-    		ListBoxModel model = new ListBoxModel();
-    		model.add(""); //$NON-NLS-1$
-    		
-    		if(presences != null) {
-	    		for(Map.Entry<String, String> entry : presences.entrySet())
-	    			model.add(entry.getValue(), entry.getKey());
-    		}
-    		return model;
-    	}
+	    	public ListBoxModel doFillPresenceIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) { //$NON-NLS-1$
+	    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+	    		Map<String, String> presences = new CloudPresenceProvider(authProvider).getPresences();
+	    		ListBoxModel model = new ListBoxModel();
+	    		model.add(""); //$NON-NLS-1$
+	
+    			if(presences != null) {
+		    		for(Map.Entry<String, String> entry : presences.entrySet())
+		    			model.add(entry.getValue(), entry.getKey());
+	    		}
+	    		return model;
+	    	}
 		
-    	public FormValidation doCheckTarget(@QueryParameter String target) {
-    		return FormValidation.validateRequired(target);
-    	}
+	    	public FormValidation doCheckTarget(@QueryParameter String target) {
+	    		return FormValidation.validateRequired(target);
+	    	}
 	}
 }
