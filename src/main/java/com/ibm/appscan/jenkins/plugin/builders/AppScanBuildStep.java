@@ -234,7 +234,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-    	setInstallDir();
     	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
