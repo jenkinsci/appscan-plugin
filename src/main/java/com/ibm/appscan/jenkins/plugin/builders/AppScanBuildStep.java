@@ -89,7 +89,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_wait;
 	private boolean m_failBuild;
 	private IAuthenticationProvider m_authProvider;
-	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.home"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
+	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
 	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuild, boolean wait, boolean email) {
