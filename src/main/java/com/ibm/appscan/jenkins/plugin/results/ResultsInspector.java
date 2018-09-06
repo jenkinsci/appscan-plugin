@@ -18,6 +18,10 @@ public class ResultsInspector {
 		m_conditions = conditions;
 		m_resultsProvider = resultsProvider;
 	}
+        
+        public ResultsInspector(IResultsProvider resultsProvider){
+            m_resultsProvider=resultsProvider;
+        }
 	
 	public boolean shouldFail() {
 		for(FailureCondition condition : m_conditions) {
@@ -28,6 +32,12 @@ public class ResultsInspector {
 		}
 		return false;
 	}
+        
+        public boolean shouldFailForNonCompliance(){
+            if (m_resultsProvider.getFindingsCount()>=1)
+                return true;
+            return false;
+        }
 
 	private boolean exceedsThreshold(String type, int threshold) {
 		switch(type.toLowerCase()) {
