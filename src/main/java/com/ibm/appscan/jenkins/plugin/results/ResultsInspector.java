@@ -1,5 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
+ * © Copyright HCL Technologies Ltd. 2017,2018.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -32,7 +33,7 @@ public class ResultsInspector {
 		}
 		return false;
 	}
-        
+        // fail the build if there is any non compliant issue
         public boolean shouldFailForNonCompliance(){
             if (m_resultsProvider.getFindingsCount()>=1)
                 return true;

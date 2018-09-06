@@ -233,6 +233,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		return properties;
     }
     
+    //to provide for the failure of build if any non compliant issue is found in the build
     private boolean failBuildForNonComplianceIssues(IResultsProvider provider) throws AbortException{
         if (!m_failBuildNonCompliance)
             return false;
