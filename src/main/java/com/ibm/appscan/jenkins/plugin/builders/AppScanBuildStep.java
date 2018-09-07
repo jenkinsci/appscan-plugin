@@ -178,11 +178,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
         
         @DataBoundSetter
-        public void setfailBuildNonCompliance(boolean failBuildNonCompliance){
+        public void setFailBuildNonCompliance(boolean failBuildNonCompliance){
             m_failBuildNonCompliance=failBuildNonCompliance;
         }
         
-        public boolean getfailBuildNonCompliance(){
+        public boolean getFailBuildNonCompliance(){
             return m_failBuildNonCompliance;
         }
 
