@@ -86,7 +86,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private List<FailureCondition> m_failureConditions;
 	private boolean m_emailNotification;
 	private boolean m_wait;
-        private boolean m_failBuildNonCompliance;
+    private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
 	private IAuthenticationProvider m_authProvider;
 	
@@ -101,7 +101,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_failureConditions = failureConditions;
 		m_emailNotification = email;
 		m_wait = wait;
-                m_failBuildNonCompliance=failBuildNonCompliance;
+        m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
 	}
 	
@@ -115,7 +115,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_credentials = credentials;
 		m_emailNotification = false;
 		m_wait = false;
-                m_failBuildNonCompliance=false;
+        m_failBuildNonCompliance=false;
 		m_failBuild = false;
 	}
 	
@@ -177,14 +177,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		return m_wait;
 	}
         
-        @DataBoundSetter
-        public void setFailBuildNonCompliance(boolean failBuildNonCompliance){
+    @DataBoundSetter
+    public void setFailBuildNonCompliance(boolean failBuildNonCompliance){
             m_failBuildNonCompliance=failBuildNonCompliance;
-        }
+    }
         
-        public boolean getFailBuildNonCompliance(){
-            return m_failBuildNonCompliance;
-        }
+    public boolean getFailBuildNonCompliance(){
+        return m_failBuildNonCompliance;
+    }
 
 	@DataBoundSetter
 	public void setEmail(boolean emailNotification) {
@@ -295,8 +295,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	build.addAction(new ResultsRetriever(build, provider, m_name));
                 
-                if (m_wait && failBuildForNonComplianceIssues(provider))
-                    throw new AbortException(Messages.error_noncompliant_issues());
+        if (m_wait && failBuildForNonComplianceIssues(provider))
+              throw new AbortException(Messages.error_noncompliant_issues());
 		if(m_wait && shouldFailBuild(provider))
 			throw new AbortException(Messages.error_threshold_exceeded());	
     }
