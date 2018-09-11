@@ -6,6 +6,7 @@
 
 package com.ibm.appscan.jenkins.plugin.scanners;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jenkinsci.Symbol;
@@ -139,11 +140,12 @@ public class DynamicAnalyzer extends Scanner {
 	
 	@Override
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
-		Map<String, String> properties = super.getProperties(resolver);
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(TARGET, getTarget());
 		properties.put(LOGIN_USER, m_loginUser);
 		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 		properties.put(PRESENCE_ID, m_presenceId);
-		properties.put(SCAN_FILE, resolver == null ? m_scanFile : resolver.resolve(m_scanFile));
+		properties.put(SCAN_FILE, resolver == null ? m_scanFile : resolvePath(m_scanFile, resolver));
 		properties.put(TEST_POLICY, m_testPolicy);
 		properties.put(SCAN_TYPE, m_scanType);
 		properties.put(EXTRA_FIELD, m_extraField);

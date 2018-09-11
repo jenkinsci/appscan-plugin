@@ -6,14 +6,7 @@
 
 package com.ibm.appscan.jenkins.plugin.scanners;
 
-import hudson.Extension;
-import hudson.RelativePath;
-import hudson.model.ItemGroup;
-import hudson.util.FormValidation;
-import hudson.util.Secret;
-import hudson.util.VariableResolver;
-import hudson.util.ListBoxModel;
-
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jenkinsci.Symbol;
@@ -25,6 +18,14 @@ import org.kohsuke.stapler.QueryParameter;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
 import com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+
+import hudson.Extension;
+import hudson.RelativePath;
+import hudson.model.ItemGroup;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import hudson.util.Secret;
+import hudson.util.VariableResolver;
 
 public class MobileAnalyzer extends Scanner {
 
@@ -101,7 +102,8 @@ public class MobileAnalyzer extends Scanner {
 	
 	@Override
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
-		Map<String, String> properties = super.getProperties(resolver);
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
 		properties.put(LOGIN_USER, m_loginUser);
 		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 		properties.put(EXTRA_FIELD, m_extraField);

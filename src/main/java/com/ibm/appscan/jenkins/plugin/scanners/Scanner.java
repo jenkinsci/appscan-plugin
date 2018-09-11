@@ -9,6 +9,7 @@ package com.ibm.appscan.jenkins.plugin.scanners;
 import hudson.model.AbstractDescribableImpl;
 import hudson.util.VariableResolver;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,11 +34,22 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		return m_target;
 	}
 	
-	public Map<String, String> getProperties(VariableResolver<String> resolver) {
-		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(TARGET, resolver == null ? m_target : resolver.resolve(m_target));
-		return properties;
-	}
+	public abstract Map<String, String> getProperties(VariableResolver<String> resolver);
 	
 	public abstract String getType();
+	
+	protected String resolvePath(String path, VariableResolver<String> resolver) {
+		//First replace any variables in the path
+		path = resolver.resolve(path);
+		
+		//If the path is not absolute, make it relative to the workspace
+		File file = new File(path);
+		if(!file.isAbsolute()) {
+			String targetPath = "${WORKSPACE}" + File.separator + file.getPath();
+			targetPath = resolver.resolve(targetPath);
+			file = new File(targetPath);
+		}
+
+		return file.getAbsolutePath();
+	}
 }
