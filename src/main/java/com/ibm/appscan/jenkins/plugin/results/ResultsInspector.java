@@ -1,5 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
+ * © Copyright HCL Technologies Ltd. 2017,2018.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -18,6 +19,10 @@ public class ResultsInspector {
 		m_conditions = conditions;
 		m_resultsProvider = resultsProvider;
 	}
+        
+        public ResultsInspector(IResultsProvider resultsProvider){
+            m_resultsProvider=resultsProvider;
+        }
 	
 	public boolean shouldFail() {
 		for(FailureCondition condition : m_conditions) {
@@ -28,6 +33,12 @@ public class ResultsInspector {
 		}
 		return false;
 	}
+        // fail the build if there is any non compliant issue
+        public boolean shouldFailForNonCompliance(){
+            if (m_resultsProvider.getFindingsCount()>=1)
+                return true;
+            return false;
+        }
 
 	private boolean exceedsThreshold(String type, int threshold) {
 		switch(type.toLowerCase()) {

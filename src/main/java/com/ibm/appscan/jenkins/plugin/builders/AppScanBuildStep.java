@@ -87,12 +87,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private List<FailureCondition> m_failureConditions;
 	private boolean m_emailNotification;
 	private boolean m_wait;
+    private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
-	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuild, boolean wait, boolean email) {
+	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email) {
 		m_scanner = scanner;
 		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
@@ -102,6 +103,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_failureConditions = failureConditions;
 		m_emailNotification = email;
 		m_wait = wait;
+        m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
 	}
 	
@@ -115,6 +117,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_credentials = credentials;
 		m_emailNotification = false;
 		m_wait = false;
+        m_failBuildNonCompliance=false;
 		m_failBuild = false;
 	}
 	
@@ -175,6 +178,15 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	public boolean getWait() {
 		return m_wait;
 	}
+        
+    @DataBoundSetter
+    public void setFailBuildNonCompliance(boolean failBuildNonCompliance){
+            m_failBuildNonCompliance=failBuildNonCompliance;
+    }
+        
+    public boolean getFailBuildNonCompliance(){
+        return m_failBuildNonCompliance;
+    }
 
 	@DataBoundSetter
 	public void setEmail(boolean emailNotification) {
@@ -222,6 +234,18 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 		return properties;
+    }
+    
+    //to provide for the failure of build if any non compliant issue is found in the build
+    private boolean failBuildForNonComplianceIssues(IResultsProvider provider) throws AbortException{
+        if (!m_failBuildNonCompliance)
+            return false;
+        try{
+            return new ResultsInspector(provider).shouldFailForNonCompliance();
+        }
+        catch(NullPointerException e){
+            throw new AbortException(Messages.error_checking_results(provider.getStatus()));
+        }
     }
     
     private boolean shouldFailBuild(IResultsProvider provider) throws AbortException{
@@ -274,7 +298,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
     	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	build.addAction(new ResultsRetriever(build, provider, m_name));
-    	
+                
+        if (m_wait && failBuildForNonComplianceIssues(provider))
+              throw new AbortException(Messages.error_noncompliant_issues());
 		if(m_wait && shouldFailBuild(provider))
 			throw new AbortException(Messages.error_threshold_exceeded());	
     }
