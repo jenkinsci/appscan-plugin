@@ -45,10 +45,6 @@
       		<id>repo.jenkins-ci.org</id>
       		<url>http://repo.jenkins-ci.org/public/</url>
     	</repository>
-    	<repository>
-		<id>jitpack.io</id>
-		<url>https://jitpack.io</url>
-	</repository>
   </repositories>
 
   <pluginRepositories>
@@ -79,9 +75,9 @@
   
   <dependencies>
 	<dependency>
-		<groupId>com.github.hclproducts</groupId>
-		<artifactId>appscan-sdk</artifactId>
-		<version>v1.0.5</version>
+		<groupId>com.hcl</groupId>
+		<artifactId>appscan.sdk</artifactId>
+		<version>1.0.7</version>
   	</dependency>
   	<dependency>
   		<groupId>org.jenkins-ci.plugins</groupId>

@@ -6,6 +6,7 @@
 
 package com.ibm.appscan.jenkins.plugin.builders;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -89,6 +90,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
 	private IAuthenticationProvider m_authProvider;
+	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
 	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email) {
@@ -230,6 +232,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
+		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 		return properties;
     }
     
@@ -271,6 +274,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			@Override
 			public IResultsProvider call() throws AbortException {
 				try {
+					setInstallDir();
 		    		scan.run();
 		    		IResultsProvider provider = scan.getResultsProvider();
 		    		
@@ -300,7 +304,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		if(m_wait && shouldFailBuild(provider))
 			throw new AbortException(Messages.error_threshold_exceeded());	
     }
-
+    
+    private void setInstallDir() {
+    	if (SystemUtil.isWindows() && System.getProperty("user.home").toLowerCase().indexOf("system32")>=0) {
+    		System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, JENKINS_INSTALL_DIR.getPath());
+    	}
+    }
+    
 	@Symbol("appscan") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
