@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-	${%description.application} <a target="_blank" href="${app.rootUrl}credentials">${%credentials.link.text}</a>.
+	${%description.application} <a target="_blank" href="${resURL}/credentials">${%credentials.link.text}</a>.
 </div>

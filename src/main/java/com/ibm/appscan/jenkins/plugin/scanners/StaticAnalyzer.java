@@ -6,12 +6,16 @@
 
 package com.ibm.appscan.jenkins.plugin.scanners;
 
-import hudson.Extension;
-import hudson.util.FormValidation;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
+
+import hudson.Extension;
+import hudson.util.FormValidation;
+import hudson.util.VariableResolver;
 
 public class StaticAnalyzer extends Scanner {
 
@@ -27,6 +31,12 @@ public class StaticAnalyzer extends Scanner {
 		return STATIC_ANALYZER;
 	}
 	
+	public Map<String, String> getProperties(VariableResolver<String> resolver) {
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
+		return properties;
+	}
+	
 	@Symbol("static_analyzer") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends ScanDescriptor {
@@ -35,9 +45,9 @@ public class StaticAnalyzer extends Scanner {
 		public String getDisplayName() {
 			return STATIC_ANALYZER;
 		}
-		
-    	public FormValidation doCheckTarget(@QueryParameter String target) {
-    		return FormValidation.validateRequired(target);
-    	}
+			
+	    	public FormValidation doCheckTarget(@QueryParameter String target) {
+	    		return FormValidation.validateRequired(target);
+	    	}
 	}
 }
