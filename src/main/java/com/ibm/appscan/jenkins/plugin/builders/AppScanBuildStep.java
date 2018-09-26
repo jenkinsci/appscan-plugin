@@ -276,7 +276,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 				try {
 					setInstallDir();
 		    		scan.run();
-		    		IResultsProvider provider = scan.getResultsProvider();
+		    		//IResultsProvider provider = scan.getResultsProvider();
+                                IResultsProvider provider=scan.getNonCompliantResultProvider();
 		    		
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
@@ -318,8 +319,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	//Retain backward compatibility
     	@Initializer(before = InitMilestone.PLUGINS_STARTED)
     	public static void createAliases() {
+    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.results.NonCompliantIssuesProvider", com.hcl.appscan.sdk.results.NonCompliantIssuesProvider.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
+                Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
     	}
     	
     	@Override

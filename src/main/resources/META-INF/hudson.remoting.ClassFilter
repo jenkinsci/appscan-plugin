@@ -3,6 +3,7 @@ com.hcl.appscan.sdk.auth.IAuthenticationProvider
 com.hcl.appscan.sdk.logging.StdOutProgress
 com.hcl.appscan.sdk.logging.IProgress
 com.hcl.appscan.sdk.results.IResultsProvider
+com.hcl.appscan.sdk.results.NonCompliantIssuesProvider
 com.hcl.appscan.sdk.results.CloudResultsProvider
 com.hcl.appscan.sdk.scan.IScan
 com.hcl.appscan.sdk.scan.IScanServiceProvider

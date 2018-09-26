@@ -53,6 +53,7 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		m_mediumCount = mediumCount;
 		m_lowCount = lowCount;
 		m_infoCount = infoCount;
+                getReport();
 	}
 	
 	@Override
