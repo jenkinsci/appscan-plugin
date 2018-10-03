@@ -40,7 +40,7 @@ import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
-import com.hcl.appscan.sdk.scan.IScanServiceProvider;
+
 import com.hcl.appscan.sdk.utils.SystemUtil;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
@@ -238,17 +238,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		return properties;
     }
     
-    //to provide for the failure of build if any non compliant issue is found in the build
-    private boolean failBuildForNonComplianceIssues(IResultsProvider provider) throws AbortException{
-        if (!m_failBuildNonCompliance)
-            return false;
-        try{
-            return new ResultsInspector(provider).shouldFailForNonCompliance();
-        }
-        catch(NullPointerException e){
-            throw new AbortException(Messages.error_checking_results(provider.getStatus()));
-        }
-    }
     
     private boolean shouldFailBuild(IResultsProvider provider) throws AbortException{
     	if(!m_failBuild)
@@ -303,10 +292,18 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	build.addAction(new ResultsRetriever(build, provider, m_name));
                 
-        if (m_wait && failBuildForNonComplianceIssues(provider))
-              throw new AbortException(Messages.error_noncompliant_issues());
-		if(m_wait && shouldFailBuild(provider))
-			throw new AbortException(Messages.error_threshold_exceeded());	
+        if (m_wait && m_failBuildNonCompliance){
+            m_failBuild=true;
+            FailureCondition nonCompliantCondition=new FailureCondition("total", 0);
+            List<FailureCondition> failureConditions=new ArrayList<>();
+            failureConditions.add(nonCompliantCondition);
+            setFailureConditions(failureConditions);
+            if (shouldFailBuild(provider))
+                throw new AbortException(Messages.error_noncompliant_issues());
+        }
+              
+	if(m_wait && shouldFailBuild(provider))
+		throw new AbortException(Messages.error_threshold_exceeded());	
     }
     
     private void setInstallDir() {
@@ -322,6 +319,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	//Retain backward compatibility
     	@Initializer(before = InitMilestone.PLUGINS_STARTED)
     	public static void createAliases() {
+            Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.results.NonCompliantIssuesResultProvider", com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
             Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
     	}
