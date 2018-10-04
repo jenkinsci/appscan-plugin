@@ -269,8 +269,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					setInstallDir();
 		    		scan.run();
 		    		
-                                IResultsProvider provider=new NonCompliantIssuesResultProvider(m_name, m_type, scan.getServiceProvider(), scan.getProgress());
-		    		
+                                IResultsProvider provider=new NonCompliantIssuesResultProvider(scan.getScanId(), scan.getType(), scan.getServiceProvider(), scan.getProgress());
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			String status = provider.getStatus();
