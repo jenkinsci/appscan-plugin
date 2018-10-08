@@ -90,12 +90,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_emailNotification;
 	private boolean m_wait;
     private boolean m_failBuildNonCompliance;
+        private boolean m_openSourceOnly;
 	private boolean m_failBuild;
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
-	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email) {
+	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email, boolean openSourceOnly) {
 		m_scanner = scanner;
 		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
@@ -107,6 +108,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_wait = wait;
         m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
+                m_openSourceOnly=openSourceOnly;
+                
 	}
 	
 	@DataBoundConstructor
@@ -121,6 +124,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_wait = false;
         m_failBuildNonCompliance=false;
 		m_failBuild = false;
+                m_openSourceOnly=false;
 	}
 	
 	public Scanner getScanner() {
@@ -231,6 +235,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
 		Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
+                properties.put(CoreConstants.OPEN_SOURCE_ONLY,Boolean.toString(m_openSourceOnly));
 		properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
