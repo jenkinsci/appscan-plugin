@@ -235,8 +235,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
 		Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-                properties.put(CoreConstants.OPEN_SOURCE_ONLY,Boolean.toString(m_openSourceOnly));
-		properties.put(CoreConstants.APP_ID,  m_application);
+                if (m_openSourceOnly==true)
+                    properties.put(CoreConstants.OPEN_SOURCE_ONLY,"");
+                properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
