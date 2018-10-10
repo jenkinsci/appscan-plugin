@@ -53,6 +53,7 @@ import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
 import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -239,11 +240,20 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     
-    private boolean shouldFailBuild(IResultsProvider provider) throws AbortException{
-    	if(!m_failBuild)
-    		return false;
+    private void shouldFailBuild(IResultsProvider provider) throws AbortException{
+    	if(!m_failBuild && !m_failBuildNonCompliance)
+    		return ;
+        String failureMessage=Messages.error_threshold_exceeded();
 		try {
-	    	return new ResultsInspector(m_failureConditions, provider).shouldFail();
+                    List<FailureCondition> failureConditions=m_failureConditions;
+                    if (m_failBuildNonCompliance){
+                        failureConditions =new ArrayList<FailureCondition>();
+                        FailureCondition nonCompliantCondition = new FailureCondition("total", 0);
+                        failureConditions.add(nonCompliantCondition);
+                        failureMessage=Messages.error_noncompliant_issues();
+                    }
+	    	if(new ResultsInspector(failureConditions, provider).shouldFail())
+                    throw new AbortException(failureMessage);
 	    } catch(NullPointerException e) {
 	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
 	    }
@@ -292,18 +302,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	build.addAction(new ResultsRetriever(build, provider, m_name));
                 
-        if (m_wait && m_failBuildNonCompliance){
-            m_failBuild=true;
-            FailureCondition nonCompliantCondition=new FailureCondition("total", 0);
-            List<FailureCondition> failureConditions=new ArrayList<>();
-            failureConditions.add(nonCompliantCondition);
-            setFailureConditions(failureConditions);
-            if (shouldFailBuild(provider))
-                throw new AbortException(Messages.error_noncompliant_issues());
-        }
-              
-	if(m_wait && shouldFailBuild(provider))
-		throw new AbortException(Messages.error_threshold_exceeded());	
+        if(m_wait)
+            shouldFailBuild(provider);	
     }
     
     private void setInstallDir() {
