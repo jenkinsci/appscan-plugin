@@ -1,5 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
+ * © Copyright HCL Technologies Ltd. 2017,2018.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -18,7 +19,8 @@ public class ResultsInspector {
 		m_conditions = conditions;
 		m_resultsProvider = resultsProvider;
 	}
-	
+        
+        
 	public boolean shouldFail() {
 		for(FailureCondition condition : m_conditions) {
 			String type = condition.getFailureType();
@@ -28,6 +30,7 @@ public class ResultsInspector {
 		}
 		return false;
 	}
+        
 
 	private boolean exceedsThreshold(String type, int threshold) {
 		switch(type.toLowerCase()) {

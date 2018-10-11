@@ -38,7 +38,9 @@ import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.IResultsProvider;
+import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
+
 import com.hcl.appscan.sdk.utils.SystemUtil;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
@@ -51,6 +53,7 @@ import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
 import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
+import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -87,12 +90,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private List<FailureCondition> m_failureConditions;
 	private boolean m_emailNotification;
 	private boolean m_wait;
+    private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
-	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuild, boolean wait, boolean email) {
+	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email) {
 		m_scanner = scanner;
 		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
@@ -102,6 +106,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_failureConditions = failureConditions;
 		m_emailNotification = email;
 		m_wait = wait;
+        m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
 	}
 	
@@ -115,6 +120,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_credentials = credentials;
 		m_emailNotification = false;
 		m_wait = false;
+        m_failBuildNonCompliance=false;
 		m_failBuild = false;
 	}
 	
@@ -175,6 +181,15 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	public boolean getWait() {
 		return m_wait;
 	}
+        
+    @DataBoundSetter
+    public void setFailBuildNonCompliance(boolean failBuildNonCompliance){
+            m_failBuildNonCompliance=failBuildNonCompliance;
+    }
+        
+    public boolean getFailBuildNonCompliance(){
+        return m_failBuildNonCompliance;
+    }
 
 	@DataBoundSetter
 	public void setEmail(boolean emailNotification) {
@@ -224,11 +239,21 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		return properties;
     }
     
-    private boolean shouldFailBuild(IResultsProvider provider) throws AbortException{
-    	if(!m_failBuild)
-    		return false;
+    
+    private void shouldFailBuild(IResultsProvider provider) throws AbortException{
+    	if(!m_failBuild && !m_failBuildNonCompliance)
+    		return ;
+        String failureMessage=Messages.error_threshold_exceeded();
 		try {
-	    	return new ResultsInspector(m_failureConditions, provider).shouldFail();
+                    List<FailureCondition> failureConditions=m_failureConditions;
+                    if (m_failBuildNonCompliance){
+                        failureConditions =new ArrayList<FailureCondition>();
+                        FailureCondition nonCompliantCondition = new FailureCondition("total", 0);
+                        failureConditions.add(nonCompliantCondition);
+                        failureMessage=Messages.error_noncompliant_issues();
+                    }
+	    	if(new ResultsInspector(failureConditions, provider).shouldFail())
+                    throw new AbortException(failureMessage);
 	    } catch(NullPointerException e) {
 	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
 	    }
@@ -239,6 +264,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
     	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
+        
     	
     	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
@@ -252,8 +278,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 				try {
 					setInstallDir();
 		    		scan.run();
-		    		IResultsProvider provider = scan.getResultsProvider();
 		    		
+                                IResultsProvider provider=new NonCompliantIssuesResultProvider(scan.getScanId(), scan.getType(), scan.getServiceProvider(), progress);
+                                provider.setReportFormat(scan.getReportFormat());
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			String status = provider.getStatus();
@@ -268,15 +295,15 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    	}
 		    	catch(ScannerException | InvalidTargetException | InterruptedException e) {
 		    		throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
-		    		}
+		    	}
 			}
 		});
 
     	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	build.addAction(new ResultsRetriever(build, provider, m_name));
-    	
-		if(m_wait && shouldFailBuild(provider))
-			throw new AbortException(Messages.error_threshold_exceeded());	
+                
+        if(m_wait)
+            shouldFailBuild(provider);	
     }
     
     private void setInstallDir() {
@@ -293,7 +320,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	@Initializer(before = InitMilestone.PLUGINS_STARTED)
     	public static void createAliases() {
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
+            Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
     	}
     	
     	@Override

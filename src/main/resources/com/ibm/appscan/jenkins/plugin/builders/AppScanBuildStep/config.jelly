@@ -27,6 +27,10 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	<f:entry field="wait">
 		<f:checkbox title="${%label.wait}" onclick="waitClicked(this);" name="wait"/>
 	</f:entry>
+        
+        <f:entry field="failBuildNonCompliance">
+		<f:checkbox title="${%label.noncompliant.issues}" onclick="failBuildNonComplianceIssuesClicked(this);" name="failBuildNonCompliance"/>
+	</f:entry>
 
 	<f:entry field="failBuild">
 		<f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" name="failBuild"/>
