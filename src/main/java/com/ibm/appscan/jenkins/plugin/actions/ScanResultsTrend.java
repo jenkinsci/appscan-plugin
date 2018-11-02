@@ -126,7 +126,7 @@ public class ScanResultsTrend extends AppScanAction {
 	private ScanResults getLatestResults() {
 		for(Run<?,?> run : m_project.getBuilds()) {
 			for(ScanResults results : run.getActions(ScanResults.class)) {
-				if(results.getScanType().equalsIgnoreCase(m_type) && results.getName().equalsIgnoreCase(m_name) && results.getHasResults()) {
+				if(results.getScanType().equalsIgnoreCase(m_type) && results.getName().equalsIgnoreCase(m_name)) {
 					return results;
 				}
 			}
