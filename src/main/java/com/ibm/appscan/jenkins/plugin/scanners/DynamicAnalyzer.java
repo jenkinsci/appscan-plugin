@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -38,16 +38,17 @@ public class DynamicAnalyzer extends Scanner {
 	private String m_scanFile;
 	private String m_testPolicy;
 	private String m_scanType;
+	private String m_optimization;
 	private String m_extraField;
 	
 	@Deprecated
 	public DynamicAnalyzer(String target) {
-		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY); 
 	}
 	
 	@Deprecated
 	public DynamicAnalyzer(String target, boolean hasOptions, String loginUser, String loginPassword, String presenceId, String scanFile, 
-			String testPolicy, String scanType, String extraField) {
+			String testPolicy, String scanType,String optimization, String extraField) {
 		super(target, hasOptions);
 		m_loginUser = loginUser;
 		m_loginPassword = Secret.fromString(loginPassword);
@@ -55,6 +56,7 @@ public class DynamicAnalyzer extends Scanner {
 		m_scanFile = scanFile;
 		m_testPolicy = EMPTY;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
+		m_optimization = optimization;
 		m_extraField = extraField;
 	}
 	
@@ -67,6 +69,7 @@ public class DynamicAnalyzer extends Scanner {
 		m_scanFile = EMPTY;
 		m_testPolicy = EMPTY;
 		m_scanType = EMPTY;
+		m_optimization = EMPTY;
 		m_extraField = EMPTY;
 	}
 	
@@ -123,6 +126,15 @@ public class DynamicAnalyzer extends Scanner {
 	public String getScanType() {
 		return m_scanType;
 	}
+
+	@DataBoundSetter
+	public void setOptimization(String optimization) {
+		m_optimization = optimization;
+	}
+	
+	public String getOptimization() {
+		return m_optimization;
+	}
 	
 	@DataBoundSetter
 	public void setExtraField(String extraField) {
@@ -148,6 +160,7 @@ public class DynamicAnalyzer extends Scanner {
 		properties.put(SCAN_FILE, resolver == null ? m_scanFile : resolvePath(m_scanFile, resolver));
 		properties.put(TEST_POLICY, m_testPolicy);
 		properties.put(SCAN_TYPE, m_scanType);
+		properties.put(OPTIMIZATION, m_optimization.equals("Normal")? "false":"true");
 		properties.put(EXTRA_FIELD, m_extraField);
 		return properties;
 	}
@@ -165,6 +178,13 @@ public class DynamicAnalyzer extends Scanner {
 			ListBoxModel model = new ListBoxModel();
 			model.add(Messages.option_staging(), STAGING);
 			model.add(Messages.option_production(), PRODUCTION);
+			return model;
+		}
+		
+		public ListBoxModel doFillOptimizationItems() {
+			ListBoxModel model = new ListBoxModel();
+			model.add(Messages.option_normal(), NORMAL);
+			model.add(Messages.option_optimized(), OPTIMIZED);
 			return model;
 		}
 		
