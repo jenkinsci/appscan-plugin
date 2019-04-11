@@ -37,7 +37,7 @@
 	
   <groupId>com.ibm</groupId>
   <artifactId>ibm-application-security</artifactId>
-  <version>1.2.3-SNAPSHOT</version>
+  <version>1.2.3</version>
   <packaging>hpi</packaging>
 
   <repositories>
@@ -95,7 +95,7 @@
   	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin.git</connection>
   	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/ibm-asoc-plugin</url>
-    <tag>HEAD</tag>
+    <tag>ibm-application-security-1.2.3</tag>
   </scm>
 
 </project>
