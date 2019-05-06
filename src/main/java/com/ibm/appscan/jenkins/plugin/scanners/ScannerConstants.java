@@ -13,6 +13,7 @@ public interface ScannerConstants {
 	String PRESENCE_ID				= "PresenceId";				//$NON-NLS-1$
 	String SCAN_FILE				= "ScanFile";				//$NON-NLS-1$
 	String SCAN_TYPE				= "ScanType";				//$NON-NLS-1$
+	String OPTIMIZATION				= "UseTestOptimizer";			//$NON-NLS-1$
 	String TEST_POLICY				= "TestPolicy";				//$NON-NLS-1$
 	String TARGET					= CoreConstants.TARGET;			//$NON-NLS-1$
 	String TEMPLATE_EXTENSION			= ".scant";				//$NON-NLS-1$
@@ -25,4 +26,7 @@ public interface ScannerConstants {
 	String CUSTOM					= "Custom";				//$NON-NLS-1$
 	String PRODUCTION				= "Production";				//$NON-NLS-1$
 	String STAGING					= "Staging";				//$NON-NLS-1$
+	
+	String NORMAL					= "Normal";				//$NON-NLS-1$
+	String OPTIMIZED				= "Optimized";				//$NON-NLS-1$
 }

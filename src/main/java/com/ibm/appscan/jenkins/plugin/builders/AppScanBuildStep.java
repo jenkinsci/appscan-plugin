@@ -240,20 +240,23 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     
-    private void shouldFailBuild(IResultsProvider provider) throws AbortException{
+    private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
     		return ;
         String failureMessage=Messages.error_threshold_exceeded();
 		try {
                     List<FailureCondition> failureConditions=m_failureConditions;
                     if (m_failBuildNonCompliance){
-                        failureConditions =new ArrayList<FailureCondition>();
+                        failureConditions =new ArrayList<>();
                         FailureCondition nonCompliantCondition = new FailureCondition("total", 0);
                         failureConditions.add(nonCompliantCondition);
                         failureMessage=Messages.error_noncompliant_issues();
                     }
-	    	if(new ResultsInspector(failureConditions, provider).shouldFail())
+	    	if(new ResultsInspector(failureConditions, provider).shouldFail()){
+                    build.setDescription(failureMessage);
                     throw new AbortException(failureMessage);
+                }
+                    
 	    } catch(NullPointerException e) {
 	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
 	    }
@@ -303,7 +306,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	build.addAction(new ResultsRetriever(build, provider, m_name));
                 
         if(m_wait)
-            shouldFailBuild(provider);	
+            shouldFailBuild(provider,build);	
     }
     
     private void setInstallDir() {
