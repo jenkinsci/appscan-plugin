@@ -11,7 +11,7 @@ import hudson.model.Job;
 
 public abstract class AppScanAction implements Action {
 
-	protected static final String ICON = "/plugin/ibm-application-security/images/ASoC.ico"; //$NON-NLS-1$
+	protected static final String ICON = "/plugin/hcl-application-security/images/ASoC.ico"; //$NON-NLS-1$
 	protected static final String URL = "https://cloud.appscan.com"; //$NON-NLS-1$
 	protected final Job<?,?> m_project;
 	
