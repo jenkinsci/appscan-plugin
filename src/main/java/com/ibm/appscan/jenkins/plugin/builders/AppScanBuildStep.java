@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
@@ -40,7 +40,6 @@ import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
-
 import com.hcl.appscan.sdk.utils.SystemUtil;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
@@ -53,12 +52,12 @@ import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
 import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.ProxyConfiguration;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.AbstractBuild;
@@ -75,6 +74,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
@@ -122,6 +122,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_wait = false;
         m_failBuildNonCompliance=false;
 		m_failBuild = false;
+		
+		setProxyInfo();
 	}
 	
 	public Scanner getScanner() {
@@ -313,6 +315,32 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	if (SystemUtil.isWindows() && System.getProperty("user.home").toLowerCase().indexOf("system32")>=0) {
     		System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, JENKINS_INSTALL_DIR.getPath());
     	}
+    }
+    
+    private void setProxyInfo() {
+    	ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+    	if (proxy != null) {
+    		if (proxy.name != null) {
+    			System.setProperty("http.proxyHost", proxy.name);
+        		System.setProperty("https.proxyHost", proxy.name);
+    		}
+    		
+    		if (Integer.toString(proxy.port) != null) {
+    			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
+        		System.setProperty("https.proxyPort", Integer.toString(proxy.port));
+    		}
+    		
+    		if (proxy.getUserName() != null) {
+    			System.setProperty("http.proxyUser", proxy.getUserName());
+        		System.setProperty("https.proxyUser", proxy.getUserName());
+    		}
+    		
+    		if (proxy.getPassword() != null) {
+    			System.setProperty("http.proxyPassword", proxy.getPassword());
+        		System.setProperty("https.proxyPassword", proxy.getPassword());
+    		}
+    	}
+    	
     }
     
 	@Symbol("appscan") //$NON-NLS-1$
