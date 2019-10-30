@@ -123,7 +123,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         m_failBuildNonCompliance=false;
 		m_failBuild = false;
 		
-		setProxyInfo();
+		
 	}
 	
 	public Scanner getScanner() {
@@ -317,31 +317,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     }
     
-    private void setProxyInfo() {
-    	ProxyConfiguration proxy = Jenkins.getInstance().proxy;
-    	if (proxy != null) {
-    		if (proxy.name != null) {
-    			System.setProperty("http.proxyHost", proxy.name);
-        		System.setProperty("https.proxyHost", proxy.name);
-    		}
-    		
-    		if (Integer.toString(proxy.port) != null) {
-    			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
-        		System.setProperty("https.proxyPort", Integer.toString(proxy.port));
-    		}
-    		
-    		if (proxy.getUserName() != null) {
-    			System.setProperty("http.proxyUser", proxy.getUserName());
-        		System.setProperty("https.proxyUser", proxy.getUserName());
-    		}
-    		
-    		if (proxy.getPassword() != null) {
-    			System.setProperty("http.proxyPassword", proxy.getPassword());
-        		System.setProperty("https.proxyPassword", proxy.getPassword());
-    		}
-    	}
-    	
-    }
+    
     
 	@Symbol("appscan") //$NON-NLS-1$
     @Extension
@@ -384,6 +360,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     	
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+    		
+    		setProxyInfo();
+    		
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
     		ListBoxModel model = new ListBoxModel();
@@ -425,6 +404,41 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	public FormValidation doCheckApplication(@QueryParameter String application) {
     		return FormValidation.validateRequired(application);
     	}
+    	
+    	private void setProxyInfo() {
+        	ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+        	if (proxy != null) {
+        		if (proxy.name != null) {
+        			System.setProperty("http.proxyHost", proxy.name);
+        			System.out.println("http.proxyHost " + proxy.name);
+            		System.setProperty("https.proxyHost", proxy.name);
+            		System.out.println("https.proxyHost " + proxy.name);
+        		}
+        		
+        		if (Integer.toString(proxy.port) != null) {
+        			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
+        			System.out.println("http.proxyPort " + proxy.port);
+        			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
+        			System.out.println("https.proxyPort " + proxy.port);
+        		}
+        		
+//        		if (proxy.getUserName() != null) {
+//        			System.setProperty("http.proxyUser", proxy.getUserName());
+//        			System.out.println("http.proxyUser " + proxy.getUserName());
+//            		System.setProperty("https.proxyUser", proxy.getUserName());
+//            		System.out.println("https.proxyUser " + proxy.getUserName());
+//        		}
+        		
+//        		if (proxy.getPassword() != null) {
+//        			System.setProperty("http.proxyPassword", proxy.getPassword());
+//        			System.out.println("http.proxyPassword " + proxy.getPassword());
+//            		System.setProperty("https.proxyPassword", proxy.getPassword());
+//            		System.out.println("https.proxyPassword " + proxy.getPassword());
+//        		}
+        	}
+        	
+        }
+    	
     }
 }
 
