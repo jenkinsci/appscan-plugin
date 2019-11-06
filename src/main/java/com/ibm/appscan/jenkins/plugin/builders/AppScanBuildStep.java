@@ -365,7 +365,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
+    		
+    		if (applications == null || applications.isEmpty()) {
+    			applications = new CloudApplicationProvider(authProvider).getApplications();
+    		}
+    		
     		ListBoxModel model = new ListBoxModel();
+    		
+    		
     		
     		if(applications != null) {
         		List<Entry<String , String>> list=sortApplications(applications.entrySet());
@@ -406,36 +413,20 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     	
     	private void setProxyInfo() {
+    		System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+    		
         	ProxyConfiguration proxy = Jenkins.getInstance().proxy;
         	if (proxy != null) {
         		if (proxy.name != null) {
         			System.setProperty("http.proxyHost", proxy.name);
-        			System.out.println("http.proxyHost " + proxy.name);
             		System.setProperty("https.proxyHost", proxy.name);
-            		System.out.println("https.proxyHost " + proxy.name);
         		}
-        		
         		if (Integer.toString(proxy.port) != null) {
         			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
-        			System.out.println("http.proxyPort " + proxy.port);
         			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
-        			System.out.println("https.proxyPort " + proxy.port);
         		}
-        		
-//        		if (proxy.getUserName() != null) {
-//        			System.setProperty("http.proxyUser", proxy.getUserName());
-//        			System.out.println("http.proxyUser " + proxy.getUserName());
-//            		System.setProperty("https.proxyUser", proxy.getUserName());
-//            		System.out.println("https.proxyUser " + proxy.getUserName());
-//        		}
-        		
-//        		if (proxy.getPassword() != null) {
-//        			System.setProperty("http.proxyPassword", proxy.getPassword());
-//        			System.out.println("http.proxyPassword " + proxy.getPassword());
-//            		System.setProperty("https.proxyPassword", proxy.getPassword());
-//            		System.out.println("https.proxyPassword " + proxy.getPassword());
-//        		}
         	}
+        	
         	
         }
     	
