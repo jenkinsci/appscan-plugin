@@ -108,7 +108,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_wait = wait;
         m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
-        }
+    }
 	
 	@DataBoundConstructor
 	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
@@ -122,8 +122,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_wait = false;
         m_failBuildNonCompliance=false;
 		m_failBuild = false;
-		
-		
 	}
 	
 	public Scanner getScanner() {
@@ -365,15 +363,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
-    		
-//    		if (applications == null || applications.isEmpty()) {
-//    			applications = new CloudApplicationProvider(authProvider).getApplications();
-//    		}
-    		
+
     		ListBoxModel model = new ListBoxModel();
-    		
-    		
-    		
+   		
     		if(applications != null) {
         		List<Entry<String , String>> list=sortApplications(applications.entrySet());
     			
@@ -413,8 +405,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     	
     	private void setProxyInfo() {
-    		//System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
-    		
         	ProxyConfiguration proxy = Jenkins.getInstance().proxy;
         	if (proxy != null) {
         		if (proxy.name != null) {
@@ -425,7 +415,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
         			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
         		}
-        	}     	
+        	}
         }
     	
     }
