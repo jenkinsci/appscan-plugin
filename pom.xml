@@ -78,6 +78,14 @@
 		<groupId>com.hcl</groupId>
 		<artifactId>appscan.sdk</artifactId>
 		<version>1.0.10</version>
+<<<<<<< HEAD
+=======
+  	</dependency>
+  	<dependency>
+  	  	<groupId>org.apache.wink</groupId>
+  		<artifactId>wink-json4j</artifactId>
+  		<version>1.4</version>
+>>>>>>> a5cd0af8610d3cda3aad6b6ce355bef7f692a8b9
   	</dependency>
   	<dependency>
   		<groupId>org.jenkins-ci.plugins</groupId>
