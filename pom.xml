@@ -80,7 +80,7 @@
 		<version>1.0.10</version>
   	</dependency>
   	<dependency>
-  	  	<groupId>org.apache.wink</groupId>
+  		<groupId>org.apache.wink</groupId>
   		<artifactId>wink-json4j</artifactId>
   		<version>1.4</version>
   	</dependency>
