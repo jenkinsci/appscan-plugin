@@ -363,7 +363,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
-
     		ListBoxModel model = new ListBoxModel();
    		
     		if(applications != null) {
