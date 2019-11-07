@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
@@ -40,6 +40,7 @@ import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
+
 import com.hcl.appscan.sdk.utils.SystemUtil;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
@@ -315,12 +316,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     }
     
-    
-    
 	@Symbol("appscan") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
     	
+		static {
+			setProxyInfo();
+		}
+		
     	//Retain backward compatibility
     	@Initializer(before = InitMilestone.PLUGINS_STARTED)
     	public static void createAliases() {
@@ -358,9 +361,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     	
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-    		
-    		setProxyInfo();
-    		
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
 
@@ -404,7 +404,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		return FormValidation.validateRequired(application);
     	}
     	
-    	private void setProxyInfo() {
+    	private static void setProxyInfo() {
         	ProxyConfiguration proxy = Jenkins.getInstance().proxy;
         	if (proxy != null) {
         		if (proxy.name != null) {
