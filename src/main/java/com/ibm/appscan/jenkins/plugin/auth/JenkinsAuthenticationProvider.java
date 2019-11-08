@@ -65,15 +65,15 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 	public Map<String, String> getAuthorizationHeader(boolean persist) {
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Bearer "+ getToken().trim()); //$NON-NLS-1$ //$NON-NLS-2$
-		headers.put("Connection", "Keep-Alive");
-		headers.putAll(Collections.singletonMap("range", "items=0-999999"));
+		//headers.put("Connection", "Keep-Alive");
+		//headers.putAll(Collections.singletonMap("range", "items=0-999999"));
 		
 		try {
 		String proxyCreds = Jenkins.getInstance().proxy.getUserName() + ":" 
 				+ Jenkins.getInstance().proxy.getPassword();
 		//String encoded = new String(Base64.getEncoder().encode("quanzt:test".getBytes()));
 		String encoded = DatatypeConverter.printBase64Binary(proxyCreds.getBytes());
-		headers.put("Proxy-Authorization","Basic " + encoded);
+		//headers.put("Proxy-Authorization","Basic " + encoded);
 		Authenticator.setDefault(new ProxyAuth(Jenkins.getInstance().proxy.getUserName(), Jenkins.getInstance().proxy.getPassword()));
 		} catch(Exception e) {
 			e.printStackTrace();
