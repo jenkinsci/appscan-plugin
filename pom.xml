@@ -43,14 +43,14 @@
   <repositories>
     	<repository>
       		<id>repo.jenkins-ci.org</id>
-      		<url>http://repo.jenkins-ci.org/public/</url>
+      		<url>https://repo.jenkins-ci.org/public/</url>
     	</repository>
   </repositories>
 
   <pluginRepositories>
     <pluginRepository>
       <id>repo.jenkins-ci.org</id>
-      <url>http://repo.jenkins-ci.org/public/</url>
+      <url>https://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
 
@@ -80,7 +80,7 @@
 		<version>1.0.10</version>
   	</dependency>
   	<dependency>
-  	  	<groupId>org.apache.wink</groupId>
+  		<groupId>org.apache.wink</groupId>
   		<artifactId>wink-json4j</artifactId>
   		<version>1.4</version>
   	</dependency>
