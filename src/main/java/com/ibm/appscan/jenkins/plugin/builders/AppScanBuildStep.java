@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
@@ -40,7 +40,6 @@ import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
-
 import com.hcl.appscan.sdk.utils.SystemUtil;
 import com.ibm.appscan.jenkins.plugin.Messages;
 import com.ibm.appscan.jenkins.plugin.ScanFactory;
@@ -53,12 +52,12 @@ import com.ibm.appscan.jenkins.plugin.scanners.Scanner;
 import com.ibm.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.ibm.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.ibm.appscan.jenkins.plugin.util.ScanProgress;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.ProxyConfiguration;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.AbstractBuild;
@@ -75,6 +74,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
@@ -108,7 +108,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_wait = wait;
         m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
-        }
+    }
 	
 	@DataBoundConstructor
 	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
@@ -315,6 +315,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     }
     
+    
+    
 	@Symbol("appscan") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
@@ -356,10 +358,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     	
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+    		
+    		setProxyInfo();
+    		
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
+
     		ListBoxModel model = new ListBoxModel();
-    		
+   		
     		if(applications != null) {
         		List<Entry<String , String>> list=sortApplications(applications.entrySet());
     			
@@ -397,6 +403,21 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	public FormValidation doCheckApplication(@QueryParameter String application) {
     		return FormValidation.validateRequired(application);
     	}
+    	
+    	private void setProxyInfo() {
+        	ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+        	if (proxy != null) {
+        		if (proxy.name != null) {
+        			System.setProperty("http.proxyHost", proxy.name);
+            		System.setProperty("https.proxyHost", proxy.name);
+        		}
+        		if (Integer.toString(proxy.port) != null) {
+        			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
+        			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
+        		}
+        	}
+        }
+    	
     }
 }
 

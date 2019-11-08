@@ -8,6 +8,9 @@ package com.ibm.appscan.jenkins.plugin.auth;
 
 import hudson.model.ItemGroup;
 import hudson.util.Secret;
+import jenkins.model.Jenkins;
+
+import javax.xml.bind.DatatypeConverter;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -59,6 +62,7 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 	public Map<String, String> getAuthorizationHeader(boolean persist) {
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Bearer "+ getToken().trim()); //$NON-NLS-1$ //$NON-NLS-2$
+
 		if(persist)
 			headers.put("Connection", "Keep-Alive"); //$NON-NLS-1$ //$NON-NLS-2$
 		return headers;
