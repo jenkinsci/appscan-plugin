@@ -9,6 +9,8 @@ package com.ibm.appscan.jenkins.plugin.builders;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -364,6 +366,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
     		ListBoxModel model = new ListBoxModel();
+   		
+    	// 	if (applications == null || applications.isEmpty()) {
+		// 	applications = new CloudApplicationProvider(authProvider).getApplications();
+		// }
+    		
     		if(applications != null) {
         		List<Entry<String , String>> list=sortApplications(applications.entrySet());
     			
@@ -403,7 +410,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     	
     	private static void setProxyInfo() {
-        	ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+    		System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+        	
+    		ProxyConfiguration proxy = Jenkins.getInstance().proxy;
         	if (proxy != null) {
         		if (proxy.name != null) {
         			System.setProperty("http.proxyHost", proxy.name);
@@ -412,7 +421,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         		if (Integer.toString(proxy.port) != null) {
         			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
         			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
-        		}
+				}
+				
+				Authenticator.setDefault(new Authenticator(){
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(Jenkins.getInstance().proxy.getUserName(), Jenkins.getInstance().proxy.getPassword().toCharArray());
+					}
+				});
         	}
         }
     	
