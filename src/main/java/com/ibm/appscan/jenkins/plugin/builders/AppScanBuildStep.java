@@ -9,6 +9,8 @@ package com.ibm.appscan.jenkins.plugin.builders;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -414,6 +416,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         		if (Integer.toString(proxy.port) != null) {
         			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
         			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
+        		}
+        		if (proxy.getUserName() != null && proxy.getPassword() != null) {
+        			Authenticator.setDefault(new Authenticator() {
+        				protected PasswordAuthentication getPasswordAuthentication() {
+        					return new PasswordAuthentication(Jenkins.getInstance().proxy.getUserName(), Jenkins.getInstance().proxy.getPassword().toCharArray());
+        				}
+        			});
         		}
         	}
         }
