@@ -406,6 +406,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     	
     	private static void setProxyInfo() {
+    		System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
     		ProxyConfiguration proxy = Jenkins.getInstance().proxy;
         	if (proxy != null) {
         		if (proxy.name != null) {
