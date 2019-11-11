@@ -366,11 +366,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
     		ListBoxModel model = new ListBoxModel();
-   		
-    	// 	if (applications == null || applications.isEmpty()) {
-		// 	applications = new CloudApplicationProvider(authProvider).getApplications();
-		// }
-    		
+
     		if(applications != null) {
         		List<Entry<String , String>> list=sortApplications(applications.entrySet());
     			
@@ -421,13 +417,15 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         		if (Integer.toString(proxy.port) != null) {
         			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
         			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
-				}
-				
-				Authenticator.setDefault(new Authenticator(){
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(Jenkins.getInstance().proxy.getUserName(), Jenkins.getInstance().proxy.getPassword().toCharArray());
-					}
-				});
+
+        		}
+        		if (proxy.getUserName() != null && proxy.getPassword() != null) {
+        			Authenticator.setDefault(new Authenticator() {
+        				protected PasswordAuthentication getPasswordAuthentication() {
+        					return new PasswordAuthentication(Jenkins.getInstance().proxy.getUserName(), Jenkins.getInstance().proxy.getPassword().toCharArray());
+        				}
+        			});
+        		}
         	}
         }
     	
