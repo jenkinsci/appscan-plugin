@@ -59,6 +59,7 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 	public Map<String, String> getAuthorizationHeader(boolean persist) {
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Bearer "+ getToken().trim()); //$NON-NLS-1$ //$NON-NLS-2$
+		
 		if(persist)
 			headers.put("Connection", "Keep-Alive"); //$NON-NLS-1$ //$NON-NLS-2$
 		return headers;
