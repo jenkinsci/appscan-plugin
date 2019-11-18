@@ -9,8 +9,6 @@ package com.ibm.appscan.jenkins.plugin.builders;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +58,6 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.ProxyConfiguration;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.AbstractBuild;
@@ -77,7 +74,6 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
