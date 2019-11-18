@@ -321,11 +321,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	@Symbol("appscan") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
-    	
-		static {
-			setProxyInfo();
-		}
-		
+
     	//Retain backward compatibility
     	@Initializer(before = InitMilestone.PLUGINS_STARTED)
     	public static void createAliases() {
@@ -404,36 +400,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	public FormValidation doCheckApplication(@QueryParameter String application) {
     		return FormValidation.validateRequired(application);
     	}
-    	
-    	private static void setProxyInfo() {
-    		ProxyConfiguration proxy = Jenkins.getInstance().proxy;
-        	if (proxy != null) {
-        		if (proxy.name != null) {
-        			System.setProperty("http.proxyHost", proxy.name);
-            		System.setProperty("https.proxyHost", proxy.name);
-        		}
-        		if (Integer.toString(proxy.port) != null) {
-        			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
-        			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
-
-        		}
-        		if (proxy.getUserName() != null && proxy.getPassword() != null) {
-        			Authenticator.setDefault(new Authenticator() {
-        				protected PasswordAuthentication getPasswordAuthentication() {
-        					return new PasswordAuthentication(Jenkins.getInstance().proxy.getUserName(), Jenkins.getInstance().proxy.getPassword().toCharArray());
-        				}
-        			});
-        		}
-        		if (proxy.getUserName() != null && proxy.getPassword() != null) {
-        			Authenticator.setDefault(new Authenticator() {
-        				protected PasswordAuthentication getPasswordAuthentication() {
-        					return new PasswordAuthentication(Jenkins.getInstance().proxy.getUserName(), Jenkins.getInstance().proxy.getPassword().toCharArray());
-        				}
-        			});
-        		}
-        	}
-        }
-    	
     }
 }
 

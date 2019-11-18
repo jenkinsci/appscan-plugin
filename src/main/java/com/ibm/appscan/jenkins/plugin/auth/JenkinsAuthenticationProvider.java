@@ -6,15 +6,22 @@
 
 package com.ibm.appscan.jenkins.plugin.auth;
 
+import hudson.ProxyConfiguration;
 import hudson.model.ItemGroup;
 import hudson.util.Secret;
+import jenkins.model.Jenkins;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import sun.net.www.protocol.http.AuthCacheValue;
+import sun.net.www.protocol.http.AuthCacheImpl;
 
 import org.apache.wink.json4j.JSONException;
 
@@ -59,6 +66,12 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 	public Map<String, String> getAuthorizationHeader(boolean persist) {
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("Authorization", "Bearer "+ getToken().trim()); //$NON-NLS-1$ //$NON-NLS-2$
+	
+		try {
+			setProxyInfo();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
 		
 		if(persist)
 			headers.put("Connection", "Keep-Alive"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -77,5 +90,30 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 	
 	private String getToken() {
 		return Secret.toString(m_credentials.getToken());
+	}
+	
+	private void setProxyInfo() {
+		System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
+		ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+    	if (proxy != null) {
+    		if (proxy.name != null) {
+    			System.setProperty("http.proxyHost", proxy.name);
+        		System.setProperty("https.proxyHost", proxy.name);
+    		}
+    		if (Integer.toString(proxy.port) != null) {
+    			System.setProperty("http.proxyPort", Integer.toString(proxy.port));
+    			System.setProperty("https.proxyPort", Integer.toString(proxy.port));
+
+    		}
+    		if (proxy.getUserName() != null && proxy.getPassword() != null) {
+    			AuthCacheValue.setAuthCache(new AuthCacheImpl());
+    			Authenticator.setDefault(new Authenticator() {
+    				@Override
+    				protected PasswordAuthentication getPasswordAuthentication() {
+    					return new PasswordAuthentication(Jenkins.getInstance().proxy.getUserName(), Jenkins.getInstance().proxy.getPassword().toCharArray());
+    				}
+    			});
+    		}
+    	}
 	}
 }

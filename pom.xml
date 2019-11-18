@@ -70,7 +70,16 @@
   	    <groupId>org.jenkins-ci.tools</groupId>
     	<artifactId>maven-hpi-plugin</artifactId>
       </plugin>
+      
+      <plugin>
+    	<groupId>org.codehaus.mojo</groupId>
+    	<artifactId>exec-maven-plugin</artifactId>
+    	<version>1.2</version>
+      </plugin>
+    
     </plugins>
+    
+
   </build>
   
   <dependencies>
