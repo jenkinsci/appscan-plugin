@@ -36,8 +36,8 @@
   </properties>
 	
   <groupId>com.hcl</groupId>
-  <artifactId>hcl-application-security</artifactId>
-  <version>1.0.0</version>
+  <artifactId>ibm-application-security</artifactId>
+  <version>1.2.7-SNAPSHOT</version>
   <description>This plugin allows you to execute security scans in HCL AppScan on Cloud</description>
   <packaging>hpi</packaging>
 

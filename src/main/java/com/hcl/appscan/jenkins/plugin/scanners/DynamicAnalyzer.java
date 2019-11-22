@@ -18,6 +18,7 @@ import org.kohsuke.stapler.QueryParameter;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
 import com.hcl.appscan.jenkins.plugin.Messages;
+import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 
 import hudson.Extension;
