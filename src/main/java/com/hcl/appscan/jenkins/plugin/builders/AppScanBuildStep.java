@@ -288,7 +288,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			String status = provider.getStatus();
 		    			
-		    			while(status != null && status.equalsIgnoreCase(CoreConstants.RUNNING)) {
+		    			while(status != null && (status.equalsIgnoreCase(CoreConstants.INQUEUE) || status.equalsIgnoreCase(CoreConstants.RUNNING))) {
 		    				Thread.sleep(60000);
 		    				status = provider.getStatus();
 		    			}
