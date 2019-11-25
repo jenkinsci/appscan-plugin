@@ -1,10 +1,10 @@
-# IBM Application Security on Cloud Jenkins Plug-in
+# HCL AppScan on Cloud Jenkins Plug-in
 
-Easily integrate security testing into your Jenkins builds using the IBM Application Security on Cloud (ASoC) Jenkins Plug-in.
+Easily integrate security testing into your Jenkins builds using the HCL AppScan on Cloud Jenkins Plug-in.
 
 # Prerequisites
 
-- An account on the [HCL AppScan on Cloud](https://cloud.appscan.com/AsoCUI/serviceui/home) service. You'll need to [create an application](http://help.hcltechsw.com/appscan/ASoC/ent_create_application.html?query=create) on the service to associate your scans with.
+- An account on the [HCL AppScan on Cloud](https://cloud.appscan.com/) service. You'll need to [create an application](https://help.hcltechsw.com/appscan/ASoC/ent_create_application.html) on the service to associate your scans with.
 
 # Usage
 

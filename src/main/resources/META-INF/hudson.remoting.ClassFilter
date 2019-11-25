@@ -8,10 +8,10 @@ com.hcl.appscan.sdk.results.CloudResultsProvider
 com.hcl.appscan.sdk.scan.IScan
 com.hcl.appscan.sdk.scan.IScanServiceProvider
 com.hcl.appscan.sdk.scan.CloudScanServiceProvider
-com.ibm.appscan.jenkins.plugin.actions.ResultsRetriever
-com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials
-com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider
-com.ibm.appscan.jenkins.plugin.results.FailureCondition
-com.ibm.appscan.jenkins.plugin.results.ResultsInspector
-com.ibm.appscan.jenkins.plugin.scanners.Scanner
-com.ibm.appscan.jenkins.plugin.util.ScanProgress
+com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever
+com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials
+com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider
+com.hcl.appscan.jenkins.plugin.results.FailureCondition
+com.hcl.appscan.jenkins.plugin.results.ResultsInspector
+com.hcl.appscan.jenkins.plugin.scanners.Scanner
+com.hcl.appscan.jenkins.plugin.util.ScanProgress

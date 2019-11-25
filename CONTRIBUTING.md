@@ -76,5 +76,5 @@ By making a contribution to this project, I certify that:
   
   Instead of typing that in every git commit message, your Git tools might let you automatically add the details for you. If you configure them to do that, when you issue the `git commit` command, just add the `-s` option.
 
-If you are an IBMer, please contact us directly as the contribution process is
+If you are an HCLite, please contact us directly as the contribution process is
 slightly different.
