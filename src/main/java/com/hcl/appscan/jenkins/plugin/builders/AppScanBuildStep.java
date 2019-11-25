@@ -53,7 +53,6 @@ import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 
 import hudson.AbortException;
 import hudson.Extension;
