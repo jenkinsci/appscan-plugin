@@ -1,15 +1,15 @@
-## HCL AppScan Jenkins plugin
+# HCL AppScan Jenkins plugin
+Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in.
 
 ## License
 - All files found in this project are licensed under the [Apache License 2.0](LICENSE).
 
+## Note
 Older versions of this plugin may not be safe to use. Please review the
 following warnings before using an older version:
 
 -   [Plain text password shown in job configuration form
     fields](https://jenkins.io/security/advisory/2019-08-28/#SECURITY-1512)
-
-Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in.
 
 ## Prerequisites
 
