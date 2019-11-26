@@ -37,7 +37,7 @@
 	
   <groupId>com.hcl</groupId>
   <artifactId>ibm-application-security</artifactId>
-  <version>1.2.7-SNAPSHOT</version>
+  <version>1.2.7</version>
   <description>This plugin allows you to execute security scans with HCL AppScan</description>
   <packaging>hpi</packaging>
 
@@ -96,7 +96,7 @@
   	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin.git</connection>
   	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/ibm-asoc-plugin</url>
-    <tag>HEAD</tag>
+    <tag>ibm-application-security-1.2.7</tag>
   </scm>
 
 </project>
