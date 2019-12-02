@@ -3,10 +3,12 @@
  * @ Copyright HCL Technologies Ltd. 2019.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
-
 package com.hcl.appscan.jenkins.plugin.auth;
 
 import hudson.Extension;
+import hudson.init.InitMilestone;
+import hudson.init.Initializer;
+import hudson.model.Items;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 
@@ -54,7 +56,14 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	
 	@Symbol("asoc-credentials") //$NON-NLS-1$
     @Extension
-    public static final class DescriptorImpl extends CredentialsDescriptor {
+    public static class DescriptorImpl extends CredentialsDescriptor {
+		
+	 	//Retain backward compatibility
+    	@Initializer(before = InitMilestone.PLUGINS_STARTED)
+    	public static void createAliases() {   		
+    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials", com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials.class);
+    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider", com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider.class);
+       	}
     	
 		@Override
 		public String getDisplayName() {
