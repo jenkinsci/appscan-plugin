@@ -24,7 +24,7 @@ import com.hcl.appscan.sdk.auth.AuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.auth.LoginType;
 
-public final class JenkinsAuthenticationProvider implements IAuthenticationProvider, Serializable {
+public class JenkinsAuthenticationProvider implements IAuthenticationProvider, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	

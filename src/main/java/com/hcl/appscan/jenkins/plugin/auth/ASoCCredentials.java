@@ -6,9 +6,6 @@
 package com.hcl.appscan.jenkins.plugin.auth;
 
 import hudson.Extension;
-import hudson.init.InitMilestone;
-import hudson.init.Initializer;
-import hudson.model.Items;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 
@@ -58,13 +55,6 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
     @Extension
     public static class DescriptorImpl extends CredentialsDescriptor {
 		
-	 	//Retain backward compatibility
-    	@Initializer(before = InitMilestone.PLUGINS_STARTED)
-    	public static void createAliases() {   		
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.auth.ASoCCredentials", com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials.class);
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider", com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider.class);
-       	}
-    	
 		@Override
 		public String getDisplayName() {
 			return Messages.label_asoc();
