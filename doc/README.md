@@ -2,6 +2,11 @@
 Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in.
 
 ## Note
+Post upgrade to 1.2.7, existing credentials cannot be viewed or edited.
+In case you need to modify the existing credentials with new ID or secret,
+note down the label, delete that credential entry and create new credentials
+with same label.
+
 Older versions of this plugin may not be safe to use. Please review the
 following warnings before using an older version:
 
@@ -102,6 +107,10 @@ installation and configuration of the plugin.
 <http://help.hcltechsw.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins>
 
 ## Release History
+
+### 1.2.7 (December, 2019)
+
+-   HCL Washed Release.
 
 ### 1.2.6 (November, 2019)
 
