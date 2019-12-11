@@ -37,6 +37,7 @@ import com.hcl.appscan.sdk.error.ScannerException;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.logging.StdOutProgress;
+import com.hcl.appscan.sdk.results.ASEResultsProvider;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
@@ -45,7 +46,9 @@ import com.hcl.appscan.sdk.utils.SystemUtil;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.ScanFactory;
 import com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever;
+import com.hcl.appscan.jenkins.plugin.auth.ASEJenkinsAuthenticationProvider;
 import com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials;
+import com.hcl.appscan.jenkins.plugin.auth.ASECredentials;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.jenkins.plugin.results.FailureCondition;
 import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
@@ -76,7 +79,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.tasks.SimpleBuildStep;
 
-public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
+public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildStep, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -84,7 +87,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private String m_name;
 	private String m_type;
 	private String m_target;
-	private String m_application;
 	private String m_credentials;
 	private List<FailureCondition> m_failureConditions;
 	private boolean m_emailNotification;
@@ -95,12 +97,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
-	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email) {
+	public AppScanEnterpriseBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email) {
 		m_scanner = scanner;
-		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		m_name = (name == null || name.trim().equals("")) ? "" + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
 		m_target = target;
-		m_application = application;
+		
 		m_credentials = credentials;
 		m_failureConditions = failureConditions;
 		m_emailNotification = email;
@@ -110,12 +112,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
 	
 	@DataBoundConstructor
-	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
+	public AppScanEnterpriseBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
 		m_scanner = scanner;
-		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		m_name = (name == null || name.trim().equals("")) ? "" + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
 		m_target = "";
-		m_application = application;
+	
 		m_credentials = credentials;
 		m_emailNotification = false;
 		m_wait = false;
@@ -144,9 +146,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		return m_target;
 	}
 	
-	public String getApplication() {
-		return m_application;
-	}
+	
 	
 	public String getCredentials() {
 		return m_credentials;
@@ -206,6 +206,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+        if (m_scanner.getType().equals("AppScan Enterprise Dynamic Analyzer")){
+            performASEScan ((Run<?,?>)build, launcher, listener);
+            return true;
+        }
     	perform((Run<?,?>)build, launcher, listener);
 		return true;
     }
@@ -231,7 +235,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
 		Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-                properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
@@ -308,6 +311,54 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             shouldFailBuild(provider,build);	
     }
     
+    private void performASEScan(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
+        Map<String,String> properties=getScanProperties(build, listener);
+    	m_authProvider = new ASEJenkinsAuthenticationProvider(properties.get("credentials"), build.getParent().getParent());
+    	final IProgress progress = new ScanProgress(listener);
+    	final boolean suspend = m_wait;
+    	final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
+        
+    	
+    	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void checkRoles(RoleChecker arg0) {
+			}
+
+			@Override
+			public IResultsProvider call() throws AbortException {
+				try {
+					setInstallDir();
+		    		scan.run();
+		    		
+                                IResultsProvider provider=new ASEResultsProvider(scan.getScanId(), scan.getType(), scan.getServiceProvider(), progress);
+                                provider.setReportFormat(scan.getReportFormat());
+		    		if(suspend) {
+		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
+		    			String status = provider.getStatus();
+		    			
+		    			while(status != null && (status.equalsIgnoreCase(CoreConstants.INQUEUE) || status.equalsIgnoreCase(CoreConstants.RUNNING))) {
+		    				Thread.sleep(60000);
+		    				status = provider.getStatus();
+		    			}
+		    		}
+		    		
+		    		return provider;
+		    	}
+		    	catch(ScannerException | InvalidTargetException | InterruptedException e) {
+		    		throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
+		    	}
+			}
+		});
+
+    	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+    	build.addAction(new ResultsRetriever(build, provider, m_name));
+                
+        if(m_wait)
+            shouldFailBuild(provider,build);	
+    }
+    
     private void setInstallDir() {
     	if (SystemUtil.isWindows() && System.getProperty("user.home").toLowerCase().indexOf("system32")>=0) {
     		System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, JENKINS_INSTALL_DIR.getPath());
@@ -321,12 +372,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	//Retain backward compatibility
     	@Initializer(before = InitMilestone.PLUGINS_STARTED)
     	public static void createAliases() {
-		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.builders.AppScanBuildStep", com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep.class);
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.StaticAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.StaticAnalyzer.class);
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.DynamicAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.DynamicAnalyzer.class);
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.MobileAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.MobileAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
-		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
+            Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
     	}
     	
     	@Override
@@ -336,55 +383,51 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
     	@Override
         public String getDisplayName() {
-            	return Messages.label_build_step();
+            	return "Run AppScan Enterprise Security Test";
         }
     	
-    	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+    	public ListBoxModel doFillCredentialsItems(@QueryParameter String scanner, @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
     		//We could just use listCredentials() to get the ListBoxModel, but need to work around JENKINS-12802.
-    		ListBoxModel model = new ListBoxModel();
-    		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
-    				ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
-    		boolean hasSelected = false;
-    		
-    		for(ASoCCredentials creds : credentialsList) {
-    			if(creds.getId().equals(credentials))
-    				hasSelected = true;
-    			String displayName = creds.getDescription();
-    			displayName = displayName == null || displayName.equals("") ? creds.getUsername() + "/******" : displayName; //$NON-NLS-1$
-    			model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
-    		}
-    		if(!hasSelected)
-    			model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
-    		return model;
+		
+		if(scanner.equalsIgnoreCase("AppScan Enterprise Dynamic Analyzer")){
+		    ListBoxModel model = new ListBoxModel();
+		    List<ASECredentials> credentialsList = CredentialsProvider.lookupCredentials(ASECredentials.class, context,
+				    ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
+		    //boolean hasSelected = false;
+
+		    for(ASECredentials creds : credentialsList) {
+			    //if(creds.getId().equals(credentials))
+				    //hasSelected = true;
+			    String displayName = creds.getDescription();
+			    displayName = displayName == null || displayName.equals("") ? creds.getUsername() + "/******" : displayName; //$NON-NLS-1$
+			    model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
+		    }
+		    //if(!hasSelected)
+		    //	model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
+		    return model;
+                }
+                else {
+			ListBoxModel model = new ListBoxModel();
+			List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
+					ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
+			boolean hasSelected = false;
+
+			for(ASoCCredentials creds : credentialsList) {
+				if(creds.getId().equals(credentials))
+					hasSelected = true;
+				String displayName = creds.getDescription();
+				displayName = displayName == null || displayName.equals("") ? creds.getUsername() + "/******" : displayName; //$NON-NLS-1$
+				model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
+			}
+			if(!hasSelected)
+				model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
+			return model;            
+                }
     	}
     	
-    	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-    		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
-    		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
-    		ListBoxModel model = new ListBoxModel();
-    		
-    		if(applications != null) {
-        		List<Entry<String , String>> list=sortApplications(applications.entrySet());
-    			
-	    		for(Map.Entry<String, String> entry : list)
-	    			model.add(entry.getValue(), entry.getKey());
-    		}
-    		return model;
-    	}
     	
-    	private List<Entry<String , String>> sortApplications(Set<Entry<String , String>> set) {
-    		List<Entry<String , String>> list= new ArrayList<>(set);
-    		if (list.size()>1) {
-    			Collections.sort( list, new Comparator<Map.Entry<String, String>>()
-                {
-                    public int compare( Map.Entry<String, String> o1, Map.Entry<String, String> o2 )
-                    {
-                        return (o1.getValue().toLowerCase()).compareTo( o2.getValue().toLowerCase() );
-                    }
-                } );
-    		}
-		return list;
-    	}
+    	
+    	
     	
     	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
     		if(credentials.trim().equals("")) //$NON-NLS-1$
@@ -397,9 +440,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		return FormValidation.ok();
     	}
     	
-    	public FormValidation doCheckApplication(@QueryParameter String application) {
-    		return FormValidation.validateRequired(application);
-    	}
+    	
     }
 }
 

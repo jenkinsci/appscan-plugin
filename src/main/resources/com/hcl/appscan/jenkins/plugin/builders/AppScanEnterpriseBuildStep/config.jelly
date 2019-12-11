@@ -1,0 +1,64 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <!--
+    © Copyright IBM Corporation 2016.
+    LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+    -->
+    <script type="text/javascript" src="${resURL}/plugin/ibm-application-security/js/util.js"></script>
+
+    <!--<f:dropdownDescriptorSelector title="${%label.type}" field="scanner"/>-->
+    
+    <f:entry title="${%label.credentials}" field="credentials">
+        <f:select />
+    </f:entry>
+	
+    <f:entry title="${%label.application}" field="application">
+        <f:select />
+    </f:entry>
+    <f:entry title="${%label.starting.url}" field="target">
+        <f:textbox />
+    </f:entry>
+        
+    <f:entry title="${%label.ase.folder}" field="folderId">
+        <f:select />
+    </f:entry>
+        
+    <f:entry title="${%label.ase.test.policies}" field="aseTestPolicy">
+        <f:select />
+    </f:entry>
+    
+    <f:entry title="${%label.aseTemplate}" field="aseTemplate">
+        <f:select />
+    </f:entry>
+    
+    <f:entry title="" />
+    
+    <f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
+        <f:entry title="${%label.ase.agent}" field="aseAgent">
+            <f:select />
+        </f:entry>			
+    </f:optionalBlock>
+    
+    <f:section title="" />
+        
+    <f:entry title="${%label.scan.name}" field="scanName">
+        <f:textbox />
+    </f:entry>
+
+    <f:entry field="email">
+        <f:checkbox title="${%label.email}"/>
+    </f:entry>
+
+    <f:entry field="wait">
+        <f:checkbox title="${%label.wait}" onclick="waitClicked(this);" readonly="true" name="wait"/>
+    </f:entry>
+
+    <f:entry field="failBuild">
+        <f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" readonly="false" name="failBuild"/>
+    </f:entry>
+    
+    <f:entry field="failureConditions">
+        <f:repeatableProperty field="failureConditions" minimum="0" add="${%label.add.condition}"/>
+    </f:entry>
+
+</j:jelly>
