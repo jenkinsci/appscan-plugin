@@ -3,7 +3,6 @@
  * @ Copyright HCL Technologies Ltd. 2019.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
-
 package com.hcl.appscan.jenkins.plugin.auth;
 
 import hudson.Extension;
@@ -54,8 +53,8 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	
 	@Symbol("asoc-credentials") //$NON-NLS-1$
     @Extension
-    public static final class DescriptorImpl extends CredentialsDescriptor {
-    	
+    public static class DescriptorImpl extends CredentialsDescriptor {
+		
 		@Override
 		public String getDisplayName() {
 			return Messages.label_asoc();
