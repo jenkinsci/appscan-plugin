@@ -30,7 +30,7 @@ import hudson.model.ItemGroup;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 
-public final class JenkinsAuthenticationProvider implements IAuthenticationProvider, Serializable {
+public class JenkinsAuthenticationProvider implements IAuthenticationProvider, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
