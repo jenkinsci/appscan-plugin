@@ -4,9 +4,7 @@
     © Copyright IBM Corporation 2016.
     LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
     -->
-    <script type="text/javascript" src="${resURL}/plugin/ibm-application-security/js/util.js"></script>
-
-    <!--<f:dropdownDescriptorSelector title="${%label.type}" field="scanner"/>-->
+    <script type="text/javascript" src="${resURL}/plugin/ibm-application-security/js/util.js"></script>    
     
     <f:entry title="${%label.credentials}" field="credentials">
         <f:select />
@@ -15,33 +13,58 @@
     <f:entry title="${%label.application}" field="application">
         <f:select />
     </f:entry>
+    
     <f:entry title="${%label.starting.url}" field="target">
         <f:textbox />
     </f:entry>
         
-    <f:entry title="${%label.ase.folder}" field="folderId">
+    <f:entry title="${%label.folder}" field="folder">
         <f:select />
     </f:entry>
         
-    <f:entry title="${%label.ase.test.policies}" field="aseTestPolicy">
+    <f:entry title="${%label.test.policy}" field="testPolicy">
         <f:select />
     </f:entry>
     
-    <f:entry title="${%label.aseTemplate}" field="aseTemplate">
+    <f:entry title="${%label.template}" field="template">
         <f:select />
     </f:entry>
+   
+    <f:section title="${%label.login.management}" field="loginTypeOptions">   
+        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true">
+            <st:nbsp/>
+            <f:entry title="${%label.traffic.file}" id="ifRecorded" field="trafficFile"> 
+                <f:textbox />
+            </f:entry>
+        </f:radioBlock>
+	
+        <f:radioBlock name="loginType" title="${%label.automatic}">
+            <f:entry title="${%label.user.name}" field="userName">
+                <f:textbox field="accessId" />
+            </f:entry>
+            <f:entry title="${%label.password}" field="password">
+                <f:password field="secretKey" />
+            </f:entry>
+        </f:radioBlock>
+	
+        <f:radioBlock name="loginType" title="${%label.none}" />
+    </f:section>
     
-    <f:entry title="" />
-    
+    <f:section title=" " />
+       
+    <f:entry title="${%label.explore.data}" field="exploreData">
+        <f:textbox />
+    </f:entry>
+        
     <f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
-        <f:entry title="${%label.ase.agent}" field="aseAgent">
+        <f:entry title="${%label.agent}" field="agent">
             <f:select />
         </f:entry>			
     </f:optionalBlock>
     
     <f:section title="" />
         
-    <f:entry title="${%label.scan.name}" field="scanName">
+    <f:entry title="${%label.job.name}" field="jobName">
         <f:textbox />
     </f:entry>
 
