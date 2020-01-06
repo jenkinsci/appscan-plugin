@@ -86,6 +86,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_template;
 	private String m_agent;	
 	private String m_jobName;
+	private String m_trafficFile;
+	private String m_exploreData;
 	private boolean m_email;
 	private boolean m_wait;
 	private boolean m_failBuild;
@@ -96,7 +98,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	@Deprecated
 	public AppScanEnterpriseBuildStep(String credentials, String application, String target, String folder, String testPolicy, String template, String agent, String jobName, 
-			boolean email, boolean wait, boolean failBuild, List<FailureCondition> failureConditions) {
+			String trafficFile, String exploreData, boolean email, boolean wait, boolean failBuild, List<FailureCondition> failureConditions) {
 		
 		m_credentials = credentials;
 		m_application = application;
@@ -105,7 +107,9 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_testPolicy = testPolicy;
 		m_template = template;
 		m_agent = agent;
-		m_jobName = (String) ((jobName == null || jobName.trim().equals("")) ? ThreadLocalRandom.current().nextInt(0, 10000) : jobName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$		
+		m_jobName = (String) ((jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$		
+		m_trafficFile = trafficFile;
+		m_exploreData = exploreData;
 		m_email = email;
 		m_wait = wait;
 		m_failBuild = failBuild;
@@ -122,7 +126,9 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_testPolicy = testPolicy;
 		m_template = template;
 		m_agent = "";
-		m_jobName = (String) ((jobName == null || jobName.trim().equals("")) ? ThreadLocalRandom.current().nextInt(0, 10000) : jobName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		m_jobName = (jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		m_trafficFile = "";
+		m_exploreData = "";
 		m_email = false;
 		m_wait = false;
 		m_failBuild = false;
@@ -164,7 +170,25 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	public String getTarget() {
 		return m_target;
-	}	
+	}
+        
+        @DataBoundSetter
+        public void setTrafficFile (String trafficFile) {
+            m_trafficFile = trafficFile;
+        }
+        
+        public String getTrafficFile() {
+            return m_trafficFile;
+        }
+        
+        @DataBoundSetter
+        public void setExploreData(String exploreData){
+            m_exploreData = exploreData;
+        }
+        
+        public String getExploreData(){
+            return m_exploreData;
+        }
 
 	@DataBoundSetter
 	public void setAgent(String agent) {
@@ -246,6 +270,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		properties.put("testPolicyId", m_testPolicy);
 		properties.put("templateId", m_template);
 		properties.put("agentServer", m_agent);
+		properties.put("exploreData", m_exploreData);
 		properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
@@ -297,8 +322,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 						String status = provider.getStatus();
 
-						while (status != null && (status.equalsIgnoreCase(CoreConstants.INQUEUE)
-								|| status.equalsIgnoreCase(CoreConstants.RUNNING))) {
+						while(status != null && (status.equalsIgnoreCase("Waiting to Run") 
+								|| status.equalsIgnoreCase("Starting") ||status.equalsIgnoreCase("Running"))) {
 							Thread.sleep(60000);
 							status = provider.getStatus();
 						}
