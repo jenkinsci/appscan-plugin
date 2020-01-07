@@ -84,21 +84,27 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_folder;
 	private String m_testPolicy;
 	private String m_template;
+	private String m_exploreData;
 	private String m_agent;	
 	private String m_jobName;
-	private String m_trafficFile;
-	private String m_exploreData;
 	private boolean m_email;
 	private boolean m_wait;
 	private boolean m_failBuild;
 	private List<FailureCondition> m_failureConditions;
+
+	//LoginMangement
+	private String m_loginType;
+	private String m_trafficFile;
+	private String m_userName;
+	private String m_password;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	@Deprecated
-	public AppScanEnterpriseBuildStep(String credentials, String application, String target, String folder, String testPolicy, String template, String agent, String jobName, 
-			String trafficFile, String exploreData, boolean email, boolean wait, boolean failBuild, List<FailureCondition> failureConditions) {
+	public AppScanEnterpriseBuildStep(String credentials, String application, String target, String folder, String testPolicy, String template, 
+		    String exploreData, String agent, String jobName, boolean email, boolean wait, boolean failBuild, 
+		    List<FailureCondition> failureConditions) {
 		
 		m_credentials = credentials;
 		m_application = application;
@@ -106,10 +112,9 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_folder = folder;
 		m_testPolicy = testPolicy;
 		m_template = template;
+		m_exploreData = exploreData;
 		m_agent = agent;
 		m_jobName = (String) ((jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$		
-		m_trafficFile = trafficFile;
-		m_exploreData = exploreData;
 		m_email = email;
 		m_wait = wait;
 		m_failBuild = failBuild;
@@ -117,7 +122,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 
 	@DataBoundConstructor
-	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
+	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template,  
+		 String loginType, String trafficFile, String accessId, String secretKey, String jobName) {
 		
 		m_credentials = credentials;
 		m_application = "";	
@@ -125,13 +131,18 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_folder = folder;
 		m_testPolicy = testPolicy;
 		m_template = template;
+		m_exploreData = "";
 		m_agent = "";
 		m_jobName = (jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		m_trafficFile = "";
-		m_exploreData = "";
 		m_email = false;
 		m_wait = false;
 		m_failBuild = false;
+		
+		m_loginType = loginType;
+		m_trafficFile = trafficFile;
+		m_userName = accessId;
+		m_password = secretKey;
+		
 	}
 	
 	public String getCredentials() {
@@ -150,6 +161,28 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_template;
 	}
 	
+	public String getLoginType() {
+		return m_loginType;
+	}
+	
+	public String getTrafficFile() {
+		if(!m_loginType.equals("Recorded"))
+			return "";
+		return m_trafficFile;
+	}
+	
+	public String getAccessId() {
+		if(!m_loginType.equals("Automatic"))
+			return "";
+		return m_userName;
+	}
+	
+	public String getSecretKey() {
+		if(!m_loginType.equals("Automatic"))
+			return "";
+		return m_password;
+	}
+
 	public String getJobName() {
 		return m_jobName;
 	}
@@ -171,16 +204,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getTarget() {
 		return m_target;
 	}
-        
-        @DataBoundSetter
-        public void setTrafficFile (String trafficFile) {
-            m_trafficFile = trafficFile;
-        }
-        
-        public String getTrafficFile() {
-            return m_trafficFile;
-        }
-        
+
         @DataBoundSetter
         public void setExploreData(String exploreData){
             m_exploreData = exploreData;
@@ -259,6 +283,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public BuildStepMonitor getRequiredMonitorService() {
 		return BuildStepMonitor.NONE;
 	}
+	
+	public String isLoginType(String testTypeName) {
+		return m_loginType.equalsIgnoreCase(testTypeName) ? "true" : "";
+	}
 
 	private Map<String, String> getScanProperties(Run<?, ?> build, TaskListener listener) {
 		Map<String, String> properties = new HashMap<String, String>();
@@ -271,6 +299,14 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		properties.put("templateId", m_template);
 		properties.put("agentServer", m_agent);
 		properties.put("exploreData", m_exploreData);
+		properties.put("loginType", m_loginType);
+		if(m_loginType.equals("Recorded")) {
+			properties.put("trafficFile", m_trafficFile);
+		} else if (m_loginType.equals("Automatic")) {
+			properties.put("userName", m_userName);
+			properties.put("password",m_password);			
+		}
+				
 		properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");

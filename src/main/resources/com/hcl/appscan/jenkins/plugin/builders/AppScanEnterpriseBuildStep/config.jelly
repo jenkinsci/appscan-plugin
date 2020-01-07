@@ -30,15 +30,15 @@
         <f:select />
     </f:entry>
    
-    <f:section title="${%label.login.management}" field="loginTypeOptions">   
-        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true">
+    <f:section title="${%label.login.management}" field="loginTypeOptions">
+        <f:radioBlock name="loginType" title="${%label.recorded}" checked="${instance.isLoginType('Recorded')}" value="Recorded" inline="true">
             <st:nbsp/>
-            <f:entry title="${%label.traffic.file}" id="ifRecorded" field="trafficFile"> 
+            <f:entry title="${%label.traffic.file}" field="trafficFile">
                 <f:textbox />
             </f:entry>
         </f:radioBlock>
 	
-        <f:radioBlock name="loginType" title="${%label.automatic}">
+        <f:radioBlock name="loginType" title="${%label.automatic}" checked="${instance.isLoginType('Automatic')}" value="Automatic" inline="true">
             <f:entry title="${%label.user.name}" field="userName">
                 <f:textbox field="accessId" />
             </f:entry>
@@ -47,7 +47,7 @@
             </f:entry>
         </f:radioBlock>
 	
-        <f:radioBlock name="loginType" title="${%label.none}" />
+        <f:radioBlock name="loginType" title="${%label.none}" checked="${instance.isLoginType('None')}" value="None" inline="true" />
     </f:section>
     
     <f:section title=" " />
