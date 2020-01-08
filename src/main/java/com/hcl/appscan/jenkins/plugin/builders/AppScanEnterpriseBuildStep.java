@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -284,8 +285,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return BuildStepMonitor.NONE;
 	}
 	
-	public String isLoginType(String testTypeName) {
-		return m_loginType.equalsIgnoreCase(testTypeName) ? "true" : "";
+	public String isLoginType(String loginTypeName) {
+		if (m_loginType != null)
+			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
+		else if (loginTypeName.equals("Recorded")) { //Default
+			return "true";	
+		}
+		return "";
 	}
 
 	private Map<String, String> getScanProperties(Run<?, ?> build, TaskListener listener) {
@@ -299,14 +305,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		properties.put("templateId", m_template);
 		properties.put("agentServer", m_agent);
 		properties.put("exploreData", m_exploreData);
-		properties.put("loginType", m_loginType);
-		if(m_loginType.equals("Recorded")) {
-			properties.put("trafficFile", m_trafficFile);
-		} else if (m_loginType.equals("Automatic")) {
-			properties.put("userName", m_userName);
-			properties.put("password",m_password);			
-		}
-				
+		properties.put("loginType", m_loginType);		
+		if (m_loginType != null) {
+			if (m_loginType.equals("Recorded")) {
+				properties.put("trafficFile", m_trafficFile);
+			} else if (m_loginType.equals("Automatic")) {
+				properties.put("userName", m_userName);
+				properties.put("password",m_password);			
+			}
+		}				
 		properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
@@ -385,8 +392,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 	}
 
-	@Symbol("appscan") //$NON-NLS-1$
-	@Extension
+	@Symbol("appscanenterprise") //$NON-NLS-1$
+    @Extension
 	public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
 		@Override
@@ -454,8 +461,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			IComponent componentProvider = ConfigurationProviderFactory.getScanner("Folder", authProvider);
 			Map<String, String> items = componentProvider.getComponents();
 			ListBoxModel model = new ListBoxModel();
-			model.add(""); //$NON-NLS-1$
-
+			
 			if (items != null) {
 				for (Map.Entry<String, String> entry : items.entrySet())
 					model.add(entry.getValue(), entry.getKey());
@@ -468,8 +474,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			IComponent componentProvider = ConfigurationProviderFactory.getScanner("TestPolicies", authProvider);
 			Map<String, String> items = componentProvider.getComponents();
-			ListBoxModel model = new ListBoxModel();
-			model.add(""); //$NON-NLS-1$
+			ListBoxModel model = new ListBoxModel();			
 
 			if (items != null) {
 				for (Map.Entry<String, String> entry : items.entrySet())
@@ -483,12 +488,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			IComponent componentProvider = ConfigurationProviderFactory.getScanner("Template", authProvider);
 			Map<String, String> items = componentProvider.getComponents();
-			ListBoxModel model = new ListBoxModel();
-			model.add(""); //$NON-NLS-1$
+			ListBoxModel model = new ListBoxModel();			
 
 			if (items != null) {
-				for (Map.Entry<String, String> entry : items.entrySet())
-					model.add(entry.getValue(), entry.getKey());
+				for (Map.Entry<String, String> entry : items.entrySet()) {
+					String template = StringEscapeUtils.unescapeHtml(entry.getValue());
+					model.add(template, entry.getKey());
+				}
 			}
 			return model;
 		}

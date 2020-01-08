@@ -9,26 +9,32 @@
     <f:entry title="${%label.credentials}" field="credentials">
         <f:select />
     </f:entry>
-	
-    <f:entry title="${%label.application}" field="application">
-        <f:select />
-    </f:entry>
     
-    <f:entry title="${%label.starting.url}" field="target">
-        <f:textbox />
-    </f:entry>
-        
-    <f:entry title="${%label.folder}" field="folder">
-        <f:select />
-    </f:entry>
-        
-    <f:entry title="${%label.test.policy}" field="testPolicy">
-        <f:select />
-    </f:entry>
-    
-    <f:entry title="${%label.template}" field="template">
-        <f:select />
-    </f:entry>
+    <f:section title="Job Properties" field="loginTypeOptions">    
+	    <f:entry title="${%label.template}" field="template">
+	        <f:select />
+	    </f:entry>    
+	            
+	    <f:entry title="${%label.job.name}" field="jobName">
+	        <f:textbox />
+	    </f:entry>
+		        
+	    <f:entry title="${%label.folder}" field="folder">
+	        <f:select />
+	    </f:entry>
+	    
+	    <f:entry title="${%label.application}" field="application">
+	        <f:select />
+	    </f:entry>
+	    
+	    <f:entry title="${%label.test.policy}" field="testPolicy">
+	        <f:select />
+	    </f:entry>
+	    
+	    <f:entry title="${%label.starting.url}" field="target">
+	        <f:textbox />
+	    </f:entry>
+     </f:section>
    
     <f:section title="${%label.login.management}" field="loginTypeOptions">
         <f:radioBlock name="loginType" title="${%label.recorded}" checked="${instance.isLoginType('Recorded')}" value="Recorded" inline="true">
@@ -50,38 +56,37 @@
         <f:radioBlock name="loginType" title="${%label.none}" checked="${instance.isLoginType('None')}" value="None" inline="true" />
     </f:section>
     
-    <f:section title=" " />
-       
-    <f:entry title="${%label.explore.data}" field="exploreData">
-        <f:textbox />
-    </f:entry>
+    <f:section title="${%label.manual.explore}" field="loginTypeOptions">
+	    <f:entry title="${%label.explore.data}" field="exploreData">
+	        <f:textbox />
+	    </f:entry>
+    </f:section>
+    
+    <f:section title="" />
         
     <f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
         <f:entry title="${%label.agent}" field="agent">
             <f:select />
-        </f:entry>			
+        </f:entry>
     </f:optionalBlock>
     
     <f:section title="" />
-        
-    <f:entry title="${%label.job.name}" field="jobName">
-        <f:textbox />
-    </f:entry>
-
-    <f:entry field="email">
-        <f:checkbox title="${%label.email}"/>
+                   
+    <f:entry>
+	    <div>
+	        <a target="_blank" href="https://www.ibm.com/support/knowledgecenter/en/SSW2NF_9.0.3/com.ibm.ase.help.doc/topics/t_set_up_control_center.html">${%label.email.doc.link}</a>
+		</div>       
     </f:entry>
 
     <f:entry field="wait">
-        <f:checkbox title="${%label.wait}" onclick="waitClicked(this);" readonly="true" name="wait"/>
+        <f:checkbox title="${%label.wait}" onclick="aseWaitClicked(this);" name="wait"/>
     </f:entry>
 
     <f:entry field="failBuild">
-        <f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" readonly="false" name="failBuild"/>
+        <f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" name="failBuild"/>
     </f:entry>
     
     <f:entry field="failureConditions">
         <f:repeatableProperty field="failureConditions" minimum="0" add="${%label.add.condition}"/>
     </f:entry>
-
-</j:jelly>
+ </j:jelly>
