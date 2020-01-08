@@ -205,14 +205,14 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_target;
 	}
 
-        @DataBoundSetter
-        public void setExploreData(String exploreData){
-            m_exploreData = exploreData;
-        }
+    @DataBoundSetter
+    public void setExploreData(String exploreData) {
+        m_exploreData = exploreData;
+    }
         
-        public String getExploreData(){
-            return m_exploreData;
-        }
+    public String getExploreData() {
+       return m_exploreData;
+    }
 
 	@DataBoundSetter
 	public void setAgent(String agent) {
