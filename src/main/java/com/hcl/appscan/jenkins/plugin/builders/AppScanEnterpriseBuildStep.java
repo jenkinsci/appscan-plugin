@@ -1,6 +1,5 @@
 /**
- * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017,2019.
+ * @ Copyright HCL Technologies Ltd. 2019.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -86,7 +85,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_testPolicy;
 	private String m_template;
 	private String m_exploreData;
-	private String m_agent;	
+	private String m_agent;
 	private String m_jobName;
 	private boolean m_email;
 	private boolean m_wait;
@@ -99,35 +98,17 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_userName;
 	private String m_password;
 	
+	private String m_scanType;
+	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
 
-	@Deprecated
-	public AppScanEnterpriseBuildStep(String credentials, String application, String target, String folder, String testPolicy, String template, 
-		    String exploreData, String agent, String jobName, boolean email, boolean wait, boolean failBuild, 
-		    List<FailureCondition> failureConditions) {
-		
-		m_credentials = credentials;
-		m_application = application;
-		m_target = target;
-		m_folder = folder;
-		m_testPolicy = testPolicy;
-		m_template = template;
-		m_exploreData = exploreData;
-		m_agent = agent;
-		m_jobName = (String) ((jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$		
-		m_email = email;
-		m_wait = wait;
-		m_failBuild = failBuild;
-		m_failureConditions = failureConditions;
-	}
-
 	@DataBoundConstructor
-	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template,  
-		 String loginType, String trafficFile, String accessId, String secretKey, String jobName) {
+	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template,
+		 String loginType, String trafficFile, String accessId, String secretKey, String jobName, String scanType) {
 		
 		m_credentials = credentials;
-		m_application = "";	
+		m_application = "";
 		m_target = "";
 		m_folder = folder;
 		m_testPolicy = testPolicy;
@@ -144,6 +125,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_userName = accessId;
 		m_password = secretKey;
 		
+		m_scanType = scanType;		
 	}
 	
 	public String getCredentials() {
@@ -188,6 +170,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_jobName;
 	}
 	
+	public String getScanType() {
+		return m_scanType;
+	}
+	
 	@DataBoundSetter
 	public void setApplication(String application) {
 		m_application = application;
@@ -210,7 +196,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
     public void setExploreData(String exploreData) {
         m_exploreData = exploreData;
     }
-        
+    
     public String getExploreData() {
        return m_exploreData;
     }
@@ -289,7 +275,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		if (m_loginType != null)
 			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
 		else if (loginTypeName.equals("Recorded")) { //Default
-			return "true";	
+			return "true";
+		}
+		return "";
+	}
+	
+	public String isScanType(String scanType) {
+		if(m_scanType != null) {
+			return m_scanType.equalsIgnoreCase(scanType) ? "true" : "";
+		} else if (scanType.equals("1")) { //Default
+			return "true";
 		}
 		return "";
 	}
@@ -297,7 +292,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private Map<String, String> getScanProperties(Run<?, ?> build, TaskListener listener) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(CoreConstants.SCANNER_TYPE, ASE_DYNAMIC_ANALYZER);
-		properties.put("credentials", m_credentials);	
+		properties.put("credentials", m_credentials);
 		properties.put("application", m_application);
 		properties.put("startingURL", m_target);
 		properties.put("folder", m_folder);
@@ -305,15 +300,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		properties.put("templateId", m_template);
 		properties.put("agentServer", m_agent);
 		properties.put("exploreData", m_exploreData);
-		properties.put("loginType", m_loginType);		
+		properties.put("loginType", m_loginType);	
 		if (m_loginType != null) {
 			if (m_loginType.equals("Recorded")) {
 				properties.put("trafficFile", m_trafficFile);
 			} else if (m_loginType.equals("Automatic")) {
 				properties.put("userName", m_userName);
-				properties.put("password",m_password);			
+				properties.put("password",m_password);	
 			}
-		}				
+		}
+		properties.put("scanType", m_scanType);
 		properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
@@ -342,8 +338,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				build.getParent().getParent());
 		final IProgress progress = new ScanProgress(listener);
 		final boolean suspend = m_wait;
-		final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider); // joy Call ASEScanFactory
-																							// directly
+		final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider); // Call ASEScanFactory directly
 
 		IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
@@ -365,13 +360,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 						String status = provider.getStatus();
 
-						while(status != null && (status.equalsIgnoreCase("Waiting to Run") 
+						while(status != null && (status.equalsIgnoreCase("Waiting to Run")
 								|| status.equalsIgnoreCase("Starting") ||status.equalsIgnoreCase("Running"))) {
 							Thread.sleep(60000);
 							status = provider.getStatus();
 						}
 					}
-
 					return provider;
 				} catch (ScannerException | InvalidTargetException | InterruptedException e) {
 					throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
@@ -474,7 +468,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			IComponent componentProvider = ConfigurationProviderFactory.getScanner("TestPolicies", authProvider);
 			Map<String, String> items = componentProvider.getComponents();
-			ListBoxModel model = new ListBoxModel();			
+			ListBoxModel model = new ListBoxModel();
 
 			if (items != null) {
 				for (Map.Entry<String, String> entry : items.entrySet())
@@ -488,7 +482,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			IComponent componentProvider = ConfigurationProviderFactory.getScanner("Template", authProvider);
 			Map<String, String> items = componentProvider.getComponents();
-			ListBoxModel model = new ListBoxModel();			
+			ListBoxModel model = new ListBoxModel();
 
 			if (items != null) {
 				for (Map.Entry<String, String> entry : items.entrySet()) {

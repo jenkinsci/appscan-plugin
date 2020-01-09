@@ -1,8 +1,8 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
     <!--
-    © Copyright IBM Corporation 2016.
-    LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+ 	@ Copyright HCL Technologies Ltd. 2019.
+ 	LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
     -->
     <script type="text/javascript" src="${resURL}/plugin/ibm-application-security/js/util.js"></script>    
     
@@ -10,10 +10,10 @@
         <f:select />
     </f:entry>
     
-    <f:section title="Job Properties" field="loginTypeOptions">    
+    <f:section title="Job Properties" field="loginTypeOptions">
 	    <f:entry title="${%label.template}" field="template">
 	        <f:select />
-	    </f:entry>    
+	    </f:entry>
 	            
 	    <f:entry title="${%label.job.name}" field="jobName">
 	        <f:textbox />
@@ -54,6 +54,12 @@
         </f:radioBlock>
 	
         <f:radioBlock name="loginType" title="${%label.none}" checked="${instance.isLoginType('None')}" value="None" inline="true" />
+    </f:section>    
+    
+    <f:section title="${%label.scan}" field="scanTypeOptions">
+        <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="${instance.isScanType('1')}" value="1"  help="/plugin/ibm-application-security/help/scanFull.html" inline="true"/>
+        <f:radioBlock name="scanType" title="${%label.scan.explore}"  checked="${instance.isScanType('2')}" value="2"  help="/plugin/ibm-application-security/help/scanExplore.html" inline="true"/>
+        <f:radioBlock name="scanType" title="${%label.scan.test}"  checked="${instance.isScanType('3')}" value="3"  help="/plugin/ibm-application-security/help/scanTest.html" inline="true"/>
     </f:section>
     
     <f:section title="${%label.manual.explore}" field="loginTypeOptions">
@@ -71,11 +77,11 @@
     </f:optionalBlock>
     
     <f:section title="" />
-                   
+
     <f:entry>
 	    <div>
 	        <a target="_blank" href="https://www.ibm.com/support/knowledgecenter/en/SSW2NF_9.0.3/com.ibm.ase.help.doc/topics/t_set_up_control_center.html">${%label.email.doc.link}</a>
-		</div>       
+		</div>
     </f:entry>
 
     <f:entry field="wait">

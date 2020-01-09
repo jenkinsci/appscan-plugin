@@ -1,8 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/** 
+ * @ Copyright HCL Technologies Ltd. 2019.
+ * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
+
 package com.hcl.appscan.jenkins.plugin.auth;
 
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
@@ -15,7 +15,6 @@ import hudson.util.Secret;
 import java.util.List;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 public class ASECredentials extends UsernamePasswordCredentialsImpl{
@@ -28,7 +27,7 @@ public class ASECredentials extends UsernamePasswordCredentialsImpl{
 	@DataBoundConstructor
 	public ASECredentials(String id, String description, String username, String password, String url) {
 		this(CredentialsScope.GLOBAL, id, description, username, password);
-		m_url=url;                
+		m_url=url;
 	}
 	
 	public ASECredentials(CredentialsScope scope, String id, String description, String username, String password) {
@@ -47,8 +46,8 @@ public class ASECredentials extends UsernamePasswordCredentialsImpl{
 	public Secret getToken() {
 		return m_token;
 	}
-        
-	public List<String> getCookies(){
+
+	public List<String> getCookies() {
 		return m_cookies;
 	}
 
@@ -56,18 +55,18 @@ public class ASECredentials extends UsernamePasswordCredentialsImpl{
 		m_token = Secret.fromString(connection);
 	}
 
-	public void setCookies(List<String> cookies){
+	public void setCookies(List<String> cookies) {
 		m_cookies=cookies;
 	}
 	
-	public String getUrl(){
+	public String getUrl() {
 		return m_url;
 	}
 
 	@Symbol("ase-credentials") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends CredentialsDescriptor {
-    	
+ 
 		@Override
 		public String getDisplayName() {
 			return Messages.label_ase();
@@ -83,6 +82,6 @@ public class ASECredentials extends UsernamePasswordCredentialsImpl{
 		
 		public FormValidation doCheckPassword(@QueryParameter String password) {
 			return FormValidation.validateRequired(password);
-		}      
+		}
 	}
 }

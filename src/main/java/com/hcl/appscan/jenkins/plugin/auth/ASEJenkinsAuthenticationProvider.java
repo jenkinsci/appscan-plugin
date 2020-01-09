@@ -1,17 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @ Copyright HCL Technologies Ltd. 2019.
+ * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
+
 package com.hcl.appscan.jenkins.plugin.auth;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.hcl.appscan.sdk.auth.AuthenticationHandler;
 import com.hcl.appscan.sdk.auth.ASEAuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IASEAuthenticationProvider;
-import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
-import com.hcl.appscan.sdk.auth.LoginType;
 import hudson.model.ItemGroup;
 import hudson.util.Secret;
 import java.io.IOException;
@@ -23,10 +20,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.wink.json4j.JSONException;
 
-/**
- *
- * @author anurag-s
- */
 public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvider, Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -63,8 +56,7 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("asc_xsrf_token", getToken().trim()); //$NON-NLS-1$ //$NON-NLS-2$
                 List<String> cookies=getCookies();
-                if (cookies != null) {
-		       
+                if (cookies != null) {		       
 		       headers.put("Cookie",cookies.get(0));
 		    }
 		if(persist)
@@ -80,20 +72,19 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 	@Override
 	public void saveConnection(String connection) {
 		m_credentials.setToken(connection);
-                
-	}
-        
-        public void setCookies(List<String> cookies){
-            m_credentials.setCookies(cookies);
-        }
-	
+ 	}
+
+    public void setCookies(List<String> cookies) {
+        m_credentials.setCookies(cookies);
+    }
+
 	private String getToken() {
 		return Secret.toString(m_credentials.getToken());
 	}
-        
-        private List<String> getCookies(){
-            return m_credentials.getCookies();
-        }
+
+    private List<String> getCookies() {
+        return m_credentials.getCookies();
+    }
 
     @Override
     public Proxy getProxy() {
