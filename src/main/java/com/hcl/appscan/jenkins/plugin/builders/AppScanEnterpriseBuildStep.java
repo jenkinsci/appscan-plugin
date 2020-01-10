@@ -71,6 +71,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import hudson.util.Secret;
 import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildStep, Serializable {
@@ -96,7 +97,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_loginType;
 	private String m_trafficFile;
 	private String m_userName;
-	private String m_password;
+	private Secret m_password;
 	
 	private String m_scanType;
 	
@@ -105,7 +106,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	@DataBoundConstructor
 	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template,
-		 String loginType, String trafficFile, String accessId, String secretKey, String jobName, String scanType) {
+		 String loginType, String trafficFile, String accessId, Secret secretKey, String jobName, String scanType) {
 		
 		m_credentials = credentials;
 		m_application = "";
@@ -149,20 +150,20 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	public String getTrafficFile() {
-		if(!m_loginType.equals("Recorded"))
-			return "";
+		if(!"Recorded".equals(m_loginType))
+               return "";
 		return m_trafficFile;
 	}
-	
+ 
 	public String getAccessId() {
-		if(!m_loginType.equals("Automatic"))
-			return "";
+		if(!"Automatic".equals(m_loginType))
+    		return "";
 		return m_userName;
 	}
-	
-	public String getSecretKey() {
-		if(!m_loginType.equals("Automatic"))
-			return "";
+
+	public Secret getSecretKey() {	 
+		if(!"Automatic".equals(m_loginType))
+			return Secret.fromString("");
 		return m_password;
 	}
 
@@ -306,7 +307,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				properties.put("trafficFile", m_trafficFile);
 			} else if (m_loginType.equals("Automatic")) {
 				properties.put("userName", m_userName);
-				properties.put("password",m_password);	
+				properties.put("password",Secret.toString(m_password));	
 			}
 		}
 		properties.put("scanType", m_scanType);
