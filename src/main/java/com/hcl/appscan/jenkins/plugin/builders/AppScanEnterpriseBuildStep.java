@@ -105,8 +105,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	@DataBoundConstructor
-	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template,
-		 String loginType, String trafficFile, String accessId, Secret secretKey, String jobName, String scanType) {
+	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
 		
 		m_credentials = credentials;
 		m_application = "";
@@ -121,12 +120,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_wait = false;
 		m_failBuild = false;
 		
-		m_loginType = loginType;
-		m_trafficFile = trafficFile;
-		m_userName = accessId;
-		m_password = secretKey;
+		m_loginType = "";
+		m_trafficFile = "";
+		m_userName = "";
+		m_password = Secret.fromString("");
 		
-		m_scanType = scanType;		
+		m_scanType = "";
 	}
 	
 	public String getCredentials() {
@@ -145,36 +144,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_template;
 	}
 	
-	public String getLoginType() {
-		return m_loginType;
-	}
-	
-	public String getTrafficFile() {
-		if(!"Recorded".equals(m_loginType))
-               return "";
-		return m_trafficFile;
-	}
- 
-	public String getAccessId() {
-		if(!"Automatic".equals(m_loginType))
-    		return "";
-		return m_userName;
-	}
-
-	public Secret getSecretKey() {	 
-		if(!"Automatic".equals(m_loginType))
-			return Secret.fromString("");
-		return m_password;
-	}
-
 	public String getJobName() {
 		return m_jobName;
 	}
-	
-	public String getScanType() {
-		return m_scanType;
-	}
-	
+
 	@DataBoundSetter
 	public void setApplication(String application) {
 		m_application = application;
@@ -192,15 +165,63 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getTarget() {
 		return m_target;
 	}
+	
+	@DataBoundSetter
+	public void setLoginType(String loginType) {
+		m_loginType = loginType;
+	}
+	
+	public String getLoginType() {
+		return m_loginType;
+	}
+	
+	@DataBoundSetter
+	public void setTrafficFile(String trafficFile) {
+		if("Recorded".equals(m_loginType))
+			m_trafficFile = trafficFile;
+        }
+	
+	public String getTrafficFile() {
+		return m_trafficFile;
+	}
+	
+	@DataBoundSetter
+        public void setAccessId(String userName) {
+		if("Automatic".equals(m_loginType))
+			m_userName = userName;
+        }
+ 
+	public String getAccessId() {
+		return m_userName;
+	}
 
-    @DataBoundSetter
-    public void setExploreData(String exploreData) {
-        m_exploreData = exploreData;
-    }
-    
-    public String getExploreData() {
-       return m_exploreData;
-    }
+	@DataBoundSetter
+        public void setSecretKey(String password) {
+		if("Automatic".equals(m_loginType))
+			m_password = Secret.fromString(password);
+        }
+	
+	public Secret getSecretKey() {	 
+		return m_password;
+	}
+	
+	@DataBoundSetter
+	public void setScanType(String scanType) {
+		 m_scanType = scanType;
+	}
+	
+	public String getScanType() {
+		return m_scanType;
+	}
+
+	@DataBoundSetter
+	public void setExploreData(String exploreData) {
+		m_exploreData = exploreData;
+	}
+
+	public String getExploreData() {
+		return m_exploreData;
+	}
 
 	@DataBoundSetter
 	public void setAgent(String agent) {
