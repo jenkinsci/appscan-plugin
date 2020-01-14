@@ -201,8 +201,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			m_password = Secret.fromString(password);
         }
 	
-	public Secret getSecretKey() {	 
-		return m_password;
+	public String getSecretKey() {	 
+		return Secret.toString(m_password);
 	}
 	
 	@DataBoundSetter
