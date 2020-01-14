@@ -177,7 +177,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	
 	@DataBoundSetter
 	public void setTrafficFile(String trafficFile) {
-		if("Recorded".equals(m_loginType))
+		if("Manual".equals(m_loginType))
 			m_trafficFile = trafficFile;
         }
 	
@@ -296,7 +296,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String isLoginType(String loginTypeName) {
 		if (m_loginType != null)
 			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
-		else if (loginTypeName.equals("Recorded")) { //Default
+		else if (loginTypeName.equals("Manual")) { //Default
 			return "true";
 		}
 		return "";
@@ -324,7 +324,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		properties.put("exploreData", m_exploreData);
 		properties.put("loginType", m_loginType);	
 		if (m_loginType != null) {
-			if (m_loginType.equals("Recorded")) {
+			if (m_loginType.equals("Manual")) {
 				properties.put("trafficFile", m_trafficFile);
 			} else if (m_loginType.equals("Automatic")) {
 				properties.put("userName", m_userName);

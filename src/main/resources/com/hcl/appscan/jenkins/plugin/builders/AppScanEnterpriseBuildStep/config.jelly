@@ -37,7 +37,7 @@
      </f:section>
    
     <f:section title="${%label.login.management}" field="loginTypeOptions">
-        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true" value="Recorded" inline="true">
+        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true" value="Manual" inline="true">
             <st:nbsp/>
             <f:entry title="${%label.traffic.file}" field="trafficFile">
                 <f:textbox />
