@@ -52,12 +52,14 @@ import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
 import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
+import com.hcl.appscan.jenkins.plugin.util.EnvironmentVariableResolver;
 import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
 
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.AbstractBuild;
@@ -74,6 +76,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import hudson.util.VariableResolver;
 import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
@@ -228,11 +231,17 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
-    	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
-		Map<String, String> properties = m_scanner.getProperties(resolver);
+    	BuildVariableResolver bvr = null;
+    	String scanName = m_name;
+    	if (build instanceof AbstractBuild) {
+    		bvr = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
+    		EnvironmentVariableResolver evr = new EnvironmentVariableResolver((AbstractBuild<?,?>)build, listener);
+    		scanName = Util.replaceMacro(m_name, evr);
+    	}
+    	Map<String, String> properties = m_scanner.getProperties(bvr);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-                properties.put(CoreConstants.APP_ID,  m_application);
-		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+        properties.put(CoreConstants.APP_ID,  m_application);
+        properties.put(CoreConstants.SCAN_NAME, scanName + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 		return properties;
@@ -302,7 +311,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		});
 
     	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-    	build.addAction(new ResultsRetriever(build, provider, m_name));
+    	String scanName = m_name;
+    	if (build instanceof AbstractBuild) {
+    		EnvironmentVariableResolver evr = new EnvironmentVariableResolver((AbstractBuild<?,?>)build, listener);
+    		scanName = Util.replaceMacro(m_name, evr);
+    	}
+    	build.addAction(new ResultsRetriever(build, provider, scanName));
                 
         if(m_wait)
             shouldFailBuild(provider,build);	
