@@ -21,10 +21,13 @@ service. You'll need to [create an
 application](http://help.hcltechsw.com/appscan/ASoC/ent_create_application.html?query=create)
 on the service to associate your scans with.
 
+Post 1.2.8 release, HCL AppScan Jenkins Plug-in will support integartion with HCL AppScan Enterprise for creation and execution of ADAC jobs. Hence, if you intend to use this integration, you would need login access to a running instance of AppScan Enterprise Server. Please note that Content Scan jobs are not supported with Jenkins integration.
+
 ## Usage
+**Integration with HCL AppScan On Cloud**
 
 [This video](http://ibm.biz/ASoC-Jenkins) demonstrates
-installation and configuration of the plugin.
+installation and configuration of the plugin for HCL AppScan On Cloud.
 
 1.  Add your AppScan on Cloud credentials on the Jenkins
     **Credentials** page.
@@ -32,7 +35,7 @@ installation and configuration of the plugin.
     -   Add new global credentials.
     -   In the **Kind** drop-down list, select **HCL AppScan on Cloud Credentials**.
     -   Enter your API key details.
-2.  Add a **Run Security Test** build step to your Jenkins project
+2.  Add a **Run AppScan On Cloud Security Test** build step to your Jenkins project
     configuration and enter the following information:
     -   **Credentials:** Select the credentials you added to Jenkins in
         step 1 above.
@@ -102,11 +105,74 @@ installation and configuration of the plugin.
         If multiple conditions are added, they will be treated as though
         they are separated by a logical OR.
 
+**Integration with HCL AppScan Enterprise**
+
+1.  Add your AppScan Enterprise credentials on the Jenkins
+    **Credentials** page.
+    -   From the main Jenkins dashboard, click the **Credentials** link.
+    -   Add new global credentials.
+    -   In the **Kind** drop-down list, select **HCL AppScan Enterprise Credentials**.
+    -   Enter your AppScan Enterprise server URL. For e.g. https:// ASE Server hostname:9443/ase
+    -   Enter your API key details.
+    
+2.  Add a **Run AppScan Enterprise Security Test** build step to your Jenkins project
+    configuration and enter the following information:    
+    -   **Credentials**: Select the credentials you added to Jenkins in
+        step 1 above.        
+       - **Job Properties**        
+            -   **Template**: Select the template for the scan.
+            -   **Job Name**: Specify a name to use for the scan. This value
+                will be used to distinguish this scan and its results from
+                others.
+            -   **Folder**: Select the destination folder to create the ADAC job. 
+            -   **Application**: Select the application to associate the scan with. 
+                Please note this is not a required parameter for an AppScan Enterprise 
+                ADAC job.
+            -   **Test Policy**: Select the test policy for your scan.
+            -   **Starting URL**: Enter the URL from where you want the
+                scan to start exploring the site.                
+       - **Login Management**       
+            - **Recorded**: Select this option to allow login to the application
+              using a recorded login sequence. Once selected, you would be prompted
+              to enter the path to recorded login sequence.
+            - **Automatic**: Select thos option to allow Login to the application
+              using a username and password. Once selected, you would be prompted
+              to enter the username and password.
+            - **None**: Selecting this option will result in AppScan not
+              scanning pages that require a login.            
+       - **Scan**       
+            - **Full automatic scan**: Selec this option to automatically explore
+              and test your web application              
+            - **Test only (manual explore data is required)**: Select this option to run the test
+              only on external recorded manual explore data.            
+       - **Manual Explore (externally recorded)**       
+            - **Path**: Enter the local path to the Manual explore data, to use as part of a new scan.
+              For example: "C:\samplefileName.dast.config".
+              Supported Manual explore file formats are: EXD, HAR, DAST.CONFIG, and CONFIG.       
+       - **Additonal Options**: If selected, the following option is available.       
+            - **Designated Agent Server**: Select the agent server to execute the job.
+              Default will be considered in absence of any selection.
+      -  **Suspend job until security analysis completes:** If selected,
+        the Jenkins job will pause until security analysis has completed
+        and the results have been retrieved. If unselected, the job will
+        continue once the scan has been submitted to the analysis service.
+      - **Fail build if:** If selected, the Jenkins job will fail if the
+        finding count(s) exceed the specified thresholds (see below).        
+        -   **Add Condition:** Allows you to add thresholds for the number
+        of findings that will cause a build to fail. You can specify
+        thresholds for total, high, medium, and/or low finding counts.
+        If multiple conditions are added, they will be treated as though
+        they are separated by a logical OR.
+
 ## Additional Information
 
 <http://help.hcltechsw.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins>
 
 ## Release History
+
+### 1.2.8 (January, 2020)
+
+-  Support for HCL AppScan Enterprise ADAC Jobs.
 
 ### 1.2.7 (December, 2019)
 
