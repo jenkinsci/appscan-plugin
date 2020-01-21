@@ -179,30 +179,30 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public void setTrafficFile(String trafficFile) {
 		if("Manual".equals(m_loginType))
 			m_trafficFile = trafficFile;
-        }
+	}
 	
 	public String getTrafficFile() {
 		return m_trafficFile;
 	}
 	
 	@DataBoundSetter
-        public void setAccessId(String userName) {
-		if("Automatic".equals(m_loginType))
-			m_userName = userName;
-        }
+    public void setAccessId(String userName) {
+	if("Automatic".equals(m_loginType))
+		m_userName = userName;
+    }
  
 	public String getAccessId() {
 		return m_userName;
 	}
 
 	@DataBoundSetter
-        public void setSecretKey(String password) {
-		if("Automatic".equals(m_loginType))
-			m_password = Secret.fromString(password);
-        }
+    public void setSecretKey(String password) {
+	if("Automatic".equals(m_loginType))
+		m_password = Secret.fromString(password);
+    }
 	
-	public String getSecretKey() {	 
-		return Secret.toString(m_password);
+	public Secret getSecretKey() {
+		return m_password;
 	}
 	
 	@DataBoundSetter
@@ -453,8 +453,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			if (applications != null) {
 				List<Entry<String, String>> list = sortApplications(applications.entrySet());
 
-				for (Map.Entry<String, String> entry : list)
-					model.add(entry.getValue(), entry.getKey());
+				for (Map.Entry<String, String> entry : list) {
+					String app = StringEscapeUtils.unescapeHtml(entry.getValue());
+					model.add(app, entry.getKey());
+				}
 			}
 			return model;
 		}
