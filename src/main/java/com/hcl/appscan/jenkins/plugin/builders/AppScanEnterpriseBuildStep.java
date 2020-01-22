@@ -186,8 +186,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	@DataBoundSetter
-    public void setAccessId(String userName) {
-	if("Automatic".equals(m_loginType))
+    public void setAccessId(String userName) {	
 		m_userName = userName;
     }
  
@@ -197,12 +196,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	@DataBoundSetter
     public void setSecretKey(String password) {
-	if("Automatic".equals(m_loginType))
 		m_password = Secret.fromString(password);
     }
 	
-	public Secret getSecretKey() {
-		return m_password;
+	public String getSecretKey() {
+		return Secret.toString(m_password);
 	}
 	
 	@DataBoundSetter
@@ -328,7 +326,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				properties.put("trafficFile", m_trafficFile);
 			} else if (m_loginType.equals("Automatic")) {
 				properties.put("userName", m_userName);
-				properties.put("password",Secret.toString(m_password));	
+				properties.put("password",Secret.toString(m_password));
 			}
 		}
 		properties.put("scanType", m_scanType);
@@ -383,7 +381,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 						String status = provider.getStatus();
 
 						while(status != null && (status.equalsIgnoreCase("Waiting to Run")
-								|| status.equalsIgnoreCase("Starting") ||status.equalsIgnoreCase("Running"))) {
+								|| status.equalsIgnoreCase("Starting") ||status.equalsIgnoreCase("Running")) 
+								|| status.equals("Post Processing")) {
 							Thread.sleep(60000);
 							status = provider.getStatus();
 						}
@@ -451,7 +450,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			model.add("");
 
 			if (applications != null) {
-				List<Entry<String, String>> list = sortApplications(applications.entrySet());
+				
+				List<Entry<String, String>> list = sortComponents(applications.entrySet());
 
 				for (Map.Entry<String, String> entry : list) {
 					String app = StringEscapeUtils.unescapeHtml(entry.getValue());
@@ -459,18 +459,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				}
 			}
 			return model;
-		}
-
-		private List<Entry<String, String>> sortApplications(Set<Entry<String, String>> set) {
-			List<Entry<String, String>> list = new ArrayList<>(set);
-			if (list.size() > 1) {
-				Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
-					public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
-						return (o1.getValue().toLowerCase()).compareTo(o2.getValue().toLowerCase());
-					}
-				});
-			}
-			return list;
 		}
 
 		public ListBoxModel doFillFolderItems(@QueryParameter String credentials,
@@ -481,7 +469,9 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			ListBoxModel model = new ListBoxModel();
 			
 			if (items != null) {
-				for (Map.Entry<String, String> entry : items.entrySet())
+				List<Entry<String, String>> list = sortComponents(items.entrySet());
+				
+				for (Map.Entry<String, String> entry : list)
 					model.add(entry.getValue(), entry.getKey());
 			}
 			return model;
@@ -495,7 +485,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			ListBoxModel model = new ListBoxModel();
 
 			if (items != null) {
-				for (Map.Entry<String, String> entry : items.entrySet())
+				List<Entry<String, String>> list = sortComponents(items.entrySet());
+				for (Map.Entry<String, String> entry : list)
 					model.add(entry.getValue(), entry.getKey());
 			}
 			return model;
@@ -509,7 +500,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			ListBoxModel model = new ListBoxModel();
 
 			if (items != null) {
-				for (Map.Entry<String, String> entry : items.entrySet()) {
+				List<Entry<String, String>> list = sortComponents(items.entrySet());
+				for (Map.Entry<String, String> entry : list) {
 					String template = StringEscapeUtils.unescapeHtml(entry.getValue());
 					model.add(template, entry.getKey());
 				}
@@ -526,10 +518,23 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			model.add(""); //$NON-NLS-1$
 
 			if (items != null) {
-				for (Map.Entry<String, String> entry : items.entrySet())
+				List<Entry<String, String>> list = sortComponents(items.entrySet());
+				for (Map.Entry<String, String> entry : list)
 					model.add(entry.getValue(), entry.getKey());
 			}
 			return model;
+		}
+
+		private List<Entry<String, String>> sortComponents(Set<Entry<String, String>> set) {
+			List<Entry<String, String>> list = new ArrayList<>(set);
+			if (list.size() > 1) {
+				Collections.sort(list, new Comparator<Map.Entry<String, String>>() {
+					public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
+						return (o1.getValue().toLowerCase()).compareTo(o2.getValue().toLowerCase());
+					}
+				});
+			}
+			return list;
 		}
 
 		public FormValidation doCheckCredentials(@QueryParameter String credentials,
