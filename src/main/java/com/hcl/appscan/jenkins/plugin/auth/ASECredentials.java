@@ -9,6 +9,9 @@ import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.hcl.appscan.jenkins.plugin.Messages;
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.utils.SystemUtil;
+
 import hudson.Extension;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
@@ -75,9 +78,16 @@ public class ASECredentials extends UsernamePasswordCredentialsImpl{
 		public FormValidation doCheckUrl(@QueryParameter String url) {
 			return FormValidation.validateRequired(url);
 		}
+		
+		public String getApiDocUrl() {
+			return "https://www.ibm.com/support/knowledgecenter/SSW2NF_9.0.3/com.ibm.ase.help.doc/topics/t_appscan_enterprise_rest_APIs_list.html";
+		}
 
 		public FormValidation doCheckUsername(@QueryParameter String username) {
-			return FormValidation.validateRequired(username);
+			if(username.trim().equals("")) //$NON-NLS-1$
+				return FormValidation.errorWithMarkup(Messages.need_ase_api_doc(getApiDocUrl())); //$NON-NLS-1$
+			return FormValidation.ok();
+
 		}
 		
 		public FormValidation doCheckPassword(@QueryParameter String password) {
