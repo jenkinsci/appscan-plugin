@@ -382,7 +382,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 						while(status != null && (status.equalsIgnoreCase("Waiting to Run")
 								|| status.equalsIgnoreCase("Starting") ||status.equalsIgnoreCase("Running")) 
-								|| status.equals("Post Processing")) {
+								|| status.equals("Post Processing") || status.equals("Waiting to Generate Results") || status.equals("Generating Results")) {
 							Thread.sleep(60000);
 							status = provider.getStatus();
 						}

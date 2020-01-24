@@ -10,7 +10,7 @@
         <f:select />
     </f:entry>
     
-    <f:section title="Job Properties" field="loginTypeOptions">
+    <f:section title="${%label.job.properties}" field="loginTypeOptions">
 	    <f:entry title="${%label.template}" field="template">
 	        <f:select />
 	    </f:entry>
