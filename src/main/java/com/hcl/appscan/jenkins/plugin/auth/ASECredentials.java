@@ -80,7 +80,7 @@ public class ASECredentials extends UsernamePasswordCredentialsImpl{
 		}
 		
 		public String getApiDocUrl() {
-			return "https://www.ibm.com/support/knowledgecenter/SSW2NF_9.0.3/com.ibm.ase.help.doc/topics/t_appscan_enterprise_rest_APIs_list.html";
+			return "https://help.hcltechsw.com/appscan/Enterprise/9.0.3/topics/t_appscan_enterprise_rest_APIs_list.html";
 		}
 
 		public FormValidation doCheckUsername(@QueryParameter String username) {
