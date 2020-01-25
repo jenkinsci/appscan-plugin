@@ -32,8 +32,8 @@ import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.app.ASEApplicationProvider;
 import com.hcl.appscan.sdk.auth.IASEAuthenticationProvider;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
-import com.hcl.appscan.sdk.configuration.ConfigurationProviderFactory;
-import com.hcl.appscan.sdk.configuration.IComponent;
+import com.hcl.appscan.sdk.configuration.ase.ConfigurationProviderFactory;
+import com.hcl.appscan.sdk.configuration.ase.IComponent;
 import com.hcl.appscan.sdk.error.InvalidTargetException;
 import com.hcl.appscan.sdk.error.ScannerException;
 import com.hcl.appscan.sdk.logging.IProgress;
@@ -540,7 +540,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		public FormValidation doCheckCredentials(@QueryParameter String credentials,
 				@AncestorInPath ItemGroup<?> context) {
 			if (credentials.trim().equals("")) //$NON-NLS-1$
-				return FormValidation.errorWithMarkup(Messages.error_no_creds("/credentials")); //$NON-NLS-1$
+				return FormValidation.errorWithMarkup(Messages.error_no_creds_ase("/credentials")); //$NON-NLS-1$
 
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
 			if (authProvider.isTokenExpired())
