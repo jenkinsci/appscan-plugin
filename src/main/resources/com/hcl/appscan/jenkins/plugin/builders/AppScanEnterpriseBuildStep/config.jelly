@@ -1,0 +1,97 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <!--
+ 	@ Copyright HCL Technologies Ltd. 2019.
+ 	LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+    -->
+    <script type="text/javascript" src="${resURL}/plugin/ibm-application-security/js/util.js"></script>    
+    
+    <f:entry title="${%label.credentials}" field="credentials">
+        <f:select />
+    </f:entry>
+    
+    <f:section title="${%label.job.properties}" field="loginTypeOptions">
+	    <f:entry title="${%label.template}" field="template">
+	        <f:select />
+	    </f:entry>
+	            
+	    <f:entry title="${%label.job.name}" field="jobName">
+	        <f:textbox />
+	    </f:entry>
+		        
+	    <f:entry title="${%label.folder}" field="folder">
+	        <f:select />
+	    </f:entry>
+	    
+	    <f:entry title="${%label.application}" field="application">
+	        <f:select />
+	    </f:entry>
+	    
+	    <f:entry title="${%label.test.policy}" field="testPolicy">
+	        <f:select />
+	    </f:entry>
+	    
+	    <f:entry title="${%label.starting.url}" field="target">
+	        <f:textbox />
+	    </f:entry>
+     </f:section>
+   
+    <f:section title="${%label.login.management}" field="loginTypeOptions">
+        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true" value="Manual" inline="true">
+            <st:nbsp/>
+            <f:entry title="${%label.traffic.file}" field="trafficFile">
+                <f:textbox />
+            </f:entry>
+        </f:radioBlock>
+	
+        <f:radioBlock name="loginType" title="${%label.automatic}" checked="${instance.isLoginType('Automatic')}" value="Automatic" inline="true">
+            <f:entry title="${%label.user.name}" field="userName">
+                <f:textbox field="accessId" />
+            </f:entry>
+            <f:entry title="${%label.password}" field="password">
+                <f:password field="secretKey" />
+            </f:entry>
+        </f:radioBlock>
+	
+        <f:radioBlock name="loginType" title="${%label.none}" checked="${instance.isLoginType('None')}" value="None" inline="true" />
+    </f:section>  
+    
+    <f:section title="${%label.scan}" field="scanTypeOptions">
+        <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="true" value="1"  help="/plugin/ibm-application-security/help/scanFull.html" inline="true"/>        
+        <f:radioBlock name="scanType" title="${%label.scan.test}"  checked="${instance.isScanType('3')}" value="3"  help="/plugin/ibm-application-security/help/scanTest.html" inline="true"/>
+    </f:section>    
+            
+    <f:section title="${%label.manual.explore}" field="loginTypeOptions">
+	    <f:entry title="${%label.explore.data}" field="exploreData">
+	        <f:textbox />
+	    </f:entry>
+    </f:section>
+    
+    <f:section title="" />
+        
+    <f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
+        <f:entry title="${%label.agent}" field="agent">
+            <f:select />
+        </f:entry>
+    </f:optionalBlock>
+    
+    <f:section title="" />
+
+    <f:entry>
+	    <div>
+	     ${%label.email.text} <a target="_blank" href="https://help.hcltechsw.com/appscan/Enterprise/9.0.3/topics/t_set_up_control_center.html">${%label.email.doc.link}</a>
+		</div>
+    </f:entry>
+
+    <f:entry field="wait">
+        <f:checkbox title="${%label.wait}" onclick="aseWaitClicked(this);" name="wait"/>
+    </f:entry>
+
+    <f:entry field="failBuild">
+        <f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" name="failBuild"/>
+    </f:entry>
+    
+    <f:entry field="failureConditions">
+        <f:repeatableProperty field="failureConditions" minimum="0" add="${%label.add.condition}"/>
+    </f:entry>
+ </j:jelly>
