@@ -1,8 +1,8 @@
 # HCL AppScan Jenkins plugin
-Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in.  
+Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute DAST(Dynamic Application Security Testing) scans using HCL AppScan On Cloud and HCL AppScan Enterprise.
 
 ## Note
-Post upgrade to 1.2.7, existing credentials cannot be viewed or edited.
+Post upgrade to 1.3.0, existing credentials cannot be viewed or edited.
 In case you need to modify the existing credentials with new ID or secret,
 note down the label, delete that credential entry and create new credentials
 with same label.
@@ -21,7 +21,7 @@ service. You'll need to [create an
 application](http://help.hcltechsw.com/appscan/ASoC/ent_create_application.html?query=create)
 on the service to associate your scans with.
 
-Post 1.2.8 release, HCL AppScan Jenkins Plug-in will support integration with HCL AppScan Enterprise for creation and execution of ADAC jobs. Hence, if you intend to use this integration, you would need login access to a running instance of AppScan Enterprise Server. Please note that Content Scan jobs are not supported with Jenkins integration.
+Post 1.3.0 release, HCL AppScan Jenkins Plug-in will support integration with HCL AppScan Enterprise for creation and execution of ADAC jobs. Hence, if you intend to use this integration, you would need login access to a running instance of AppScan Enterprise Server. Please note that Content Scan jobs are not supported with Jenkins integration.
 
 ## Usage
 **Integration with HCL AppScan On Cloud**
@@ -172,11 +172,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
 
 ### 1.3.0 (January, 2020)
 
--  Support for HCL AppScan Enterprise ADAC Jobs.
-
-### 1.2.7 (December, 2019)
-
--   HCL Washed Release.
+-  HCL Washed Release with support for HCL AppScan Enterprise ADAC Jobs.
 
 ### 1.2.6 (November, 2019)
 
