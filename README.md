@@ -1,6 +1,6 @@
 # HCL AppScan Jenkins Plug-in
 
-Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute DAST(Dynamic Application Security Testing) scans using HCL AppScan On Cloud and HCL AppScan Enterprise.
+Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) and MAST (Mobile Application Security Testing) scans using HCL AppScan On Cloud and DAST (Dynamic Application Security Testing) scans using both HCL AppScan On Cloud and HCL AppScan Enterprise.
 
 # Prerequisites
 
