@@ -4,6 +4,7 @@
  */
  
 package com.ibm.appscan.jenkins.plugin.results;
+
 //Added for backward compatibility during HCL wash
 public class FailureCondition extends com.hcl.appscan.jenkins.plugin.results.FailureCondition {
 
