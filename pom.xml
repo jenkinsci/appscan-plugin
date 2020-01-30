@@ -80,6 +80,11 @@
 		<artifactId>appscan.sdk</artifactId>
 		<version>1.0.13</version>
   	</dependency>
+	<dependency>
+  	  	<groupId>org.apache.wink</groupId>
+  		<artifactId>wink-json4j</artifactId>
+  		<version>1.4</version>
+  	</dependency>
   	<dependency>
   		<groupId>org.jenkins-ci.plugins</groupId>
   		<artifactId>credentials</artifactId>
