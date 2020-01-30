@@ -74,7 +74,11 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	
 	@Override
 	public Proxy getProxy() {
-		final ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return Proxy.NO_PROXY;
+		
+		final ProxyConfiguration proxy = jenkins.proxy;
 		
 		if(proxy != null && proxy.name != null && proxy.port > 0) {
 			//If authentication is required
