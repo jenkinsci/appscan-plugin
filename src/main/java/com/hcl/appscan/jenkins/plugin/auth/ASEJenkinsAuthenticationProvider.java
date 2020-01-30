@@ -88,6 +88,6 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 
     @Override
     public Proxy getProxy() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return Proxy.NO_PROXY;
     }
 }
