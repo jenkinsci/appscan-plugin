@@ -35,11 +35,9 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	private static final long serialVersionUID = 1L;
 	
 	private ASoCCredentials m_credentials;
-	private Proxy m_proxy;
 	
 	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
 		configureCredentials(id, context);
-		configureProxy();
 	}
 	
 	@Override
@@ -76,7 +74,23 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	
 	@Override
 	public Proxy getProxy() {
-		return m_proxy;
+		final ProxyConfiguration proxy = Jenkins.getInstance().proxy;
+		
+		if(proxy != null && proxy.name != null && proxy.port > 0) {
+			//If authentication is required
+			if(proxy.getUserName() != null && proxy.getPassword() != null) {
+				Authenticator.setDefault(new Authenticator() {
+					@Override
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(proxy.getUserName(), proxy.getPassword().toCharArray());
+					}
+				});
+			}
+			
+			return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.name, proxy.port));
+		}
+		
+		return Proxy.NO_PROXY;
 	}
 	
 	private String getToken() {
@@ -93,29 +107,5 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 			}
 		}
 		m_credentials = new ASoCCredentials("", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	}
-	
-	private void configureProxy() {
-		final ProxyConfiguration proxy = Jenkins.getInstance().proxy;
-		
-		if(proxy == null) {
-			m_proxy = Proxy.NO_PROXY;
-			return;
-		}
-		
-		//Set up the proxy host and port
-		if(proxy.name != null && proxy.port > 0) {
-			m_proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.name, proxy.port));
-		}
-
-		//If authentication is required
-		if(proxy.getUserName() != null && proxy.getPassword() != null) {
-			Authenticator.setDefault(new Authenticator() {
-				@Override
-				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(proxy.getUserName(), proxy.getPassword().toCharArray());
-				}
-			});
-		}
 	}
 }
