@@ -15,11 +15,17 @@ following warnings before using an older version:
 
 ## Prerequisites
 
+The plugin supports scanning through HCL AppScan on Cloud and HCL AppScan Enterprise.
+
+**HCL AppScan on Cloud prerequisites**
+
 An account at the [HCL AppScan on
 Cloud](https://cloud.appscan.com/AsoCUI/serviceui/home)
 service. You'll need to [create an
 application](http://help.hcltechsw.com/appscan/ASoC/ent_create_application.html?query=create)
 on the service to associate your scans with.
+
+**HCL AppScan Enterprise prerequisites**
 
 As of the 1.3.0 release, HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for creation and execution of ADAC jobs. To use this integration, you must have access to a running instance of AppScan Enterprise Server  version 9.0.3.14 or later. Please note that Content Scan jobs are not supported through this integration.
 
