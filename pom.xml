@@ -33,11 +33,12 @@
 
   <properties>
 	  <jenkins.version>1.609.1</jenkins.version>
+	  <findbugs.failOnError>false</findbugs.failOnError>
   </properties>
 	
   <groupId>com.hcl.security</groupId>
   <artifactId>ibm-application-security</artifactId>
-  <version>1.3.0-SNAPSHOT</version>
+  <version>1.3.0</version>
   <description>This plugin allows you to execute security scans with HCL AppScan</description>
   <packaging>hpi</packaging>
 
@@ -101,7 +102,7 @@
   	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin.git</connection>
   	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/ibm-asoc-plugin</url>
-    <tag>HEAD</tag>
+    <tag>ibm-application-security-1.3.0</tag>
   </scm>
 
 </project>
