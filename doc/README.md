@@ -173,6 +173,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
 ### 1.3.0 (January, 2020)
 
 -  HCL Washed Release with support for HCL AppScan Enterprise ADAC Jobs.
+-  Proxy support
 
 ### 1.2.6 (November, 2019)
 
