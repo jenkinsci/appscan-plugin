@@ -52,7 +52,6 @@ import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
 import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
-import com.hcl.appscan.jenkins.plugin.util.EnvironmentVariableResolver;
 import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
 
 import hudson.AbortException;
@@ -231,14 +230,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
-    	BuildVariableResolver bvr = null;
+    	VariableResolver<String> resolver = null;
     	String scanName = m_name;
     	if (build instanceof AbstractBuild) {
-    		bvr = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
-    		EnvironmentVariableResolver evr = new EnvironmentVariableResolver((AbstractBuild<?,?>)build, listener);
-    		scanName = Util.replaceMacro(m_name, evr);
+    		resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
+    		scanName = Util.replaceMacro(m_name, resolver);
     	}
-    	Map<String, String> properties = m_scanner.getProperties(bvr);
+    	Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
         properties.put(CoreConstants.APP_ID,  m_application);
         properties.put(CoreConstants.SCAN_NAME, scanName + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
@@ -313,8 +311,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	String scanName = m_name;
     	if (build instanceof AbstractBuild) {
-    		EnvironmentVariableResolver evr = new EnvironmentVariableResolver((AbstractBuild<?,?>)build, listener);
-    		scanName = Util.replaceMacro(m_name, evr);
+    		VariableResolver<String> resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
+    		scanName = Util.replaceMacro(m_name, resolver);
     	}
     	build.addAction(new ResultsRetriever(build, provider, scanName));
                 
