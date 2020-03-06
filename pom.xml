@@ -98,9 +98,9 @@
   </dependencies>
   
   <scm>
-  	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin.git</connection>
-  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin.git</developerConnection>
-  	<url>https://github.com/jenkinsci/ibm-asoc-plugin</url>
+  	<connection>scm:git:ssh://github.com/jenkinsci/appscan-plugin.git</connection>
+  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
+  	<url>https://github.com/jenkinsci/appscan-plugin</url>
     <tag>HEAD</tag>
   </scm>
 
