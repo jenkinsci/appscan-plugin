@@ -4,7 +4,7 @@
  	@ Copyright HCL Technologies Ltd. 2019.
  	LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
     -->
-    <script type="text/javascript" src="${resURL}/plugin/ibm-application-security/js/util.js"></script>    
+    <script type="text/javascript" src="${resURL}/plugin/appscan/js/util.js"></script>    
     
     <f:entry title="${%label.credentials}" field="credentials">
         <f:select />
@@ -57,8 +57,8 @@
     </f:section>  
     
     <f:section title="${%label.scan}" field="scanTypeOptions">
-        <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="true" value="1"  help="/plugin/ibm-application-security/help/scanFull.html" inline="true"/>        
-        <f:radioBlock name="scanType" title="${%label.scan.test}"  checked="${instance.isScanType('3')}" value="3"  help="/plugin/ibm-application-security/help/scanTest.html" inline="true"/>
+        <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="true" value="1"  help="/plugin/appscan/help/scanFull.html" inline="true"/>        
+        <f:radioBlock name="scanType" title="${%label.scan.test}"  checked="${instance.isScanType('3')}" value="3"  help="/plugin/appscan/help/scanTest.html" inline="true"/>
     </f:section>    
             
     <f:section title="${%label.manual.explore}" field="loginTypeOptions">
