@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
-  <name>HCL AppScan</name>
+  <name>Deprecated: HCL AppScan</name>
   <organization>
   	<name>HCL</name>
   	<url>https://www.hcl.com/</url>
@@ -38,8 +38,8 @@
 	
   <groupId>com.hcl.security</groupId>
   <artifactId>ibm-application-security</artifactId>
-  <version>1.3.0</version>
-  <description>This plugin allows you to execute security scans with HCL AppScan</description>
+  <version>1.3.1-SNAPSHOT</version>
+  <description>This plugin is deprecated. Use the HCL AppScan plugin with id appscan instead</description>
   <packaging>hpi</packaging>
 
   <repositories>
@@ -91,11 +91,16 @@
   		<artifactId>credentials</artifactId>
   		<version>2.1.6</version>
   	</dependency>
-    <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>structs</artifactId>
-        <version>1.2</version>
-    </dependency>
+	<dependency>
+		<groupId>com.hcl.security</groupId>
+		<artifactId>appscan</artifactId>
+		<version>1.0.0</version>
+	</dependency>
+    	<dependency>
+        	<groupId>org.jenkins-ci.plugins</groupId>
+        	<artifactId>structs</artifactId>
+        	<version>1.2</version>
+    	</dependency>
   </dependencies>
   
   <scm>

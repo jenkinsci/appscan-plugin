@@ -14,21 +14,6 @@ public class ScannerFactory implements ScannerConstants {
 	 * @return
 	 */
 	public static Scanner getScanner(String type, String target) {
-		Scanner ret = null;
-		
-		switch(type) {
-		case DYNAMIC_ANALYZER:
-			ret = new DynamicAnalyzer(target);
-			break;
-		case MOBILE_ANALYZER:
-			ret = new MobileAnalyzer(target);
-			break;
-		case STATIC_ANALYZER:
-			ret = new StaticAnalyzer(target);
-			break;
-		default:
-				break;
-		}
-		return ret;
+		return null;
 	}
 }
