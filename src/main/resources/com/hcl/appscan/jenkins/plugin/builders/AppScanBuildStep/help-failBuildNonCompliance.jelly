@@ -1,5 +1,0 @@
-<?jelly escape-by-default='true'?>
-<div>
-	${%description.fail.build.noncompliance.issues}
-</div>
-
