@@ -32,7 +32,8 @@
   </parent>
 
   <properties>
-	  <jenkins.version>1.609.1</jenkins.version>
+	<jenkins.version>1.609.1</jenkins.version>
+	<findbugs.failOnError>false</findbugs.failOnError>
   </properties>
 	
   <groupId>com.hcl.security</groupId>
