@@ -7,7 +7,7 @@
   	<url>https://www.hcl.com/</url>
   </organization>
   
-  <url>https://plugins.jenkins.io/appscan</url>
+  <url>https://github.com/jenkinsci/appscan-plugin</url>
 	
   <licenses>
   	<license>
