@@ -38,7 +38,7 @@
 	
   <groupId>com.hcl.security</groupId>
   <artifactId>ibm-application-security</artifactId>
-  <version>1.3.2</version>
+  <version>1.3.3-SNAPSHOT</version>
   <description>This plugin is deprecated. Use the HCL AppScan plugin with id appscan instead</description>
   <packaging>hpi</packaging>
 
@@ -107,7 +107,7 @@
   	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin.git</connection>
   	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/ibm-asoc-plugin</url>
-    <tag>ibm-application-security-1.3.2</tag>
+    <tag>ibm-application-security-1.3.0</tag>
   </scm>
 
 </project>
