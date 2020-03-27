@@ -26,9 +26,9 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.gargoylesoftware.htmlunit.javascript.host.Console;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.app.CloudApplicationProvider;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
@@ -75,6 +75,10 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.tasks.SimpleBuildStep;
+
+//put in proper order before commit
+import jenkins.model.Jenkins;
+import hudson.Plugin;
 
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
 	
@@ -231,13 +235,25 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
 		Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-                properties.put(CoreConstants.APP_ID,  m_application);
+        properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
+		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
+		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
 		return properties;
     }
     
+    private String getPluginVersion() {
+    	String pluginVersion = "";		
+    	Plugin tempPlugin = Jenkins.getInstance().getPlugin("ibm-application-security");
+	
+    	if(tempPlugin.getWrapper().getVersion() != null) {
+    		pluginVersion = tempPlugin.getWrapper().getVersion();
+    	}
+		
+		return pluginVersion;	
+    }
     
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
