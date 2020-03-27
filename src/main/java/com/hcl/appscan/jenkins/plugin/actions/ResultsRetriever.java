@@ -6,12 +6,15 @@
 
 package com.hcl.appscan.jenkins.plugin.actions;
 
+import com.hcl.appscan.jenkins.plugin.util.ExecutorUtil;
 import hudson.model.Action;
 import hudson.model.Run;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import jenkins.model.RunAction2;
 import jenkins.tasks.SimpleBuildStep;
@@ -26,6 +29,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	private final Run<?,?> m_build;	
 	private IResultsProvider m_provider;
 	private String m_name;
+	private Future<Boolean> futureTask = null;
 
 	@DataBoundConstructor
 	public ResultsRetriever(Run<?,?> build, IResultsProvider provider, String scanName) {
@@ -66,18 +70,38 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	}
 	
 	public boolean checkResults(Run<?,?> r) {
-		if(r.getAllActions().contains(this) && m_provider.hasResults()) {
-			r.getActions().remove(this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
-			r.addAction(createResults());
+		boolean results = false;
+		if (futureTask != null && futureTask.isDone()) {
 			try {
-				r.save();
-			} catch (IOException e) {
+				results = futureTask.get();
+			} catch (Exception e) {
 			}
-			return true;
+		} else if (futureTask != null) return false;
+
+		if (!results) {
+			final Run<?,?> rTemp  = r;
+			Callable<Boolean> callableTask = new Callable<Boolean>() {
+				@Override
+				public Boolean call() throws Exception {
+					if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
+						rTemp.getActions().remove(ResultsRetriever.this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
+						rTemp.addAction(createResults());
+						try {
+							rTemp.save();
+						} catch (IOException e) {
+						}
+						return true;
+					}
+
+					return false;
+				}
+			};
+			futureTask = (Future<Boolean>) ExecutorUtil.submitTask(callableTask);
 		}
-		return false;
+
+		return results;
 	}
-	
+
 	private ScanResults createResults() {
 		return new ScanResults(
 				m_build,
