@@ -26,7 +26,6 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.hcl.appscan.sdk.CoreConstants;
@@ -58,6 +57,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Plugin;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.AbstractBuild;
@@ -74,7 +74,9 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
+
 
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
 	
@@ -231,14 +233,24 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
 		Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-                properties.put(CoreConstants.APP_ID,  m_application);
+        properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins-" + SystemUtil.getOS());
-		properties.put("ClientType", "Jenkins-" + SystemUtil.getOS());
+		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
+		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
+		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
 		return properties;
     }
     
+    private String getPluginVersion() {
+    	Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
+	
+    	if(tempPlugin != null) {
+    		return tempPlugin.getWrapper().getVersion();
+    	}
+		
+    	return "";
+	}
     
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
