@@ -236,8 +236,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins-" + SystemUtil.getOS());
-		properties.put("ClientType", "Jenkins-" + SystemUtil.getOS());
+		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
 		return properties;
@@ -246,7 +245,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     private String getPluginVersion() {
     	Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
 	
-    	if(tempPlugin.getWrapper().getVersion() != null) {
+    	if(tempPlugin != null) {
     		return tempPlugin.getWrapper().getVersion();
     	}
 		
