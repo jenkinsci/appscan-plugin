@@ -243,15 +243,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     private String getPluginVersion() {
-    	String pluginVersion = "";		
-    	Plugin tempPlugin = Jenkins.getInstance().getPlugin("ibm-application-security");
+    	Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
 	
     	if(tempPlugin.getWrapper().getVersion() != null) {
-    		pluginVersion = tempPlugin.getWrapper().getVersion();
+    		return tempPlugin.getWrapper().getVersion();
     	}
 		
-		return pluginVersion;	
-    }
+    	return "";
+	}
     
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
