@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017,2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -236,22 +236,23 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
+		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins-" + SystemUtil.getOS());
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
+		properties.put("ClientType", "Jenkins-" + SystemUtil.getOS());
 		return properties;
     }
     
     private String getPluginVersion() {
     	Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
-	
+
     	if(tempPlugin != null) {
     		return tempPlugin.getWrapper().getVersion();
     	}
-		
+
     	return "";
 	}
-    
+
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
     		return ;
