@@ -20,6 +20,7 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
+import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -317,9 +318,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
     	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	build.addAction(new ResultsRetriever(build, provider, m_name));
-                
+
+		if (CoreConstants.FAILED.equals(provider.getStatus()))
+			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Id: " + scan.getScanId()));
+
         if(m_wait)
-            shouldFailBuild(provider,build);	
+            shouldFailBuild(provider,build);
     }
     
     private void setInstallDir() {
