@@ -128,6 +128,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_password = Secret.fromString("");
 		
 		m_scanType = "";
+		m_testOptimization = "";
 	}
 	
 	public String getCredentials() {
