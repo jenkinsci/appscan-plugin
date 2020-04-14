@@ -66,7 +66,60 @@
 	        <f:textbox />
 	    </f:entry>
     </f:section>
-    
+
+    <f:section title="${%label.test.optimization}" field="testOptimizationOptions">
+        <f:entry help="/plugin/appscan/help/testOptimization.html">
+        </f:entry>
+        <f:radioBlock name="testOptimization" title="${%label.fast}" checked="true" value="1" inline="true">
+            <f:entry>
+                <div style="border-style:solid;border-color:lightgrey">
+                    <ul>
+                        <li>Scan will find about 97% vulnerabilities of equivalent non-optimized scan</li>
+                        <li>Test stage will be up to twice as fast</li>
+                        <li>Recommended for security experts for more frequent scans</li>
+                        <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                    </ul>
+                </div>
+            </f:entry>
+        </f:radioBlock>
+        <f:radioBlock name="testOptimization" title="${%label.faster}" checked="${instance.isTestOptimization('2')}" value="2" inline="true" >
+            <f:entry>
+                <div style="border-style:solid;border-color:lightgrey">
+                    <ul>
+                        <li>Scan will find about 85% vulnerabilities of equivalent non-optimized scan</li>
+                        <li>Test stage will be up to 5 times as fast</li>
+                        <li>Recommended for DevSecOps during ongoing evaluation</li>
+                        <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                    </ul>
+                </div>
+            </f:entry>
+        </f:radioBlock>
+        <f:radioBlock name="testOptimization" title="${%label.fastest}" checked="${instance.isTestOptimization('3')}" value="3" inline="true" >
+            <f:entry>
+                <div style="border-style:solid;border-color:lightgrey">
+                    <ul>
+                        <li>Scan will find about 70% vulnerabilities of equivalent non-optimized scan</li>
+                        <li>Test stage will be up to 10 times as fast</li>
+                        <li>Recommended for Dev and QA during initial evaluation</li>
+                        <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                    </ul>
+                </div>
+            </f:entry>
+        </f:radioBlock>
+        <f:radioBlock name="testOptimization" title="${%label.noOpt}" checked="${instance.isTestOptimization('0')}" value="0" inline="true" >
+            <f:entry>
+                <div style="border-style:solid;border-color:lightgrey">
+                    <ul>
+                        <li>Scan will test for all issues in the selected Test Policy</li>
+                        <li>Longest scan</li>
+                        <li>Recommended for security experts before major releases, compliance and benchmarks</li>
+                        <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                    </ul>
+                </div>
+            </f:entry>
+        </f:radioBlock>
+    </f:section>
+
     <f:section title="" />
         
     <f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
