@@ -100,6 +100,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private Secret m_password;
 	
 	private String m_scanType;
+
+	private String m_testOptimization;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -126,6 +128,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_password = Secret.fromString("");
 		
 		m_scanType = "";
+		m_testOptimization = "";
 	}
 	
 	public String getCredentials() {
@@ -222,6 +225,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 
 	@DataBoundSetter
+	public void setTestOptimization(String testOptimization) {
+		m_testOptimization = testOptimization;
+	}
+
+	public String getTestOptimization() {
+		return m_testOptimization;
+	}
+
+	@DataBoundSetter
 	public void setAgent(String agent) {
 		m_agent = agent;
 	}
@@ -309,6 +321,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return "";
 	}
 
+	public String isTestOptimization(String testOptimizationLevel) {
+		if (m_testOptimization != null) {
+			return  m_testOptimization.equalsIgnoreCase(testOptimizationLevel) ? "true" : "";
+		} else if (testOptimizationLevel.equals("1")) { //Default
+			return "true";
+		}
+		return "";
+	}
+
 	private Map<String, String> getScanProperties(Run<?, ?> build, TaskListener listener) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(CoreConstants.SCANNER_TYPE, ASE_DYNAMIC_ANALYZER);
@@ -320,7 +341,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		properties.put("templateId", m_template);
 		properties.put("agentServer", m_agent);
 		properties.put("exploreData", m_exploreData);
-		properties.put("loginType", m_loginType);	
+		properties.put("loginType", m_loginType);
 		if (m_loginType != null) {
 			if (m_loginType.equals("Manual")) {
 				properties.put("trafficFile", m_trafficFile);
@@ -330,6 +351,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			}
 		}
 		properties.put("scanType", m_scanType);
+		properties.put("testOptimization", m_testOptimization);
 		properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins-" + SystemUtil.getOS());
