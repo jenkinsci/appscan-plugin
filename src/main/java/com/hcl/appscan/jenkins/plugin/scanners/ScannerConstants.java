@@ -28,9 +28,9 @@ public interface ScannerConstants {
 	
 	String NORMAL					= "Normal";				//$NON-NLS-1$
 	String OPTIMIZED				= "Optimized";				//$NON-NLS-1$
-	String FAST                     = "Fast";               //$NON-NLS-1$
-	String FASTER                   = "Faster";               //$NON-NLS-1$
-	String FASTEST                  = "Fastest";               //$NON-NLS-1$
-	String NO_OPTIMIZATION          = "NoOptimization";               //$NON-NLS-1$
+	String FAST                     = "Fast";                   //$NON-NLS-1$
+	String FASTER                   = "Faster";                 //$NON-NLS-1$
+	String FASTEST                  = "Fastest";                //$NON-NLS-1$
+	String NO_OPTIMIZATION          = "NoOptimization";         //$NON-NLS-1$
 	String TEST_OPTIMIZATION_LEVEL  = "TestOptimizationLevel";  //$NON-NLS-1$
 }
