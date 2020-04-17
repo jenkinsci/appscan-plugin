@@ -239,7 +239,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins-" + SystemUtil.getOS());
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
-		properties.put("ClientType", "Jenkins-" + SystemUtil.getOS());
+		properties.put("ClientType", "Jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
 		return properties;
     }
     
