@@ -142,7 +142,16 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
        - **Manual Explore (externally recorded)**       
             - **Path**: Enter the local path to the Manual explore data, to use as part of a new scan.
               For example: "C:\samplefileName.dast.config".
-              Supported Manual explore file formats are: EXD, HAR, DAST.CONFIG, and CONFIG.       
+              Supported Manual explore file formats are: EXD, HAR, DAST.CONFIG, and CONFIG.
+       - **Test Optimization**
+            - **Fast**: Select this option for approximately 97% issue coverage and twice as fast test stage speed.
+			  Recommended for security experts for more frequent scans.
+            - **Faster**: Select this option for approximately 85% issue coverage and five times as fast test stage speed.
+			  Recommended for DevSecOps during ongoing evaluation.
+            - **Fastest**: Select this option for approximately 70% issue coverage and ten times as fast test stage speed.
+			  Recommended for Dev and QA during initial evaluation.
+            - **No Optimization**: Select this option for maximum issue coverage and longest scan. Recommended for security
+              experts before major releases, compliance testing and benchmarks.			
        - **More Options**: If selected, the following option is available.       
             - **Designated Agent Server**: Select the agent server to execute the job.
               Default will be considered in absence of any selection.
