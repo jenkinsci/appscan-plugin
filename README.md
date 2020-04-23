@@ -50,7 +50,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
                 -   **Scan Type**: Select whether your site is a Staging
                     site (under development) or a Production site (live
                     and in use).
-                -   **Test Optimization**: Following options are available.
+                -   **Test Optimization**: Following options are available:
                     - **Fast**: Select this option for approximately 97% issue coverage and twice as fast test stage speed.
 			          Recommended for security experts for more frequent scans.
                     - **Faster**: Select this option for approximately 85% issue coverage and five times as fast test stage speed.
