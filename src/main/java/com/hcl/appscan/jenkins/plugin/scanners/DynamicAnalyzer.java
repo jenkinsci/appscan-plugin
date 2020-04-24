@@ -131,16 +131,14 @@ public class DynamicAnalyzer extends Scanner {
 	@DataBoundSetter
 	public void setOptimization(String optimization) {
 		if(optimization != null) {
-			m_optimization = setBackwardCompatibleOptimization(optimization);
+			m_optimization = mapOldtoNewOptLevels(optimization);
 		} else {
 			m_optimization = optimization;
 		}
 	}
 	
 	public String getOptimization() {
-		if(m_optimization != null) {
-			m_optimization = setBackwardCompatibleOptimization(m_optimization);
-		}
+	    m_optimization = mapOldtoNewOptLevels(m_optimization);
 		return m_optimization;
 	}
 	
@@ -173,7 +171,7 @@ public class DynamicAnalyzer extends Scanner {
 		return properties;
 	}
 
-	private String setBackwardCompatibleOptimization(String optimization) //Backward Compatibility
+	private String mapOldtoNewOptLevels(String optimization) //Backward Compatibility
 	{
 		if(optimization != null) {
 			if(optimization.equals(NORMAL)) {
