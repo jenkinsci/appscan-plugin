@@ -130,17 +130,15 @@ public class DynamicAnalyzer extends Scanner {
 
 	@DataBoundSetter
 	public void setOptimization(String optimization) {
-		m_optimization = optimization;
+		if(optimization != null) {
+			m_optimization = mapOldtoNewOptLevels(optimization);
+		} else {
+			m_optimization = optimization;
+		}
 	}
 	
 	public String getOptimization() {
-		if(m_optimization != null) { //Backward Compatibility
-			if(m_optimization.equals(NORMAL)) {
-				m_optimization = NO_OPTIMIZATION;
-			} else if(m_optimization.equals(OPTIMIZED)) {
-				m_optimization = FAST;
-			}
-		}
+	    m_optimization = mapOldtoNewOptLevels(m_optimization);
 		return m_optimization;
 	}
 	
@@ -171,6 +169,20 @@ public class DynamicAnalyzer extends Scanner {
 		properties.put(TEST_OPTIMIZATION_LEVEL, m_optimization);
 		properties.put(EXTRA_FIELD, m_extraField);
 		return properties;
+	}
+
+	private String mapOldtoNewOptLevels(String optimization) //Backward Compatibility
+	{
+		if(optimization != null) {
+			if(optimization.equals(NORMAL)) {
+				m_optimization = NO_OPTIMIZATION;
+			} else if(optimization.equals(OPTIMIZED)) {
+				m_optimization = FAST;
+			} else {
+				m_optimization = optimization;
+			}
+		}
+		return m_optimization;
 	}
 	
 	@Symbol("dynamic_analyzer") //$NON-NLS-1$
