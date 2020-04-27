@@ -353,8 +353,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		properties.put("scanType", m_scanType);
 		properties.put("testOptimization", m_testOptimization);
 		properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
-		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
-		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins-" + SystemUtil.getOS());
+		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));		
 		return properties;
 	}
 
