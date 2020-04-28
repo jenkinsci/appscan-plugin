@@ -7,6 +7,7 @@
 package com.hcl.appscan.jenkins.plugin.actions;
 
 import com.hcl.appscan.jenkins.plugin.util.ExecutorUtil;
+import com.hcl.appscan.sdk.CoreConstants;
 import hudson.model.Action;
 import hudson.model.Run;
 
@@ -83,7 +84,16 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 			Callable<Boolean> callableTask = new Callable<Boolean>() {
 				@Override
 				public Boolean call() throws Exception {
-					if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
+					String status = null;
+					if (rTemp.getAllActions().contains(ResultsRetriever.this) && CoreConstants.FAILED.equalsIgnoreCase(status = m_provider.getStatus())) {
+						rTemp.getActions().remove(ResultsRetriever.this);
+						try {
+							rTemp.save();
+						} catch (IOException e) {
+						}
+						if (m_provider.getMessage() != null) rTemp.setDescription(m_provider.getMessage());
+						return true;
+					} else if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
 						rTemp.getActions().remove(ResultsRetriever.this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
 						rTemp.addAction(createResults());
 						try {
@@ -91,6 +101,10 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 						} catch (IOException e) {
 						}
 						return true;
+					}
+
+					if (m_provider.getMessage() != null) {
+						rTemp.setDescription(m_provider.getMessage());
 					}
 
 					return false;

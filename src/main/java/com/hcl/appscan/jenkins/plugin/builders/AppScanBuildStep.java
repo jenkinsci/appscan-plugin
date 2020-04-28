@@ -94,6 +94,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_wait;
     private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
+	private String scanStatus;
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
@@ -300,11 +301,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                                 provider.setReportFormat(scan.getReportFormat());
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
-		    			String status = provider.getStatus();
+		    			scanStatus = provider.getStatus();
 		    			
-		    			while(status != null && (status.equalsIgnoreCase(CoreConstants.INQUEUE) || status.equalsIgnoreCase(CoreConstants.RUNNING))) {
+		    			while(scanStatus != null && (scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || scanStatus.equalsIgnoreCase(CoreConstants.RUNNING))) {
 		    				Thread.sleep(60000);
-		    				status = provider.getStatus();
+		    				scanStatus = provider.getStatus();
 		    			}
 		    		}
 		    		
@@ -316,11 +317,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			}
 		});
 
-    	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-    	build.addAction(new ResultsRetriever(build, provider, m_name));
+		if (CoreConstants.FAILED.equalsIgnoreCase(scanStatus)) {
+			build.setDescription(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName()));
+			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
+					", Scan Name: " + scan.getName())));
+		}
 
-		if (CoreConstants.FAILED.equals(provider.getStatus()))
-			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Id: " + scan.getScanId()));
+		provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+		build.addAction(new ResultsRetriever(build, provider, m_name));
 
         if(m_wait)
             shouldFailBuild(provider,build);
