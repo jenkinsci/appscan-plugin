@@ -94,7 +94,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_wait;
     private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
-	private String scanStatus;
+	private String m_scanStatus;
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
@@ -301,11 +301,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                                 provider.setReportFormat(scan.getReportFormat());
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
-		    			scanStatus = provider.getStatus();
+		    			m_scanStatus = provider.getStatus();
 		    			
-		    			while(scanStatus != null && (scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || scanStatus.equalsIgnoreCase(CoreConstants.RUNNING))) {
+		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING))) {
 		    				Thread.sleep(60000);
-		    				scanStatus = provider.getStatus();
+		    				m_scanStatus = provider.getStatus();
 		    			}
 		    		}
 		    		
@@ -317,7 +317,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			}
 		});
 
-		if (CoreConstants.FAILED.equalsIgnoreCase(scanStatus)) {
+		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
 			build.setDescription(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName()));
 			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
 					", Scan Name: " + scan.getName())));

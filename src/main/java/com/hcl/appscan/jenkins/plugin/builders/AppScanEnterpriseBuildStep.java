@@ -103,7 +103,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_scanType;
 
 	private String m_testOptimization;
-	private String scanStatus;
+	private String m_scanStatus;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -402,13 +402,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					provider.setReportFormat(scan.getReportFormat());
 					if (suspend) {
 						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
-						scanStatus = provider.getStatus();
+						m_scanStatus = provider.getStatus();
 
-						while(scanStatus != null && (scanStatus.equalsIgnoreCase("Waiting to Run")
-								|| scanStatus.equalsIgnoreCase("Starting") ||scanStatus.equalsIgnoreCase("Running")
-								|| scanStatus.equals("Post Processing") || scanStatus.equals("Waiting to Generate Results") || scanStatus.equals("Generating Results"))) {
+						while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase("Waiting to Run")
+								|| m_scanStatus.equalsIgnoreCase("Starting") || m_scanStatus.equalsIgnoreCase("Running")
+								|| m_scanStatus.equals("Post Processing") || m_scanStatus.equals("Waiting to Generate Results") || m_scanStatus.equals("Generating Results"))) {
 							Thread.sleep(60000);
-							scanStatus = provider.getStatus();
+							m_scanStatus = provider.getStatus();
 						}
 					}
 					return provider;
@@ -418,7 +418,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			}
 		});
 
-		if (CoreConstants.FAILED.equalsIgnoreCase(scanStatus)) {
+		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
 			build.setDescription(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName()));
 			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
 					", Scan Name: " + scan.getName())));
