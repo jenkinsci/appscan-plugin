@@ -160,7 +160,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
             - **Fastest**: Select this option for approximately 70% issue coverage and ten times as fast test stage speed.
 			  Recommended for Dev and QA during initial evaluation.
             - **No Optimization**: Select this option for maximum issue coverage and longest scan. Recommended for security
-              experts before major releases, compliance testing and benchmarks.\            
+              experts before major releases, compliance testing and benchmarks.            
             **Note**: The options of “Faster” and “Fastest” are supported only for AppScan Enterprise version 10.0.0 and above.		
        - **More Options**: If selected, the following option is available.
             - **Designated Agent Server**: Select the agent server to execute the job.
