@@ -21,3 +21,4 @@ com.hcl.appscan.jenkins.plugin.results.ResultsInspector
 com.hcl.appscan.jenkins.plugin.scanners.Scanner
 com.hcl.appscan.jenkins.plugin.util.ScanProgress
 java.net.Proxy
+java.util.concurrent.Future
