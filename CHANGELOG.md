@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+1.0.2 (May, 2020)
+------
+* ASE Test Optimization description updates.
+* Fix for [JENKINS-62314](https://issues.jenkins-ci.org/browse/JENKINS-62314)
+
 1.0.1 (April, 2020)
 ------
 * Updated Test Optimization for ASoC DAST scans (“No Optimization”, “Fast”, “Faster” and “Fastest”).
