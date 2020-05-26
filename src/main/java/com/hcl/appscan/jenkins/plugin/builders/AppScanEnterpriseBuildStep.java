@@ -64,6 +64,8 @@ import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import jenkins.model.Jenkins;
+import hudson.model.AutoCompletionCandidates;
 import hudson.remoting.Callable;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -78,6 +80,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	private static final long serialVersionUID = 1L;
 	private static final String ASE_DYNAMIC_ANALYZER = "AppScan Enterprise Dynamic Analyzer";
+	private static final String SHOW_ALL = "Show All";
 
 	private String m_credentials;
 	private String m_application;
@@ -110,11 +113,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
 		
 		m_credentials = credentials;
+		getDescriptor().setAutoCompleteList(m_credentials, Jenkins.getInstance().getItemGroup()); // To handle pipeline project
 		m_application = "";
 		m_target = "";
-		m_folder = folder;
+		m_folder = getDescriptor().getFolderId(folder) != null ? getDescriptor().getFolderId(folder) : folder;
 		m_testPolicy = testPolicy;
-		m_template = template;
+		m_template = getDescriptor().getTemplateId(template) != null ? getDescriptor().getTemplateId(template) : template;
 		m_exploreData = "";
 		m_agent = "";
 		m_jobName = (jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -132,10 +136,25 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	public String getCredentials() {
+		if (m_credentials != null && m_credentials != ""
+				&& getDescriptor().folderMap == null
+				&& getDescriptor().applicationMap == null
+				&& getDescriptor().templateMap == null) {
+			// To handle backward compatibiliy for existing jobs
+			getDescriptor().setAutoCompleteList(m_credentials,
+					Jenkins.getInstance().getItemGroup());
+		}
 		return m_credentials;
 	}
 	
 	public String getFolder() {
+		//Get folder name from folder id
+		if (getDescriptor().folderMap != null &&
+				getDescriptor().folderMap.get(m_folder) != null) {
+			String folder = StringEscapeUtils.unescapeHtml(
+					getDescriptor().folderMap.get(m_folder));
+			return folder;
+		}
 		return m_folder;
 	}
 	
@@ -144,6 +163,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	public String getTemplate() {
+		//get template name from template id
+        if (getDescriptor().templateMap != null &&
+				getDescriptor().templateMap.get(m_template) != null) {
+        	String template = StringEscapeUtils.unescapeHtml(
+        			getDescriptor().templateMap.get(m_template));
+        	return template;
+		}
 		return m_template;
 	}
 	
@@ -153,10 +179,19 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	@DataBoundSetter
 	public void setApplication(String application) {
-		m_application = application;
+		//set respective application id if exists
+		m_application = getDescriptor().getApplicationId(application)
+				!= null ? getDescriptor().getApplicationId(application) : application;
 	}
 
 	public String getApplication() {
+		//get application name from application id
+		if (getDescriptor().applicationMap != null &&
+				getDescriptor().applicationMap.get(m_application) != null) {
+			String appName = StringEscapeUtils.unescapeHtml(
+					getDescriptor().applicationMap.get(m_application));
+			return appName;
+		}
 		return m_application;
 	}
 
@@ -432,6 +467,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
     @Extension
 	public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
+		private List<Entry<String, String>> sortedTemplateList = null;
+		private List<Entry<String, String>> sortedFolderList = null;
+		private List<Entry<String, String>> sortedApplicationList = null;
+		private Map<String, String> templateMap = null;
+		private Map<String, String> folderMap = null;
+		private Map<String, String> applicationMap = null;
+
 		@Override
 		public boolean isApplicable(Class<? extends AbstractProject> projectType) {
 			return true;
@@ -459,41 +501,56 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); // $NON-NLS-1$
 			}
 			if (!hasSelected)
+			{
 				model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
+				//Resetting autocomplete lists
+				sortedTemplateList = null;
+				sortedFolderList = null;
+				sortedApplicationList = null;
+				templateMap = null;
+				folderMap = null;
+				applicationMap = null;
+			}
+			else {
+				setAutoCompleteList(credentials, context); //set AutoComplete lists if credential is selected
+			}
 			return model;
 		}
 
-		public ListBoxModel doFillApplicationItems(@QueryParameter String credentials,
-				@AncestorInPath ItemGroup<?> context) {
-			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
-			Map<String, String> applications = new ASEApplicationProvider(authProvider).getApplications();
-			ListBoxModel model = new ListBoxModel();
-			model.add("");
+		public AutoCompletionCandidates doAutoCompleteApplication(@QueryParameter String value) {
+			AutoCompletionCandidates model = new AutoCompletionCandidates();
+			if (sortedApplicationList != null) {
+				for(Map.Entry<String, String> entry : sortedApplicationList) {
+					String appName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					if (value.equals(SHOW_ALL)) {
+						model.add(appName);
+					}
+					else {
+						if (appName != null && appName.toLowerCase().contains(value.toLowerCase())) {
+							model.add(appName);
+						}
+					}
 
-			if (applications != null) {
-				
-				List<Entry<String, String>> list = sortComponents(applications.entrySet());
-
-				for (Map.Entry<String, String> entry : list) {
-					String app = StringEscapeUtils.unescapeHtml(entry.getValue());
-					model.add(app, entry.getKey());
 				}
 			}
 			return model;
 		}
 
-		public ListBoxModel doFillFolderItems(@QueryParameter String credentials,
-				@AncestorInPath ItemGroup<?> context) { // $NON-NLS-1$
-			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
-			IComponent componentProvider = ConfigurationProviderFactory.getScanner("Folder", authProvider);
-			Map<String, String> items = componentProvider.getComponents();
-			ListBoxModel model = new ListBoxModel();
-			
-			if (items != null) {
-				List<Entry<String, String>> list = sortComponents(items.entrySet());
-				
-				for (Map.Entry<String, String> entry : list)
-					model.add(entry.getValue(), entry.getKey());
+		public AutoCompletionCandidates doAutoCompleteFolder(@QueryParameter String value) {
+			AutoCompletionCandidates model = new AutoCompletionCandidates();
+			if (sortedFolderList != null) {
+				for(Map.Entry<String, String> entry : sortedFolderList) {
+					String folderName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					if (value.equals(SHOW_ALL)) {
+						model.add(folderName);
+					}
+					else {
+						if (folderName != null && folderName.toLowerCase().contains(value.toLowerCase())) {
+							model.add(folderName);
+						}
+					}
+
+				}
 			}
 			return model;
 		}
@@ -513,18 +570,20 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			return model;
 		}
 
-		public ListBoxModel doFillTemplateItems(@QueryParameter String credentials,
-				@AncestorInPath ItemGroup<?> context) { // $NON-NLS-1$
-			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
-			IComponent componentProvider = ConfigurationProviderFactory.getScanner("Template", authProvider);
-			Map<String, String> items = componentProvider.getComponents();
-			ListBoxModel model = new ListBoxModel();
+		public AutoCompletionCandidates doAutoCompleteTemplate(@QueryParameter String value) {
+			AutoCompletionCandidates model = new AutoCompletionCandidates();
+			if (sortedTemplateList != null) {
+				for(Map.Entry<String, String> entry : sortedTemplateList) {
+					String templateName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					if (value.equals(SHOW_ALL)) {
+						model.add(templateName);
+					}
+					else {
+						if (templateName != null && templateName.toLowerCase().contains(value.toLowerCase())) {
+							model.add(templateName);
+						}
+					}
 
-			if (items != null) {
-				List<Entry<String, String>> list = sortComponents(items.entrySet());
-				for (Map.Entry<String, String> entry : list) {
-					String template = StringEscapeUtils.unescapeHtml(entry.getValue());
-					model.add(template, entry.getKey());
 				}
 			}
 			return model;
@@ -584,6 +643,55 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		
 		public FormValidation doCheckJobName(@QueryParameter String jobName) {
 			return FormValidation.validateRequired(jobName);
+		}
+
+		//This method will initialize Template, folder and application list.
+		private void setAutoCompleteList(String credentials, ItemGroup<?> context) {
+			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
+			IComponent folderComponentProvider = ConfigurationProviderFactory.getScanner("Folder", authProvider);
+			folderMap = folderComponentProvider.getComponents();
+			sortedFolderList = folderMap != null ? sortComponents(folderMap.entrySet()) : null;
+			IComponent templateComponentProvider = ConfigurationProviderFactory.getScanner("Template", authProvider);
+			templateMap = templateComponentProvider.getComponents();
+			sortedTemplateList = templateMap != null ? sortComponents(templateMap.entrySet()) : null;
+			applicationMap = new ASEApplicationProvider(authProvider).getApplications();
+			sortedApplicationList = applicationMap != null ? sortComponents(applicationMap.entrySet()) : null;
+		}
+
+		private String getApplicationId(String application) {
+			if (sortedApplicationList != null) {
+				for(Map.Entry<String, String> entry : sortedApplicationList) {
+					String appName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					if (appName != null && appName.equals(application)) {
+						return entry.getKey();
+					}
+				}
+			}
+			return null;
+		}
+
+		private String getFolderId(String folder) {
+			if (sortedFolderList != null) {
+				for(Map.Entry<String, String> entry : sortedFolderList) {
+					String folderName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					if(folderName != null && folderName.equals(folder)) {
+						return entry.getKey();
+					}
+				}
+			}
+			return null;
+		}
+
+		private String getTemplateId(String template) {
+			if (sortedTemplateList != null) {
+				for(Map.Entry<String, String> entry : sortedTemplateList) {
+					String templateName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					if(templateName != null && templateName.equals(template)) {
+						return entry.getKey();
+					}
+				}
+			}
+			return null;
 		}
 	}
 }

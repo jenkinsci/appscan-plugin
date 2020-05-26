@@ -50,3 +50,19 @@ function aseWaitClicked(e) {
 		failCheckbox.checked = false;        
 	}
 }
+
+/*
+   * Overridable method called before autocomplete container is loaded with result data.
+   * This method is overridden to dynamically change the autocomplete result list size
+   * @param sQuery {String} Original request.
+   * @param oResponse {Object} Response object.
+   * @param oPayload {MIXED} (optional) Additional argument(s)
+   * @return {Boolean} Return true to continue loading data, false to cancel.
+
+*/
+YAHOO.widget.AutoComplete.prototype.doBeforeLoadData = function (sQuery, oResponse, oPayload) {
+     if (oResponse.results.length != 0) {
+          YAHOO.widget.AutoComplete.prototype.maxResultsDisplayed = oResponse.results.length;
+     }
+     return true;
+}
