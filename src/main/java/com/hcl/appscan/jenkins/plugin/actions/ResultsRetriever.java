@@ -93,6 +93,10 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 						return true;
 					}
 
+                    if (m_provider.getMessage() != null) {
+                        rTemp.setDescription(m_provider.getMessage());
+                    }
+
 					return false;
 				}
 			};
