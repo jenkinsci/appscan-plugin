@@ -113,12 +113,17 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
 		
 		m_credentials = credentials;
-		getDescriptor().setAutoCompleteList(m_credentials, Jenkins.getInstance().getItemGroup()); // To handle pipeline project
 		m_application = "";
 		m_target = "";
-		m_folder = getDescriptor().getFolderId(folder) != null ? getDescriptor().getFolderId(folder) : folder;
+		// Post autocomplete feature, we need to explicitly map 
+		// folder name to folder id before saving it in
+		// job configuration file.
+		m_folder = getDescriptor().getFolderId(folder);
 		m_testPolicy = testPolicy;
-		m_template = getDescriptor().getTemplateId(template) != null ? getDescriptor().getTemplateId(template) : template;
+		// Post autocomplete feature, we need to explicitly map 
+		// template name to template id before saving it in
+		// job configuration file.
+		m_template = getDescriptor().getTemplateId(template);
 		m_exploreData = "";
 		m_agent = "";
 		m_jobName = (jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -136,11 +141,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	public String getCredentials() {
+		// Post autocomplete feature, to handle backward compatibiliy 
+		// we have to initialize autocomplete lists explicitly 
+		// for already existing jobs.
 		if (m_credentials != null && m_credentials != ""
 				&& getDescriptor().folderMap == null
 				&& getDescriptor().applicationMap == null
 				&& getDescriptor().templateMap == null) {
-			// To handle backward compatibiliy for existing jobs
 			getDescriptor().setAutoCompleteList(m_credentials,
 					Jenkins.getInstance().getItemGroup());
 		}
@@ -148,7 +155,9 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	public String getFolder() {
-		//Get folder name from folder id
+		// Post autocomplete feature, we need to explicitly map the folder id
+		// to folder name before displaying the value in jenkins's job
+		// configuration. 
 		if (getDescriptor().folderMap != null &&
 				getDescriptor().folderMap.get(m_folder) != null) {
 			String folder = StringEscapeUtils.unescapeHtml(
@@ -163,8 +172,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	public String getTemplate() {
-		//get template name from template id
-        if (getDescriptor().templateMap != null &&
+		// Post autocomplete feature, we need to explicitly map the template id
+		// to template name before displaying the value in jenkins's job
+		// configuration. 
+		if (getDescriptor().templateMap != null &&
 				getDescriptor().templateMap.get(m_template) != null) {
         	String template = StringEscapeUtils.unescapeHtml(
         			getDescriptor().templateMap.get(m_template));
@@ -179,13 +190,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	@DataBoundSetter
 	public void setApplication(String application) {
-		//set respective application id if exists
-		m_application = getDescriptor().getApplicationId(application)
-				!= null ? getDescriptor().getApplicationId(application) : application;
+		// Post autocomplete feature, we need to explicitly map 
+		// application name to application id before saving it in
+		// job configuration file.
+		m_application = getDescriptor().getApplicationId(application);
 	}
 
 	public String getApplication() {
-		//get application name from application id
+		// Post autocomplete feature, we need to explicitly map the application
+		// id to application name before displaying the value in jenkins's job
+		// configuration. 
 		if (getDescriptor().applicationMap != null &&
 				getDescriptor().applicationMap.get(m_application) != null) {
 			String appName = StringEscapeUtils.unescapeHtml(
@@ -657,7 +671,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			applicationMap = new ASEApplicationProvider(authProvider).getApplications();
 			sortedApplicationList = applicationMap != null ? sortComponents(applicationMap.entrySet()) : null;
 		}
-
+		
+		/**
+		 * Gets application Id
+		 * @param application This is valid application name 
+		 * @return application Id for valid application name otherwise 
+		 * application name itself.
+		 */
 		private String getApplicationId(String application) {
 			if (sortedApplicationList != null) {
 				for(Map.Entry<String, String> entry : sortedApplicationList) {
@@ -667,9 +687,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					}
 				}
 			}
-			return null;
+			return application;
 		}
 
+		/**
+		 * Gets folder Id
+		 * @param folder This is valid folder name 
+		 * @return folder Id for valid folder name otherwise 
+		 * folder name itself.
+		 */
 		private String getFolderId(String folder) {
 			if (sortedFolderList != null) {
 				for(Map.Entry<String, String> entry : sortedFolderList) {
@@ -679,9 +705,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					}
 				}
 			}
-			return null;
+			return folder;
 		}
 
+		/**
+		 * Gets template Id
+		 * @param template This is valid template name 
+		 * @return template Id for valid template name otherwise 
+		 * template name itself.
+		 */
 		private String getTemplateId(String template) {
 			if (sortedTemplateList != null) {
 				for(Map.Entry<String, String> entry : sortedTemplateList) {
@@ -691,7 +723,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					}
 				}
 			}
-			return null;
+			return template;
 		}
 	}
 }

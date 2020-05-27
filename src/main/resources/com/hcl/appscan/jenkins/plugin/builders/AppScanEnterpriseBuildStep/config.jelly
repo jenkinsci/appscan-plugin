@@ -20,7 +20,7 @@
     
     <f:section title="${%label.job.properties}" field="loginTypeOptions">
 	    <f:entry title="${%label.template}" field="template">
-	        <f:textbox placeholder="Type: 'Show All' to list all templates" />
+	        <f:textbox placeholder="${%template.placeholder}" />
 	    </f:entry>
 	            
 	    <f:entry title="${%label.job.name}" field="jobName">
@@ -28,11 +28,11 @@
 	    </f:entry>
 		        
 	    <f:entry title="${%label.folder}" field="folder">
-	        <f:textbox placeholder="Type: 'Show All' to list all folders" />
+	        <f:textbox placeholder="${%folder.placeholder}" />
 	    </f:entry>
 	    
 	    <f:entry title="${%label.application}" field="application">
-	        <f:textbox placeholder="Type: 'Show All' to list all applications" />
+	        <f:textbox placeholder="${%application.placeholder}" />
 	    </f:entry>
 	    
 	    <f:entry title="${%label.test.policy}" field="testPolicy">
