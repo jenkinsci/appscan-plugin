@@ -50,6 +50,15 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
                 -   **Scan Type**: Select whether your site is a Staging
                     site (under development) or a Production site (live
                     and in use).
+                -   **Test Optimization**: Following options are available:
+                    - **Fast**: Select this option for approximately 97% issue coverage and twice as fast test stage speed.
+			          Recommended for security experts for more frequent scans.
+                    - **Faster**: Select this option for approximately 85% issue coverage and five times as fast test stage speed.
+			          Recommended for DevSecOps during ongoing evaluation.
+                    - **Fastest**: Select this option for approximately 70% issue coverage and ten times as fast test stage speed.
+			          Recommended for Dev and QA during initial evaluation.
+                    - **No Optimization**: Select this option for maximum issue coverage and longest scan. Recommended for security
+                      experts before major releases, compliance testing and benchmarks.								
                 -   **Login User** and **Login Password**: If your app
                     requires login, enter valid user credentials so that
                     Application Security on Cloud can log in to the
@@ -142,8 +151,18 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
        - **Manual Explore (externally recorded)**       
             - **Path**: Enter the local path to the Manual explore data, to use as part of a new scan.
               For example: "C:\samplefileName.dast.config".
-              Supported Manual explore file formats are: EXD, HAR, DAST.CONFIG, and CONFIG.       
-       - **More Options**: If selected, the following option is available.       
+              Supported Manual explore file formats are: EXD, HAR, DAST.CONFIG, and CONFIG.
+       - **Test Optimization**
+            - **Fast**: Select this option for approximately 97% issue coverage and twice as fast test stage speed.
+			  Recommended for security experts for more frequent scans.
+            - **Faster**: Select this option for approximately 85% issue coverage and five times as fast test stage speed.
+			  Recommended for DevSecOps during ongoing evaluation.
+            - **Fastest**: Select this option for approximately 70% issue coverage and ten times as fast test stage speed.
+			  Recommended for Dev and QA during initial evaluation.
+            - **No Optimization**: Select this option for maximum issue coverage and longest scan. Recommended for security
+              experts before major releases, compliance testing and benchmarks.            
+            **Note**: The options of “Faster” and “Fastest” are supported only for AppScan Enterprise version 10.0.0 and above.		
+       - **More Options**: If selected, the following option is available.
             - **Designated Agent Server**: Select the agent server to execute the job.
               Default will be considered in absence of any selection.
       -  **Do not execute the next steps in the Jenkins job sequence, until AppScan security analysis completes.:** If selected,
@@ -151,7 +170,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
         and the results have been retrieved. If unselected, the job will
         continue once the scan has been submitted to the analysis service.
       - **Fail the build if one of the following conditions apply:** If selected, the Jenkins job will fail if the
-        finding count(s) exceed the specified thresholds (see below).        
+        finding count(s) exceed the specified thresholds (see below).
         -   **Add Condition:** Allows you to add thresholds for the number
         of findings that will cause a build to fail. You can specify
         thresholds for total, high, medium, and/or low finding counts.

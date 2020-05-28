@@ -5,14 +5,22 @@
  	LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
     -->
     <script type="text/javascript" src="${resURL}/plugin/appscan/js/util.js"></script>    
-    
+
+    <!-- Following css is added to show scroll-bar in autocomplete list -->
+    <style type="text/css" >
+     .yui-skin-sam .yui-ac-content {
+        max-height: 200px;
+        overflow-y: auto;
+     }
+    </style>
+
     <f:entry title="${%label.credentials}" field="credentials">
         <f:select />
     </f:entry>
     
     <f:section title="${%label.job.properties}" field="loginTypeOptions">
 	    <f:entry title="${%label.template}" field="template">
-	        <f:select />
+	        <f:textbox placeholder="${%template.placeholder}" />
 	    </f:entry>
 	            
 	    <f:entry title="${%label.job.name}" field="jobName">
@@ -20,11 +28,11 @@
 	    </f:entry>
 		        
 	    <f:entry title="${%label.folder}" field="folder">
-	        <f:select />
+	        <f:textbox placeholder="${%folder.placeholder}" />
 	    </f:entry>
 	    
 	    <f:entry title="${%label.application}" field="application">
-	        <f:select />
+	        <f:textbox placeholder="${%application.placeholder}" />
 	    </f:entry>
 	    
 	    <f:entry title="${%label.test.policy}" field="testPolicy">
@@ -90,6 +98,7 @@
                         <li>Test stage will be up to 5 times as fast</li>
                         <li>Recommended for DevSecOps during ongoing evaluation</li>
                         <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                        <p style="color:red;">This option is supported with HCL AppScan Enterprise v10.0.0 and above.</p>
                     </ul>
                 </div>
             </f:entry>
@@ -102,6 +111,7 @@
                         <li>Test stage will be up to 10 times as fast</li>
                         <li>Recommended for Dev and QA during initial evaluation</li>
                         <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                        <p style="color:red;">This option is supported with HCL AppScan Enterprise v10.0.0 and above.</p>
                     </ul>
                 </div>
             </f:entry>
