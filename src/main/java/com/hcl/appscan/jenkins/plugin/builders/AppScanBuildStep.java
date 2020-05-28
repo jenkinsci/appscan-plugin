@@ -27,6 +27,7 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.hcl.appscan.sdk.CoreConstants;
@@ -78,7 +79,6 @@ import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
-
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -94,6 +94,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_wait;
     private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
+	private String m_scanStatus;
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
@@ -234,7 +235,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
 		Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-        properties.put(CoreConstants.APP_ID,  m_application);
+		properties.put(CoreConstants.APP_ID,  m_application);
 		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "jenkins");
@@ -300,11 +301,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                                 provider.setReportFormat(scan.getReportFormat());
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
-		    			String status = provider.getStatus();
+		    			m_scanStatus = provider.getStatus();
 		    			
-		    			while(status != null && (status.equalsIgnoreCase(CoreConstants.INQUEUE) || status.equalsIgnoreCase(CoreConstants.RUNNING))) {
+		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING))) {
 		    				Thread.sleep(60000);
-		    				status = provider.getStatus();
+		    				m_scanStatus = provider.getStatus();
 		    			}
 		    		}
 		    		
@@ -316,14 +317,21 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			}
 		});
 
-    	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-    	build.addAction(new ResultsRetriever(build, provider, m_name));
+		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
+			String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+			if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+				message += ", " + provider.getMessage();
+			}
+			build.setDescription(message);
+			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
+					", Scan Name: " + scan.getName())));
+		}
 
-		if (CoreConstants.FAILED.equals(provider.getStatus()))
-			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Id: " + scan.getScanId()));
+		provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+		build.addAction(new ResultsRetriever(build, provider, m_name));
 
-        if(m_wait)
-            shouldFailBuild(provider,build);
+		if(m_wait)
+			shouldFailBuild(provider,build);
     }
     
     private void setInstallDir() {
