@@ -92,7 +92,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 							rTemp.save();
 						} catch (IOException e) {
 						}
-                        String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
+						String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
 						if (m_provider.getMessage() != null  && m_provider.getMessage().trim().length() > 0) message += ", " + m_provider.getMessage();
 						rTemp.setDescription(message);
 						return true;
