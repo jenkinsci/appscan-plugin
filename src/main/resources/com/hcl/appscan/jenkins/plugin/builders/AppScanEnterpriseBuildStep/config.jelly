@@ -20,7 +20,9 @@
     
     <f:section title="${%label.job.properties}" field="loginTypeOptions">
 	    <f:entry title="${%label.template}" field="template">
-	        <f:textbox placeholder="${%template.placeholder}" />
+	        <f:textbox placeholder="${%template.placeholder}"
+	         style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
+	         background-size: 16px;" />
 	    </f:entry>
 	            
 	    <f:entry title="${%label.job.name}" field="jobName">
@@ -28,11 +30,15 @@
 	    </f:entry>
 		        
 	    <f:entry title="${%label.folder}" field="folder">
-	        <f:textbox placeholder="${%folder.placeholder}" />
+	        <f:textbox placeholder="${%folder.placeholder}" 
+	         style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
+             background-size: 16px;" />
 	    </f:entry>
 	    
 	    <f:entry title="${%label.application}" field="application">
-	        <f:textbox placeholder="${%application.placeholder}" />
+	        <f:textbox placeholder="${%application.placeholder}" 
+	        style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
+            background-size: 16px;" />
 	    </f:entry>
 	    
 	    <f:entry title="${%label.test.policy}" field="testPolicy">
