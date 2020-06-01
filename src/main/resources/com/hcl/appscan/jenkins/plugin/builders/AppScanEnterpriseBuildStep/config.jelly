@@ -40,7 +40,7 @@
 	        style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
             background-size: 16px;" />
 	    </f:entry>
-	    
+  
 	    <f:entry title="${%label.test.policy}" field="testPolicy">
 	        <f:select />
 	    </f:entry>

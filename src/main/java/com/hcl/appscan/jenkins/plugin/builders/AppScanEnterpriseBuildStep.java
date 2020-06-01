@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
@@ -105,6 +106,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_scanType;
 
 	private String m_testOptimization;
+	private String m_scanStatus;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -444,17 +446,17 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					scan.run();
 
 					IResultsProvider provider = new ASEResultsProvider(scan.getScanId(), scan.getType(),
-							scan.getServiceProvider(), progress);
+							scan.getServiceProvider(), progress, scan.getName());
 					provider.setReportFormat(scan.getReportFormat());
 					if (suspend) {
 						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
-						String status = provider.getStatus();
+						m_scanStatus = provider.getStatus();
 
-						while(status != null && (status.equalsIgnoreCase("Waiting to Run")
-								|| status.equalsIgnoreCase("Starting") ||status.equalsIgnoreCase("Running")
-								|| status.equals("Post Processing") || status.equals("Waiting to Generate Results") || status.equals("Generating Results"))) {
+						while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase("Waiting to Run")
+								|| m_scanStatus.equalsIgnoreCase("Starting") || m_scanStatus.equalsIgnoreCase("Running")
+								|| m_scanStatus.equals("Post Processing") || m_scanStatus.equals("Waiting to Generate Results") || m_scanStatus.equals("Generating Results"))) {
 							Thread.sleep(60000);
-							status = provider.getStatus();
+							m_scanStatus = provider.getStatus();
 						}
 					}
 					return provider;
@@ -463,6 +465,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				}
 			}
 		});
+
+		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
+            String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+            if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+                message += ", " + provider.getMessage();
+            }
+            build.setDescription(message);
+			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
+					", Scan Name: " + scan.getName())));
+		}
 
 		provider.setProgress(new StdOutProgress()); // Avoid serialization problem with StreamBuildListener.
 		build.addAction(new ResultsRetriever(build, provider, m_jobName));

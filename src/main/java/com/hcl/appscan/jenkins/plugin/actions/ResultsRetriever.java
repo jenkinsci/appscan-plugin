@@ -1,12 +1,14 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019.
+ * @ Copyright HCL Technologies Ltd. 2019, 2020.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
 package com.hcl.appscan.jenkins.plugin.actions;
 
 import com.hcl.appscan.jenkins.plugin.util.ExecutorUtil;
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.scanners.ScanConstants;
 import hudson.model.Action;
 import hudson.model.Run;
 
@@ -83,7 +85,18 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 			Callable<Boolean> callableTask = new Callable<Boolean>() {
 				@Override
 				public Boolean call() throws Exception {
-					if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
+					String status = null;
+					if (rTemp.getAllActions().contains(ResultsRetriever.this) && CoreConstants.FAILED.equalsIgnoreCase(status = m_provider.getStatus())) {
+						rTemp.getActions().remove(ResultsRetriever.this);
+						try {
+							rTemp.save();
+						} catch (IOException e) {
+						}
+						String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
+						if (m_provider.getMessage() != null  && m_provider.getMessage().trim().length() > 0) message += ", " + m_provider.getMessage();
+						rTemp.setDescription(message);
+						return true;
+					} else if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
 						rTemp.getActions().remove(ResultsRetriever.this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
 						rTemp.addAction(createResults());
 						try {
@@ -91,6 +104,10 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 						} catch (IOException e) {
 						}
 						return true;
+					}
+
+					if (m_provider.getMessage() != null) {
+						rTemp.setDescription(m_provider.getMessage());
 					}
 
 					return false;
