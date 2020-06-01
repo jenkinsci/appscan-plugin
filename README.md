@@ -123,12 +123,12 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
     -   **Credentials**: Select the credentials you added to Jenkins in
         step 1 above.        
        - **Job properties**        
-            -   **Template**: Select the template for the scan.
+            -   **Template**: Search the template for the scan.
             -   **Job name**: Specify a name to use for the scan. This value
                 will be used to distinguish this scan and its results from
                 others.
-            -   **Scan folder**: Select the destination folder to create the ADAC job. 
-            -   **Application name**: Select the application to associate the scan with. 
+            -   **Scan folder**: Search for the destination folder to create the ADAC job. 
+            -   **Application name**: Search for the application with which the scan will be associated.
                 Please note this is not a required parameter for an AppScan Enterprise 
                 ADAC job.
             -   **Test policy**: Select the test policy for your scan.
