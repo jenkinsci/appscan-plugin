@@ -67,3 +67,18 @@ YAHOO.widget.AutoComplete.prototype.doBeforeLoadData = function (sQuery, oRespon
      }
      return true;
 }
+
+function resetFields(credentialElement) {
+     var credentialNodeList = document.getElementsByName('_.credentials');
+     var templateNodeList = document.getElementsByName('_.template');
+     var folderNodeList = document.getElementsByName('_.folder');
+     var applicationNodeList = document.getElementsByName('_.application');
+     for ( i=0; i < credentialNodeList.length; i++) {
+         if(credentialNodeList[i] === credentialElement) {
+             templateNodeList[i].value = "";
+             folderNodeList[i].value = "";
+             applicationNodeList[i].value = "";
+             break;
+         }
+     }
+}
