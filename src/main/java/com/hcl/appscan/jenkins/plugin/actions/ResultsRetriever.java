@@ -86,7 +86,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 		return m_provider.getType();
 	}
 
-    public boolean checkResults(Run<?,?> r) {
+	public boolean checkResults(Run<?,?> r) {
 		boolean results = false;
 		if (futureTask != null && futureTask.isDone()) {
 			try {
