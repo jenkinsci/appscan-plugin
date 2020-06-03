@@ -15,7 +15,7 @@
     </style>
 
     <f:entry title="${%label.credentials}" field="credentials">
-        <f:select />
+        <f:select onchange="resetFields(this)"/>
     </f:entry>
     
     <f:section title="${%label.job.properties}" field="loginTypeOptions">
