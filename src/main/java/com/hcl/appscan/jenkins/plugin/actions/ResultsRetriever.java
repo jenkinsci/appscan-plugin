@@ -31,8 +31,8 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	private final Run<?,?> m_build;	
 	private IResultsProvider m_provider;
 	private String m_name;
-	private String status;
-	private String message;
+	private String m_status;
+	private String m_message;
 	private Future<Boolean> futureTask = null;
 
 	@DataBoundConstructor
@@ -74,11 +74,11 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	}
 
 	public boolean getFailed() {
-		return CoreConstants.FAILED.equalsIgnoreCase(status);
+		return CoreConstants.FAILED.equalsIgnoreCase(m_status);
 	}
 
 	public String getMessage() {
-		return message;
+		return m_message;
 	}
 
 	public String getScanType() {
@@ -105,8 +105,8 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 						String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
 						if (m_provider.getMessage() != null  && m_provider.getMessage().trim().length() > 0) message += ", " + m_provider.getMessage();
 
-						ResultsRetriever.this.status = status;
-						ResultsRetriever.this.message = message;
+						ResultsRetriever.this.m_status = status;
+						ResultsRetriever.this.m_message = message;
 						return true;
 					} else if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
 						rTemp.getActions().remove(ResultsRetriever.this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
@@ -116,12 +116,12 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 						} catch (IOException e) {
 						}
 
-						ResultsRetriever.this.status = status;
+						ResultsRetriever.this.m_status = status;
 						return true;
 					}
 
 					if (m_provider.getMessage() != null) {
-					    ResultsRetriever.this.message = m_provider.getMessage();
+					    ResultsRetriever.this.m_message = m_provider.getMessage();
 					}
 
 					return false;
