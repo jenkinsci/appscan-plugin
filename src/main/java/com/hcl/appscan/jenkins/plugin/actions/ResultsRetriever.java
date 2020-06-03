@@ -31,7 +31,9 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	private final Run<?,?> m_build;	
 	private IResultsProvider m_provider;
 	private String m_name;
-	private Future<Boolean> futureTask = null;
+	private String status;
+    private String message;
+    private Future<Boolean> futureTask = null;
 
 	@DataBoundConstructor
 	public ResultsRetriever(Run<?,?> build, IResultsProvider provider, String scanName) {
@@ -70,8 +72,21 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	public boolean getHasResults() {
 		return checkResults(m_build);
 	}
-	
-	public boolean checkResults(Run<?,?> r) {
+
+    public boolean getFailed() {
+        return CoreConstants.FAILED.equalsIgnoreCase(status);
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getScanType() {
+	    if (m_provider == null) return "";
+	    return m_provider.getType();
+    }
+
+    public boolean checkResults(Run<?,?> r) {
 		boolean results = false;
 		if (futureTask != null && futureTask.isDone()) {
 			try {
@@ -87,15 +102,12 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 				public Boolean call() throws Exception {
 					String status = null;
 					if (rTemp.getAllActions().contains(ResultsRetriever.this) && CoreConstants.FAILED.equalsIgnoreCase(status = m_provider.getStatus())) {
-						rTemp.getActions().remove(ResultsRetriever.this);
-						try {
-							rTemp.save();
-						} catch (IOException e) {
-						}
-						String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
+					    String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
 						if (m_provider.getMessage() != null  && m_provider.getMessage().trim().length() > 0) message += ", " + m_provider.getMessage();
-						rTemp.setDescription(message);
-						return true;
+
+                        ResultsRetriever.this.status = status;
+                        ResultsRetriever.this.message = message;
+                        return true;
 					} else if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
 						rTemp.getActions().remove(ResultsRetriever.this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
 						rTemp.addAction(createResults());
@@ -103,11 +115,13 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 							rTemp.save();
 						} catch (IOException e) {
 						}
+
+                        ResultsRetriever.this.status = status;
 						return true;
 					}
 
 					if (m_provider.getMessage() != null) {
-						rTemp.setDescription(m_provider.getMessage());
+					    ResultsRetriever.this.message = m_provider.getMessage();
 					}
 
 					return false;
