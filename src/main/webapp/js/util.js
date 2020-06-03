@@ -69,19 +69,17 @@ YAHOO.widget.AutoComplete.prototype.doBeforeLoadData = function (sQuery, oRespon
 }
 
 function resetFields(credentialElement) {
-var index = -1;
-var credentialNodeList = document.getElementsByName('_.credentials');
-var templateNodeList = document.getElementsByName('_.template');
-var folderNodeList = document.getElementsByName('_.folder');
-var applicationNodeList = document.getElementsByName('_.application');
-for (i=0; i < credentialNodeList.length; i++) {
-    if(credentialNodeList[i] === credentialElement) {
-        index = i;
-    }
-}
-if (index != -1) {
-templateNodeList[index].value = "";
-folderNodeList[index].value = "";
-applicationNodeList[index].value = "";
-}
+     var index = -1;
+     var credentialNodeList = document.getElementsByName('_.credentials');
+     var templateNodeList = document.getElementsByName('_.template');
+     var folderNodeList = document.getElementsByName('_.folder');
+     var applicationNodeList = document.getElementsByName('_.application');
+     for ( i=0; i < credentialNodeList.length; i++) {
+         if(credentialNodeList[i] === credentialElement) {
+             templateNodeList[i].value = "";
+             folderNodeList[i].value = "";
+             applicationNodeList[i].value = "";
+             break;
+         }
+     }
 }
