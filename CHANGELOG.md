@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+1.0.3 (June, 2020)
+------
+* ASE Template, Folder, and Application fields now support type-ahead search.
+* Enhanced error reporting for ASE jobs.
+* Documentaion and help updates.
+* General bug fixes.
 
 1.0.2 (May, 2020)
 ------
