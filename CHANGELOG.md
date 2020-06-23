@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+1.0.4 (June, 2020)
+------
+* Fix for [JENKINS-62314](https://issues.jenkins-ci.org/browse/JENKINS-62314)
+
 1.0.3 (June, 2020)
 ------
 * ASE Template, Folder, and Application fields now support type-ahead search.
