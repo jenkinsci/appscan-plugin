@@ -1,5 +1,5 @@
 /**
- * @ Copyright HCL Technologies Ltd. 2019.
+ * @ Copyright HCL Technologies Ltd. 2019,2020.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -25,7 +25,8 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 	private static final long serialVersionUID = 1L;
 	
 	private ASECredentials m_credentials;
-	
+	private static final Object object = new Object();
+
 	public ASEJenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
 		List<ASECredentials> credentialsList = CredentialsProvider.lookupCredentials(ASECredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
@@ -44,7 +45,15 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 		ASEAuthenticationHandler handler = new ASEAuthenticationHandler(this);
 
 		try {
-			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true,m_credentials.getServer());
+			isExpired = handler.isTokenExpired(); // To check if the current session is active
+			if (isExpired) {
+			    // If Session has expired login part is handled in Synchronized Block to restrict creating multiple Sessions
+                // when requests are executed in Parallel with invalid Session
+			    synchronized (object) {
+			        // Before creating new Session, Current Session is checked if it is active so that Session value is not Overwritten
+                    isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true,m_credentials.getServer());
+                }
+            }
 		} catch (IOException | JSONException e) {
 			isExpired = false;
 		}
