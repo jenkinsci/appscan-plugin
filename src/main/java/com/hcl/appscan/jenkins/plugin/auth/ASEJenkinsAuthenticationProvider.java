@@ -47,13 +47,13 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 		try {
 			isExpired = handler.isTokenExpired(); // To check if the current session is active
 			if (isExpired) {
-			    // If Session has expired login part is handled in Synchronized Block to restrict creating multiple Sessions
-                // when requests are executed in Parallel with invalid Session
-			    synchronized (object) {
-			        // Before creating new Session, Current Session is checked if it is active so that Session value is not Overwritten
-                    isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true,m_credentials.getServer());
-                }
-            }
+				// If Session has expired login part is handled in Synchronized Block to restrict creation of multiple Sessions
+				// when requests are executed in Parallel with invalid Session
+				synchronized (object) {
+					// Before creating new Session, Current Session is checked if it is active so that Session value is not Overwritten
+					isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true,m_credentials.getServer());
+				}
+			}
 		} catch (IOException | JSONException e) {
 			isExpired = false;
 		}
