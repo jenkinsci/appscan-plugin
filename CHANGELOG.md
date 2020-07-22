@@ -1,6 +1,6 @@
 CHANGELOG
 =========
-1.0.5 (June, 2020)
+1.0.5 (July, 2020)
 ------
 * Updating URL to validate existing Session and restrict creation of multiple Sessions in Parallel API Calls with Invalid Session Id
 
