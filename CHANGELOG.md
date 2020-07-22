@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+1.0.5 (June, 2020)
+------
+* Updating URL to validate existing Session and restrict creation of multiple Sessions in Parallel API Calls with Invalid Session Id
+
 1.0.4 (June, 2020)
 ------
 * Fix for [JENKINS-62314](https://issues.jenkins-ci.org/browse/JENKINS-62314)
