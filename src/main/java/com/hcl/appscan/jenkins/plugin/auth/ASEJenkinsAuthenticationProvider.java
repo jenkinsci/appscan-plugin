@@ -7,6 +7,7 @@ package com.hcl.appscan.jenkins.plugin.auth;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.hcl.appscan.jenkins.plugin.util.ASESessionManager;
 import com.hcl.appscan.sdk.auth.ASEAuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IASEAuthenticationProvider;
 import hudson.model.ItemGroup;
@@ -23,11 +24,13 @@ import org.apache.wink.json4j.JSONException;
 public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvider, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private ASECredentials m_credentials;
-	private static final Object object = new Object();
+	transient private static final Object m_object = new Object();
+	transient private Boolean m_reloaded = null;
 
 	public ASEJenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
+        m_reloaded = true;
 		List<ASECredentials> credentialsList = CredentialsProvider.lookupCredentials(ASECredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
 		for(ASECredentials creds : credentialsList) {
@@ -38,18 +41,23 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 		}
 		m_credentials = new ASECredentials("", "", "", "",""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
-	
+
 	@Override
 	public boolean isTokenExpired() {
 		boolean isExpired = false;
 		ASEAuthenticationHandler handler = new ASEAuthenticationHandler(this);
 
 		try {
+		    // This will reuse Credentials Object with Same Configuration
+		    if (m_reloaded == null || m_reloaded) {
+		        m_credentials = ASESessionManager.getASECredentialObject(m_credentials);
+		        m_reloaded = false;
+            }
 			isExpired = handler.isTokenExpired(); // To check if the current session is active
 			if (isExpired) {
 				// If Session has expired login part is handled in Synchronized Block to restrict creation of multiple Sessions
 				// when requests are executed in Parallel with invalid Session
-				synchronized (object) {
+				synchronized (m_object) {
 					// Before creating new Session, Current Session is checked if it is active so that Session value is not Overwritten
 					isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true,m_credentials.getServer());
 				}

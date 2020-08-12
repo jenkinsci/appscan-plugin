@@ -33,7 +33,8 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	private String m_name;
 	private String m_status;
 	private String m_message;
-	private Future<Boolean> futureTask = null;
+	transient private Future<Boolean> futureTask = null;
+	private Boolean m_resultsAvailable;
 
 	@DataBoundConstructor
 	public ResultsRetriever(Run<?,?> build, IResultsProvider provider, String scanName) {
@@ -41,6 +42,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 		m_build = build;
 		m_provider = provider;
 		m_name = scanName;
+		m_resultsAvailable = false;
 	}
 
 	@Override
@@ -88,9 +90,11 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 
 	public boolean checkResults(Run<?,?> r) {
 		boolean results = false;
+		if (m_resultsAvailable != null && m_resultsAvailable) return true;
 		if (futureTask != null && futureTask.isDone()) {
 			try {
 				results = futureTask.get();
+				m_resultsAvailable = results;
 			} catch (Exception e) {
 			}
 		} else if (futureTask != null) return false;
