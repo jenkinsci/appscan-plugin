@@ -1,6 +1,6 @@
 CHANGELOG
 =========
-1.0.5 (July, 2020)
+1.0.5 (August, 2020)
 ------
 * Fixed bugs related to session validation and token reuse while configuring and executing ADAC jobs in AppScan Enterprise.
 
