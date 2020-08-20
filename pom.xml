@@ -38,7 +38,7 @@
 	
   <groupId>com.hcl.security</groupId>
   <artifactId>appscan</artifactId>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.6-SNAPSHOT</version>
   <description>This plugin allows you to execute security scans with HCL AppScan</description>
   <packaging>hpi</packaging>
 
