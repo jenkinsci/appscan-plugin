@@ -450,12 +450,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					IResultsProvider provider = new ASEResultsProvider(scan.getScanId(), scan.getType(),
 							scan.getServiceProvider(), progress, scan.getName(), m_authProvider.getServer(), Messages.ase_homepage());
 					provider.setReportFormat(scan.getReportFormat());
-                    try {
-                        URL url = new URL(m_authProvider.getServer() + String.format(CoreConstants.ASE_SCAN_STATS, scan.getScanId()));
-                        progress.setStatus(new Message(Message.INFO, Messages.logs_link(new URL(url.getProtocol(), url.getHost(), url.getFile()).toString())));
-                    } catch (MalformedURLException e) {
-                        progress.setStatus(new Message(Message.ERROR, m_authProvider.getServer()));
-                    }
+					try {
+						URL url = new URL(m_authProvider.getServer() + String.format(CoreConstants.ASE_SCAN_STATS, scan.getScanId()));
+						progress.setStatus(new Message(Message.INFO, Messages.logs_link(new URL(url.getProtocol(), url.getHost(), url.getFile()).toString())));
+					} catch (MalformedURLException e) {
+						progress.setStatus(new Message(Message.ERROR, Messages.error_malformed_url(m_authProvider.getServer())));
+					}
 					if (suspend) {
 						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 						m_scanStatus = provider.getStatus();
@@ -469,7 +469,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					}
 					return provider;
 				} catch (ScannerException | InvalidTargetException | InterruptedException e) {
-				    progress.setStatus(new Message(Message.INFO, Messages.ase_homepage() + ": " + m_authProvider.getServer()));
+					progress.setStatus(new Message(Message.INFO, Messages.ase_homepage() + ": " + m_authProvider.getServer()));
 					throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
 				}
 			}
