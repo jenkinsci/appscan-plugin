@@ -114,6 +114,14 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		String status = m_status == null ? m_provider.getStatus() : m_status;
 		return status.equalsIgnoreCase(CoreConstants.FAILED);
 	}
+
+	public String getScanServerUrl()  {
+		return m_provider.getScanServerUrl();
+	}
+
+	public String getLabel() {
+		return m_provider.getLabel();
+	}
 	
 	public boolean isBetterThanLast() {
 		return getTotalFindings() < getLastFindingsCount();
