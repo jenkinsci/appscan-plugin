@@ -328,7 +328,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		}
 
 		provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-		build.addAction(new ResultsRetriever(build, provider, m_name));
+		build.addAction(new ResultsRetriever(build, provider, m_name, null, null));
 
 		if(m_wait)
 			shouldFailBuild(provider,build);

@@ -33,16 +33,20 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	private String m_name;
 	private String m_status;
 	private String m_message;
+	private String m_scanServerUrl;
+	private String m_label;
 	transient private Future<Boolean> futureTask = null;
 	private Boolean m_resultsAvailable;
 
 	@DataBoundConstructor
-	public ResultsRetriever(Run<?,?> build, IResultsProvider provider, String scanName) {
+	public ResultsRetriever(Run<?,?> build, IResultsProvider provider, String scanName, String scanServerUrl, String label) {
 		super(build.getParent());
 		m_build = build;
 		m_provider = provider;
 		m_name = scanName;
 		m_resultsAvailable = false;
+		m_scanServerUrl = scanServerUrl;
+		m_label = label;
 	}
 
 	@Override
@@ -147,6 +151,8 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 				m_provider.getHighCount(),
 				m_provider.getMediumCount(),
 				m_provider.getLowCount(),
-				m_provider.getInfoCount());
+				m_provider.getInfoCount(),
+                m_scanServerUrl,
+                m_label);
 	}
 }

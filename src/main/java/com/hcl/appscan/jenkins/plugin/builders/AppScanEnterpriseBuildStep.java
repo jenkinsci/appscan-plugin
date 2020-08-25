@@ -448,10 +448,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					scan.run();
 
 					IResultsProvider provider = new ASEResultsProvider(scan.getScanId(), scan.getType(),
-							scan.getServiceProvider(), progress, scan.getName(), m_authProvider.getServer(), Messages.ase_homepage());
+							scan.getServiceProvider(), progress, scan.getName());
 					provider.setReportFormat(scan.getReportFormat());
 					try {
-						URL url = new URL(m_authProvider.getServer() + String.format(CoreConstants.ASE_SCAN_STATS, scan.getScanId()));
+                        String ASE_SCAN_STATS = "/Jobs/QuickScanStats.aspx?fiid=%s";
+						URL url = new URL(m_authProvider.getServer() + String.format(ASE_SCAN_STATS, scan.getScanId()));
 						progress.setStatus(new Message(Message.INFO, Messages.logs_link(new URL(url.getProtocol(), url.getHost(), url.getFile()).toString())));
 					} catch (MalformedURLException e) {
 						progress.setStatus(new Message(Message.ERROR, Messages.error_malformed_url(m_authProvider.getServer())));
@@ -486,7 +487,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 
 		provider.setProgress(new StdOutProgress()); // Avoid serialization problem with StreamBuildListener.
-		build.addAction(new ResultsRetriever(build, provider, m_jobName));
+		build.addAction(new ResultsRetriever(build, provider, m_jobName, m_authProvider.getServer(), Messages.ase_homepage()));
 
 		if (m_wait)
 			shouldFailBuild(provider, build);

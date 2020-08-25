@@ -35,6 +35,8 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	private IResultsProvider m_provider;
 	private String m_name;
 	private String m_status;
+	private String m_scanServerUrl;
+	private String m_label;
 	private int m_totalFindings;
 	private int m_highCount;
 	private int m_mediumCount;
@@ -43,7 +45,7 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	
 	@DataBoundConstructor
 	public ScanResults(Run<?,?> build, IResultsProvider provider, String name, String status,
-			int totalFindings, int highCount, int mediumCount, int lowCount, int infoCount) {
+			int totalFindings, int highCount, int mediumCount, int lowCount, int infoCount, String scanServerUrl, String label) {
 		super(build.getParent());
 		m_build = build;
 		m_provider = provider;
@@ -54,6 +56,8 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		m_mediumCount = mediumCount;
 		m_lowCount = lowCount;
 		m_infoCount = infoCount;
+        m_label = label;
+        m_scanServerUrl = scanServerUrl;
                 getReport();
 	}
 	
@@ -116,11 +120,11 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	}
 
 	public String getScanServerUrl()  {
-		return m_provider.getScanServerUrl();
+		return m_scanServerUrl;
 	}
 
 	public String getLabel() {
-		return m_provider.getLabel();
+		return m_label;
 	}
 	
 	public boolean isBetterThanLast() {
