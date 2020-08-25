@@ -152,7 +152,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 				m_provider.getMediumCount(),
 				m_provider.getLowCount(),
 				m_provider.getInfoCount(),
-                m_scanServerUrl,
-                m_label);
+				m_scanServerUrl,
+				m_label);
 	}
 }

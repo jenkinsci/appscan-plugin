@@ -451,7 +451,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 							scan.getServiceProvider(), progress, scan.getName());
 					provider.setReportFormat(scan.getReportFormat());
 					try {
-                        String ASE_SCAN_STATS = "/Jobs/QuickScanStats.aspx?fiid=%s";
+						String ASE_SCAN_STATS = "/Jobs/QuickScanStats.aspx?fiid=%s";
 						URL url = new URL(m_authProvider.getServer() + String.format(ASE_SCAN_STATS, scan.getScanId()));
 						progress.setStatus(new Message(Message.INFO, Messages.logs_link(new URL(url.getProtocol(), url.getHost(), url.getFile()).toString())));
 					} catch (MalformedURLException e) {

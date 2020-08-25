@@ -56,8 +56,8 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		m_mediumCount = mediumCount;
 		m_lowCount = lowCount;
 		m_infoCount = infoCount;
-        m_label = label;
-        m_scanServerUrl = scanServerUrl;
+		m_label = label;
+		m_scanServerUrl = scanServerUrl;
                 getReport();
 	}
 	
