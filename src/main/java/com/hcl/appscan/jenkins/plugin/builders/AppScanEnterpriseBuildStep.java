@@ -477,23 +477,23 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		});
 
 		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
-            String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
-            if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
-                message += ", " + provider.getMessage();
-            }
-            build.setDescription(message);
+			String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+			if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+				message += ", " + provider.getMessage();
+			}
+			build.setDescription(message);
 			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
 					", Scan Name: " + scan.getName())));
 		}
 
 		provider.setProgress(new StdOutProgress()); // Avoid serialization problem with StreamBuildListener.
-        String aseScanUrl = m_authProvider.getServer();
-        String label = Messages.label_ase_homepage();
-        if (m_application != null && m_application.trim().length() > 0) {
-            String applicationUrl = "/api/pages/applications.html#appProfile/%s/issues";
-            aseScanUrl += String.format(applicationUrl, m_application);
-            label = Messages.label_ase_application();
-        }
+		String aseScanUrl = m_authProvider.getServer();
+		String label = Messages.label_ase_homepage();
+		if (m_application != null && m_application.trim().length() > 0) {
+			String applicationUrl = "/api/pages/applications.html#appProfile/%s/issues";
+			aseScanUrl += String.format(applicationUrl, m_application);
+			label = Messages.label_ase_application();
+		}
 		build.addAction(new ResultsRetriever(build, provider, m_jobName, aseScanUrl, label));
 
 		if (m_wait)
