@@ -328,11 +328,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		}
 
 		provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-		String asocAppUrl = m_authProvider.getServer();
-		if (m_application != null && m_application.trim().length() > 0) {
-			String appUrl = "/AsoCUI/serviceui/main/myapps/oneapp/%s/scans";
-			asocAppUrl += String.format(appUrl, m_application);
-		}
+		String asocAppUrl = m_authProvider.getServer() + "/serviceui/main/myapps/portfolio";
 		build.addAction(new ResultsRetriever(build, provider, m_name, asocAppUrl, Messages.label_asoc_homepage()));
 
 		if(m_wait)
