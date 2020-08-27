@@ -453,7 +453,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					try {
 						String ASE_SCAN_STATS = "/Jobs/QuickScanStats.aspx?fiid=%s";
 						URL url = new URL(m_authProvider.getServer() + String.format(ASE_SCAN_STATS, scan.getScanId()));
-						progress.setStatus(new Message(Message.INFO, Messages.logs_link(new URL(url.getProtocol(), url.getHost(), url.getFile()).toString())));
+						progress.setStatus(new Message(Message.INFO, Messages.logs_link(scan.getScanId(), new URL(url.getProtocol(), url.getHost(), url.getFile()).toString())));
 					} catch (MalformedURLException e) {
 						progress.setStatus(new Message(Message.ERROR, Messages.error_malformed_url(m_authProvider.getServer())));
 					}
@@ -470,7 +470,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					}
 					return provider;
 				} catch (ScannerException | InvalidTargetException | InterruptedException e) {
-					progress.setStatus(new Message(Message.INFO, Messages.ase_homepage() + ": " + m_authProvider.getServer()));
+					progress.setStatus(new Message(Message.INFO, Messages.label_ase_homepage() + ": " + m_authProvider.getServer()));
 					throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
 				}
 			}
@@ -487,7 +487,14 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 
 		provider.setProgress(new StdOutProgress()); // Avoid serialization problem with StreamBuildListener.
-		build.addAction(new ResultsRetriever(build, provider, m_jobName, m_authProvider.getServer(), Messages.ase_homepage()));
+        String aseScanUrl = m_authProvider.getServer();
+        String label = Messages.label_ase_homepage();
+        if (m_application != null && m_application.trim().length() > 0) {
+            String applicationUrl = "/api/pages/applications.html#appProfile/%s/issues";
+            aseScanUrl += String.format(applicationUrl, m_application);
+            label = Messages.label_ase_application();
+        }
+		build.addAction(new ResultsRetriever(build, provider, m_jobName, aseScanUrl, label));
 
 		if (m_wait)
 			shouldFailBuild(provider, build);
