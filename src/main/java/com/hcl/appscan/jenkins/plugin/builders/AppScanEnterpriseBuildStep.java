@@ -8,6 +8,8 @@ package com.hcl.appscan.jenkins.plugin.builders;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -448,6 +450,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					IResultsProvider provider = new ASEResultsProvider(scan.getScanId(), scan.getType(),
 							scan.getServiceProvider(), progress, scan.getName());
 					provider.setReportFormat(scan.getReportFormat());
+					try {
+						String ASE_SCAN_STATS = "/Jobs/QuickScanStats.aspx?fiid=%s";
+						URL url = new URL(m_authProvider.getServer() + String.format(ASE_SCAN_STATS, scan.getScanId()));
+						progress.setStatus(new Message(Message.INFO, Messages.logs_link(scan.getScanId(), new URL(url.getProtocol(), url.getHost(), url.getFile()).toString())));
+					} catch (MalformedURLException e) {
+						progress.setStatus(new Message(Message.ERROR, Messages.error_malformed_url(m_authProvider.getServer())));
+					}
 					if (suspend) {
 						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 						m_scanStatus = provider.getStatus();
@@ -461,23 +470,31 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					}
 					return provider;
 				} catch (ScannerException | InvalidTargetException | InterruptedException e) {
+					progress.setStatus(new Message(Message.INFO, Messages.label_ase_homepage() + ": " + m_authProvider.getServer()));
 					throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
 				}
 			}
 		});
 
 		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
-            String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
-            if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
-                message += ", " + provider.getMessage();
-            }
-            build.setDescription(message);
+			String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+			if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+				message += ", " + provider.getMessage();
+			}
+			build.setDescription(message);
 			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
 					", Scan Name: " + scan.getName())));
 		}
 
 		provider.setProgress(new StdOutProgress()); // Avoid serialization problem with StreamBuildListener.
-		build.addAction(new ResultsRetriever(build, provider, m_jobName));
+		String aseScanUrl = m_authProvider.getServer();
+		String label = Messages.label_ase_homepage();
+		if (m_application != null && m_application.trim().length() > 0) {
+			String applicationUrl = "/api/pages/applications.html#appProfile/%s/issues";
+			aseScanUrl += String.format(applicationUrl, m_application);
+			label = Messages.label_ase_application();
+		}
+		build.addAction(new ResultsRetriever(build, provider, m_jobName, aseScanUrl, label));
 
 		if (m_wait)
 			shouldFailBuild(provider, build);

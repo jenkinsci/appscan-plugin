@@ -8,6 +8,11 @@
 			<j:otherwise>
 				<div style="float:right;">
 					<st:include page="findingsTable.jelly"/>
+					<j:choose>
+						<j:if test="${!empty(it.scanServerUrl)}">
+							<h3><a target="_blank" href="${it.scanServerUrl}">${it.label}</a></h3>
+						</j:if>
+					</j:choose>
 				</div>
 			</j:otherwise>
 		</j:choose>	
