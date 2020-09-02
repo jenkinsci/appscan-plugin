@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+1.0.6 (September, 2020)
+------
+* Fix to accommodate a design change made in AppScan Enterprise 10.0.2 as regards polling frequency of report packs for ADAC jobs. If you are a consumer of AppScan Enterprise 10.0.2 release or above, it is mandatory to use this version or else "Fail Build Condition" might not work as expected.
+* Inclusion of AppScan Enterprise Scan log URL in console output of a job configured for AppScan Enterprise Scan execution.
+* Inclusion of AppScan Enterprise URL in Status section of a job configured for AppScan Enterprise Scan execution. The URL will be displayed only if a job completes successfully with display of scan results.
+* Inclusion of AppScan On Cloud URL in Status section of a job configured for ASoC scans. The URL will be displayed only if a job completes successfully with display of scan results.
+
 1.0.5 (August, 2020)
 ------
 * Fixed bugs related to session validation and token reuse while configuring and executing ADAC jobs in AppScan Enterprise.
