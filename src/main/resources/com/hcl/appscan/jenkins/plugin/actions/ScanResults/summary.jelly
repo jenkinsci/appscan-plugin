@@ -10,7 +10,7 @@
 					<st:include page="findingsTable.jelly"/>
 					<j:choose>
 						<j:if test="${!empty(it.scanServerUrl)}">
-							<h3><a target="_blank" href="${it.scanServerUrl}">${it.label}</a></h3>
+							<br/> For more details, go to <a target="_blank" href="${it.scanServerUrl}">${it.label}</a>
 						</j:if>
 					</j:choose>
 				</div>
