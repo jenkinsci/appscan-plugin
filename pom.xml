@@ -79,7 +79,7 @@
 	<dependency>
 		<groupId>com.hcl</groupId>
 		<artifactId>appscan.sdk</artifactId>
-		<version>1.0.17</version>
+		<version>1.0.18</version>
   	</dependency>
 	<dependency>
   	  	<groupId>org.apache.wink</groupId>
