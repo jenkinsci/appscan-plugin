@@ -40,7 +40,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	}
 	
 	public String getServer() {
-		return SystemUtil.getDefaultServer();
+		return SystemUtil.getServer(getUsername());
 	}
 	
 	public Secret getToken() {
