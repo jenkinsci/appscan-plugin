@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+1.0.7 (November, 2020)
+------
+* Support for additional data centers.
+
 1.0.6 (September, 2020)
 ------
 * Fix to accommodate a design change made in AppScan Enterprise 10.0.2 as regards polling frequency of report packs for ADAC jobs. If you are a consumer of AppScan Enterprise 10.0.2 release or above, it is mandatory to use this version or else "Fail Build Condition" might not work as expected.
