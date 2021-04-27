@@ -1,0 +1,166 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <!--
+ 	@ Copyright HCL Technologies Ltd. 2019, 2020.
+ 	LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+    -->
+    <script type="text/javascript" src="${resURL}/plugin/appscan/js/util.js"></script>    
+
+    <!-- Following css is added to show scroll-bar in autocomplete list -->
+    <style type="text/css" >
+     .yui-skin-sam .yui-ac-content {
+        max-height: 200px;
+        overflow-y: auto;
+     }
+    </style>
+
+    <f:entry title="${%label.credentials}" field="credentials">
+        <f:select onchange="resetFields(this)"/>
+    </f:entry>
+    
+    <f:section title="${%label.job.properties}" field="loginTypeOptions">
+	    <f:entry title="${%label.template}" field="template">
+	        <f:textbox placeholder="${%template.placeholder}"
+	         style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
+	         background-size: 16px;" />
+	    </f:entry>
+	            
+	    <f:entry title="${%label.job.name}" field="jobName">
+	        <f:textbox />
+	    </f:entry>
+		        
+	    <f:entry title="${%label.folder}" field="folder">
+	        <f:textbox placeholder="${%folder.placeholder}" 
+	         style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
+             background-size: 16px;" />
+	    </f:entry>
+	    
+	    <f:entry title="${%label.application}" field="application">
+	        <f:textbox placeholder="${%application.placeholder}" 
+	        style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
+            background-size: 16px;" />
+	    </f:entry>
+  
+	    <f:entry title="${%label.test.policy}" field="testPolicy">
+	        <f:select />
+	    </f:entry>
+	    
+	    <f:entry title="${%label.starting.url}" field="target">
+	        <f:textbox />
+	    </f:entry>
+     </f:section>
+   
+    <f:section title="${%label.login.management}" field="loginTypeOptions">
+        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true" value="Manual" inline="true">
+            <st:nbsp/>
+            <f:entry title="${%label.traffic.file}" field="trafficFile">
+                <f:textbox />
+            </f:entry>
+        </f:radioBlock>
+	
+        <f:radioBlock name="loginType" title="${%label.automatic}" checked="${instance.isLoginType('Automatic')}" value="Automatic" inline="true">
+            <f:entry title="${%label.user.name}" field="userName">
+                <f:textbox field="accessId" />
+            </f:entry>
+            <f:entry title="${%label.password}" field="password">
+                <f:password field="secretKey" />
+            </f:entry>
+        </f:radioBlock>
+	
+        <f:radioBlock name="loginType" title="${%label.none}" checked="${instance.isLoginType('None')}" value="None" inline="true" />
+    </f:section>  
+    
+    <f:section title="${%label.scan}" field="scanTypeOptions">
+        <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="true" value="1"  help="/plugin/appscan/help/scanFull.html" inline="true"/>        
+        <f:radioBlock name="scanType" title="${%label.scan.test}"  checked="${instance.isScanType('3')}" value="3"  help="/plugin/appscan/help/scanTest.html" inline="true"/>
+    </f:section>    
+            
+    <f:section title="${%label.manual.explore}" field="loginTypeOptions">
+	    <f:entry title="${%label.explore.data}" field="exploreData">
+	        <f:textbox />
+	    </f:entry>
+    </f:section>
+
+    <f:section title="${%label.test.optimization}" field="testOptimizationOptions">
+        <f:entry help="/plugin/appscan/help/testOptimization.html">
+        </f:entry>
+        <f:radioBlock name="testOptimization" title="${%label.fast}" checked="true" value="1" inline="true">
+            <f:entry>
+                <div style="border-style:solid;border-color:lightgrey">
+                    <ul>
+                        <li>Scan will find about 97% vulnerabilities of equivalent non-optimized scan</li>
+                        <li>Test stage will be up to twice as fast</li>
+                        <li>Recommended for security experts for more frequent scans</li>
+                        <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                    </ul>
+                </div>
+            </f:entry>
+        </f:radioBlock>
+        <f:radioBlock name="testOptimization" title="${%label.faster}" checked="${instance.isTestOptimization('2')}" value="2" inline="true" >
+            <f:entry>
+                <div style="border-style:solid;border-color:lightgrey">
+                    <ul>
+                        <li>Scan will find about 85% vulnerabilities of equivalent non-optimized scan</li>
+                        <li>Test stage will be up to 5 times as fast</li>
+                        <li>Recommended for DevSecOps during ongoing evaluation</li>
+                        <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                        <p style="color:red;">This option is supported with HCL AppScan Enterprise v10.0.0 and above.</p>
+                    </ul>
+                </div>
+            </f:entry>
+        </f:radioBlock>
+        <f:radioBlock name="testOptimization" title="${%label.fastest}" checked="${instance.isTestOptimization('3')}" value="3" inline="true" >
+            <f:entry>
+                <div style="border-style:solid;border-color:lightgrey">
+                    <ul>
+                        <li>Scan will find about 70% vulnerabilities of equivalent non-optimized scan</li>
+                        <li>Test stage will be up to 10 times as fast</li>
+                        <li>Recommended for Dev and QA during initial evaluation</li>
+                        <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                        <p style="color:red;">This option is supported with HCL AppScan Enterprise v10.0.0 and above.</p>
+                    </ul>
+                </div>
+            </f:entry>
+        </f:radioBlock>
+        <f:radioBlock name="testOptimization" title="${%label.noOpt}" checked="${instance.isTestOptimization('0')}" value="0" inline="true" >
+            <f:entry>
+                <div style="border-style:solid;border-color:lightgrey">
+                    <ul>
+                        <li>Scan will test for all issues in the selected Test Policy</li>
+                        <li>Longest scan</li>
+                        <li>Recommended for security experts before major releases, compliance and benchmarks</li>
+                        <li style="list-style-type: none;"><b>Note:</b> The actual reduction in time, and extent of issue coverage, will vary depending on your application.</li>
+                    </ul>
+                </div>
+            </f:entry>
+        </f:radioBlock>
+    </f:section>
+
+    <f:section title="" />
+        
+    <f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
+        <f:entry title="${%label.agent}" field="agent">
+            <f:select />
+        </f:entry>
+    </f:optionalBlock>
+    
+    <f:section title="" />
+
+    <f:entry>
+	    <div>
+	     ${%label.email.text} <a target="_blank" href="https://help.hcltechsw.com/appscan/Enterprise/9.0.3/topics/t_set_up_control_center.html">${%label.email.doc.link}</a>
+		</div>
+    </f:entry>
+
+    <f:entry field="wait">
+        <f:checkbox title="${%label.wait}" onclick="aseWaitClicked(this);" name="wait"/>
+    </f:entry>
+
+    <f:entry field="failBuild">
+        <f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" name="failBuild"/>
+    </f:entry>
+    
+    <f:entry field="failureConditions">
+        <f:repeatableProperty field="failureConditions" minimum="0" add="${%label.add.condition}"/>
+    </f:entry>
+ </j:jelly>

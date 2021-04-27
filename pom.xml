@@ -7,7 +7,7 @@
   	<url>https://www.hcl.com/</url>
   </organization>
   
-  <url>https://github.com/jenkinsci/ibm-asoc-plugin/blob/master/doc/README.md</url>
+  <url>https://github.com/jenkinsci/appscan-plugin</url>
 	
   <licenses>
   	<license>
@@ -32,12 +32,13 @@
   </parent>
 
   <properties>
-	  <jenkins.version>1.609.1</jenkins.version>
+	<jenkins.version>1.609.1</jenkins.version>
+	<findbugs.failOnError>false</findbugs.failOnError>
   </properties>
 	
   <groupId>com.hcl.security</groupId>
-  <artifactId>ibm-application-security</artifactId>
-  <version>1.2.8-SNAPSHOT</version>
+  <artifactId>appscan</artifactId>
+  <version>1.0.8-SNAPSHOT</version>
   <description>This plugin allows you to execute security scans with HCL AppScan</description>
   <packaging>hpi</packaging>
 
@@ -78,7 +79,12 @@
 	<dependency>
 		<groupId>com.hcl</groupId>
 		<artifactId>appscan.sdk</artifactId>
-		<version>1.0.10</version>
+		<version>1.0.18</version>
+  	</dependency>
+	<dependency>
+  	  	<groupId>org.apache.wink</groupId>
+  		<artifactId>wink-json4j</artifactId>
+  		<version>1.4</version>
   	</dependency>
   	<dependency>
   		<groupId>org.jenkins-ci.plugins</groupId>
@@ -93,9 +99,9 @@
   </dependencies>
   
   <scm>
-  	<connection>scm:git:ssh://github.com/jenkinsci/ibm-asoc-plugin.git</connection>
-  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/ibm-asoc-plugin.git</developerConnection>
-  	<url>https://github.com/jenkinsci/ibm-asoc-plugin</url>
+  	<connection>scm:git:ssh://github.com/jenkinsci/appscan-plugin.git</connection>
+  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
+  	<url>https://github.com/jenkinsci/appscan-plugin</url>
     <tag>HEAD</tag>
   </scm>
 

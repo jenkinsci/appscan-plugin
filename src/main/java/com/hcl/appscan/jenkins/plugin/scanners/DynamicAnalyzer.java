@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -130,10 +130,15 @@ public class DynamicAnalyzer extends Scanner {
 
 	@DataBoundSetter
 	public void setOptimization(String optimization) {
-		m_optimization = optimization;
+		if(optimization != null) {
+			m_optimization = mapOldtoNewOptLevels(optimization);
+		} else {
+			m_optimization = optimization;
+		}
 	}
 	
 	public String getOptimization() {
+	    m_optimization = mapOldtoNewOptLevels(m_optimization);
 		return m_optimization;
 	}
 	
@@ -161,9 +166,23 @@ public class DynamicAnalyzer extends Scanner {
 		properties.put(SCAN_FILE, resolver == null ? m_scanFile : resolvePath(m_scanFile, resolver));
 		properties.put(TEST_POLICY, m_testPolicy);
 		properties.put(SCAN_TYPE, m_scanType);
-		properties.put(OPTIMIZATION, m_optimization.equals("Normal")? "false":"true");
+		properties.put(TEST_OPTIMIZATION_LEVEL, m_optimization);
 		properties.put(EXTRA_FIELD, m_extraField);
 		return properties;
+	}
+
+	private String mapOldtoNewOptLevels(String optimization) //Backward Compatibility
+	{
+		if(optimization != null) {
+			if(optimization.equals(NORMAL)) {
+				m_optimization = NO_OPTIMIZATION;
+			} else if(optimization.equals(OPTIMIZED)) {
+				m_optimization = FAST;
+			} else {
+				m_optimization = optimization;
+			}
+		}
+		return m_optimization;
 	}
 	
 	@Symbol("dynamic_analyzer") //$NON-NLS-1$
@@ -184,8 +203,10 @@ public class DynamicAnalyzer extends Scanner {
 		
 		public ListBoxModel doFillOptimizationItems() {
 			ListBoxModel model = new ListBoxModel();
-			model.add(Messages.option_normal(), NORMAL);
-			model.add(Messages.option_optimized(), OPTIMIZED);
+			model.add(Messages.option_fast(), FAST);
+			model.add(Messages.option_faster(), FASTER);
+			model.add(Messages.option_fastest(), FASTEST);
+			model.add(Messages.option_nooptimization(), NO_OPTIMIZATION);
 			return model;
 		}
 		

@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017,2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -20,6 +20,7 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
+import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -58,6 +59,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Plugin;
 import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -76,6 +78,7 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.VariableResolver;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serializable {
@@ -93,6 +96,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_wait;
     private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
+	private String m_scanStatus;
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
@@ -241,11 +245,23 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         properties.put(CoreConstants.APP_ID,  m_application);
         properties.put(CoreConstants.SCAN_NAME, scanName + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
+		properties.put("APPSCAN_IRGEN_CLIENT", "jenkins");
+		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
+		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
+		properties.put("ClientType", "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
 		return properties;
     }
     
-    
+    private String getPluginVersion() {
+    	Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
+
+    	if(tempPlugin != null) {
+    		return tempPlugin.getWrapper().getVersion();
+    	}
+
+    	return "";
+	}
+
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
     		return ;
@@ -292,11 +308,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                                 provider.setReportFormat(scan.getReportFormat());
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
-		    			String status = provider.getStatus();
+		    			m_scanStatus = provider.getStatus();
 		    			
-		    			while(status != null && (status.equalsIgnoreCase(CoreConstants.INQUEUE) || status.equalsIgnoreCase(CoreConstants.RUNNING))) {
+		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING))) {
 		    				Thread.sleep(60000);
-		    				status = provider.getStatus();
+		    				m_scanStatus = provider.getStatus();
 		    			}
 		    		}
 		    		
@@ -308,13 +324,23 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			}
 		});
 
-    	provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+    	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
+			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+			  if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+				  message += ", " + provider.getMessage();
+			  }
+			  build.setDescription(message);
+			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
+					", Scan Name: " + scan.getName())));
+		  }
+      provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	String scanName = m_name;
     	if (build instanceof AbstractBuild) {
     		VariableResolver<String> resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
     		scanName = Util.replaceMacro(m_name, resolver);
     	}
-    	build.addAction(new ResultsRetriever(build, provider, scanName));
+    	String asocAppUrl = m_authProvider.getServer() + "/serviceui/main/myapps/portfolio";
+		  build.addAction(new ResultsRetriever(build, provider, scanName, asocAppUrl, Messages.label_asoc_homepage()));
                 
         if(m_wait)
             shouldFailBuild(provider,build);	
@@ -333,12 +359,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	//Retain backward compatibility
     	@Initializer(before = InitMilestone.PLUGINS_STARTED)
     	public static void createAliases() {
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.builders.AppScanBuildStep", com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep.class);
+		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.builders.AppScanBuildStep", com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.StaticAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.StaticAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.DynamicAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.DynamicAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.MobileAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.MobileAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
-            Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
+		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
     	}
     	
     	@Override

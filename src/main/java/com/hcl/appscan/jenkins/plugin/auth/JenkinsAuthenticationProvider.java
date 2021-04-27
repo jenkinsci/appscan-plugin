@@ -6,11 +6,12 @@
 
 package com.hcl.appscan.jenkins.plugin.auth;
 
-import hudson.model.ItemGroup;
-import hudson.util.Secret;
-
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,11 @@ import com.hcl.appscan.sdk.auth.AuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.auth.LoginType;
 
+import hudson.ProxyConfiguration;
+import hudson.model.ItemGroup;
+import hudson.util.Secret;
+import jenkins.model.Jenkins;
+
 public class JenkinsAuthenticationProvider implements IAuthenticationProvider, Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -31,15 +37,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	private ASoCCredentials m_credentials;
 	
 	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
-		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
-				null, Collections.<DomainRequirement>emptyList());
-		for(ASoCCredentials creds : credentialsList) {
-			if(creds.getId().equals(id)) {
-				m_credentials = creds;
-				return;
-			}
-		}
-		m_credentials = new ASoCCredentials("", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		configureCredentials(id, context);
 	}
 	
 	@Override
@@ -74,7 +72,44 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		m_credentials.setToken(connection);
 	}
 	
+	@Override
+	public Proxy getProxy() {
+		Jenkins jenkins = Jenkins.getInstance();
+		if(jenkins == null)
+			return Proxy.NO_PROXY;
+		
+		final ProxyConfiguration proxy = jenkins.proxy;
+		
+		if(proxy != null && proxy.name != null && proxy.port > 0) {
+			//If authentication is required
+			if(proxy.getUserName() != null && proxy.getPassword() != null) {
+				Authenticator.setDefault(new Authenticator() {
+					@Override
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(proxy.getUserName(), proxy.getPassword().toCharArray());
+					}
+				});
+			}
+			
+			return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.name, proxy.port));
+		}
+		
+		return Proxy.NO_PROXY;
+	}
+	
 	private String getToken() {
 		return Secret.toString(m_credentials.getToken());
+	}
+	
+	private void configureCredentials(String id, ItemGroup<?> context) {
+		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
+				null, Collections.<DomainRequirement>emptyList());
+		for(ASoCCredentials creds : credentialsList) {
+			if(creds.getId().equals(id)) {
+				m_credentials = creds;
+				return;
+			}
+		}
+		m_credentials = new ASoCCredentials("", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }
