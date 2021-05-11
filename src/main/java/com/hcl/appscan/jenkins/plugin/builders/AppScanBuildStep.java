@@ -60,6 +60,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Plugin;
+import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.AbstractBuild;
@@ -76,6 +77,7 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import hudson.util.VariableResolver;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
@@ -232,11 +234,16 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
-    	BuildVariableResolver resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
-		Map<String, String> properties = m_scanner.getProperties(resolver);
+    	VariableResolver<String> resolver = null;
+    	String scanName = m_name;
+    	if (build instanceof AbstractBuild) {
+    		resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
+    		scanName = Util.replaceMacro(m_name, resolver);
+    	}
+    	Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-		properties.put(CoreConstants.APP_ID,  m_application);
-		properties.put(CoreConstants.SCAN_NAME, m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+        properties.put(CoreConstants.APP_ID,  m_application);
+        properties.put(CoreConstants.SCAN_NAME, scanName + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "jenkins");
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
@@ -317,22 +324,26 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			}
 		});
 
-		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
-			String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
-			if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
-				message += ", " + provider.getMessage();
-			}
-			build.setDescription(message);
-			throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
+    	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
+			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+			  if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+				  message += ", " + provider.getMessage();
+			  }
+			  build.setDescription(message);
+			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
 					", Scan Name: " + scan.getName())));
-		}
-
-		provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-		String asocAppUrl = m_authProvider.getServer() + "/serviceui/main/myapps/portfolio";
-		build.addAction(new ResultsRetriever(build, provider, m_name, asocAppUrl, Messages.label_asoc_homepage()));
-
-		if(m_wait)
-			shouldFailBuild(provider,build);
+		  }
+      provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+    	String scanName = m_name;
+    	if (build instanceof AbstractBuild) {
+    		VariableResolver<String> resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
+    		scanName = Util.replaceMacro(m_name, resolver);
+    	}
+    	String asocAppUrl = m_authProvider.getServer() + "/serviceui/main/myapps/portfolio";
+		  build.addAction(new ResultsRetriever(build, provider, scanName, asocAppUrl, Messages.label_asoc_homepage()));
+                
+        if(m_wait)
+            shouldFailBuild(provider,build);	
     }
     
     private void setInstallDir() {
