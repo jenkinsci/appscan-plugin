@@ -67,6 +67,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
+import hudson.model.Result;
 import hudson.model.Items;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -333,6 +334,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
 					", Scan Name: " + scan.getName())));
 		  }
+        else if (CoreConstants.UNSTABLE.equalsIgnoreCase(m_scanStatus)) {
+            build.setResult(Result.UNSTABLE);
+        }
+        else {
       provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	String scanName = m_name;
     	if (build instanceof AbstractBuild) {
@@ -344,6 +349,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 
         if(m_wait)
             shouldFailBuild(provider,build);	
+    }
     }
     
     private void setInstallDir() {
