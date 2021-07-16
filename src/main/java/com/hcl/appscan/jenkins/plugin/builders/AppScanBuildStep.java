@@ -311,9 +311,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			m_scanStatus = provider.getStatus();
 		    			
-		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING))) {
-		    				Thread.sleep(60000);
-		    				m_scanStatus = provider.getStatus();
+                                        int requestCounter=0;
+		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING) || m_scanStatus.equalsIgnoreCase(CoreConstants.UNSTABLE)) && requestCounter<=10) {
+                                            Thread.sleep(60000);
+                                            if(m_scanStatus.equalsIgnoreCase(CoreConstants.UNSTABLE))
+                                                requestCounter++; 
+                                            else
+                                                requestCounter=0;
+                                            m_scanStatus = provider.getStatus();
 		    			}
 		    		}
 		    		
@@ -335,6 +340,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					", Scan Name: " + scan.getName())));
 		  }
         else if (CoreConstants.UNSTABLE.equalsIgnoreCase(m_scanStatus)) {
+            progress.setStatus(new Message(Message.ERROR, com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE,m_authProvider.getServer())));
             build.setResult(Result.UNSTABLE);
         }
         else {
