@@ -312,7 +312,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    			m_scanStatus = provider.getStatus();
 		    			
                                         int requestCounter=0;
-		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING) || m_scanStatus.equalsIgnoreCase(CoreConstants.UNKNOWN)) && requestCounter<=10) {
+		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING) || m_scanStatus.equalsIgnoreCase(CoreConstants.UNKNOWN)) && requestCounter<10) {
                                             Thread.sleep(60000);
                                             if(m_scanStatus.equalsIgnoreCase(CoreConstants.UNKNOWN))
                                                 requestCounter++;   // In case of internet disconnect, polling the server 10 times to check the connection has established 
@@ -340,7 +340,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					", Scan Name: " + scan.getName())));
 		  }
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
-            progress.setStatus(new Message(Message.ERROR, com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE,m_authProvider.getServer())));
+            progress.setStatus(new Message(Message.ERROR, com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE) + " Please check " + m_authProvider.getServer() + " for updates."));
+            build.setDescription(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE));
             build.setResult(Result.UNSTABLE);
         }
         else {
