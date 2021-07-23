@@ -58,6 +58,13 @@ function waitClicked(e) {
 	}
 }
 
+function aseFailBuildClicked(e) {
+	if(e.checked) {
+		var waitCheckbox = getComponent(e, 'wait');
+		waitCheckbox.checked = true;
+	}
+}
+
 function aseWaitClicked(e) {
 	if(!e.checked) {
 		var failCheckbox = getComponent(e, 'failBuild');
