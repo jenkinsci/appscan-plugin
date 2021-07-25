@@ -157,7 +157,7 @@
     </f:entry>
 
     <f:entry field="failBuild">
-        <f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" name="failBuild"/>
+        <f:checkbox title="${%label.fail.build}" onclick="aseFailBuildClicked(this);" name="failBuild"/>
     </f:entry>
     
     <f:entry field="failureConditions">
