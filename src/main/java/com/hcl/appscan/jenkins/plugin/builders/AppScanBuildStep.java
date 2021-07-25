@@ -340,7 +340,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					", Scan Name: " + scan.getName())));
 		  }
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
-            progress.setStatus(new Message(Message.ERROR, com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE) + " Please check " + m_authProvider.getServer() + " for updates."));
+            progress.setStatus(new Message(Message.ERROR, com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE) + " Please check " + m_authProvider.getServer() + " for your scan results."));
             build.setDescription(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE));
             build.setResult(Result.UNSTABLE);
         }
