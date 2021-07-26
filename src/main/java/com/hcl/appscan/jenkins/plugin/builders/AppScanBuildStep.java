@@ -329,7 +329,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    	}
 			}
 		});
-        if(m_scanStatus == null)
+        if(m_scanStatus == null) // to address the status in association with Master and Slave congifuration
             m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
