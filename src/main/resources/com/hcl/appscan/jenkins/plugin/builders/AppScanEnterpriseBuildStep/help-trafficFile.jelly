@@ -1,4 +1,5 @@
 <?jelly escape-by-default='true'?>
 <div>
 	${%description.trafficFile}
+        <p style="color:red;">.login file is supported with HCL AppScan Enterprise v10.0.4 and above.</p>
 </div>

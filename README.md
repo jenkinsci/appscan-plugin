@@ -137,7 +137,8 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
        - **Which Login method you want to use**       
             - **Recorded login**: Select this option to allow login to the application
               using a recorded login sequence. Once selected, you would be prompted
-              to enter the path to recorded login sequence.
+              to enter the path to recorded login sequence. Supported file formats are EXD, HAR DAST.CONFIG and LOGIN.
+              Please note that .login file is supported from AppScan Enterprise 10.0.4 release onwards.
             - **Automatic login**: Select this option to allow Login to the application
               using a username and password. Once selected, you would be prompted
               to enter the username and password.

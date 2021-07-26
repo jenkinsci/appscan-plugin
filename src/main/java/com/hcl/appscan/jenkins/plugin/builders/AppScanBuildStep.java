@@ -329,6 +329,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    	}
 			}
 		});
+        if(m_scanStatus == null)
+            m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
 			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
