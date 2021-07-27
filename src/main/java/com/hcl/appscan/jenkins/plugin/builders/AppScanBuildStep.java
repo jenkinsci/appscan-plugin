@@ -343,7 +343,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					", Scan Name: " + scan.getName())));
 		  }
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
-            progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.server_get_info(m_authProvider.getServer())));
+            progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));
             build.setDescription(Messages.error_server_unavailable());
             build.setResult(Result.UNSTABLE);
         }
