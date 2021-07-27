@@ -329,7 +329,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    	}
 			}
 		});
-        if(m_scanStatus == null) // to address the status in association with Master and Slave congifuration
+        
+        if(suspend && m_scanStatus == null) // to address the status in association with Master and Slave congifuration
             m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
@@ -342,8 +343,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					", Scan Name: " + scan.getName())));
 		  }
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
-            progress.setStatus(new Message(Message.ERROR, com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE) + " Please check " + m_authProvider.getServer() + " for your scan results."));
-            build.setDescription(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SERVER_UNAVAILABLE));
+            progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " Please check " + m_authProvider.getServer() + " for your scan results."));
+            build.setDescription(Messages.error_server_unavailable());
             build.setResult(Result.UNSTABLE);
         }
         else {
