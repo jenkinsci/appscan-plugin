@@ -34,18 +34,26 @@ function isTargetComponent(elem, eleName) {
 function failBuildClicked(e) {
 	if(e.checked) {
 		var waitCheckbox = getComponent(e, 'wait');
-		waitCheckbox.checked = true;
+		if (waitCheckbox != null) {
+			waitCheckbox.checked = true;
+		}
 		var failNonCompliantIssuesCheckbox = getComponent(e, 'failBuildNonCompliance');
-		failNonCompliantIssuesCheckbox.checked = false;
+		if (failNonCompliantIssuesCheckbox != null) {
+			failNonCompliantIssuesCheckbox.checked = false;
+		}
 	}
 }
 
 function failBuildNonComplianceIssuesClicked(e){
 	if (e.checked) {
 		var waitCheckbox = getComponent(e, 'wait');
-		waitCheckbox.checked = true;
+		if (waitCheckbox != null) {
+			waitCheckbox.checked = true;
+		}
 		var failCheckbox = getComponent(e, 'failBuild');
-		failCheckbox.checked = false;
+		if (failCheckbox != null) {
+			failCheckbox.checked = false;
+		}
 	}
 }
 
@@ -53,22 +61,30 @@ function waitClicked(e) {
 	if(!e.checked) {
 		var failCheckbox = getComponent(e, 'failBuild');
 		var failNonCompliantIssuesCheckbox = getComponent(e, 'failBuildNonCompliance');
-		failCheckbox.checked = false;
-		failNonCompliantIssuesCheckbox.checked = false;
+		if (failCheckbox != null) {
+			failCheckbox.checked = false;
+		}
+		if (failNonCompliantIssuesCheckbox != null) {
+			failNonCompliantIssuesCheckbox.checked = false;
+		}
 	}
 }
 
 function aseFailBuildClicked(e) {
 	if(e.checked) {
 		var waitCheckbox = getComponent(e, 'wait');
-		waitCheckbox.checked = true;
+		if (waitCheckbox != null) {
+			waitCheckbox.checked = true;
+		}
 	}
 }
 
 function aseWaitClicked(e) {
 	if(!e.checked) {
 		var failCheckbox = getComponent(e, 'failBuild');
-		failCheckbox.checked = false;
+		if (failCheckbox != null) {
+			failCheckbox.checked = false;
+		}
 	}
 }
 
