@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+1.0.8 (July, 2021)
+------
+* Fix to handle the network disconnection scenario while Jenkins job is awaiting scan results from ASoC.
+* Login file support for AppScan Enterprise scans.
+* Display of new AppScan icon for scan results.
+
 1.0.7 (November, 2020)
 ------
 * Support for additional data centers.
