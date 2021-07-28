@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2020.
+ * @ Copyright HCL Technologies Ltd. 2020, 2021.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -14,41 +14,77 @@ function getAncestorByType(elem, type) {
 	return null;
 }
 
+function getComponent(elem, eleName) {
+	while(elem) {
+		elem = elem.parentNode;
+		var v = elem.getElementsByTagName('INPUT');
+		for (i = 0; i < v.length; i++) {
+			if (isTargetComponent(v[i], eleName)) {
+				return v[i];
+			}
+		}
+	}
+	return null;
+}
+
+function isTargetComponent(elem, eleName) {
+	return (elem != null && elem.nodeType === Node.ELEMENT_NODE && elem.hasAttribute('name') && elem.getAttribute('name') === eleName);
+}
+
 function failBuildClicked(e) {
 	if(e.checked) {
-		var table = getAncestorByType(e, 'table');
-		var waitCheckbox = table.querySelector('input[name=wait]');
-		waitCheckbox.checked = true;
-        var failNonCompliantIssuesCheckbox=table.querySelector('input[name=failBuildNonCompliance]');
-        failNonCompliantIssuesCheckbox.checked=false;                
+		var waitCheckbox = getComponent(e, 'wait');
+		if (waitCheckbox != null) {
+			waitCheckbox.checked = true;
+		}
+		var failNonCompliantIssuesCheckbox = getComponent(e, 'failBuildNonCompliance');
+		if (failNonCompliantIssuesCheckbox != null) {
+			failNonCompliantIssuesCheckbox.checked = false;
+		}
 	}
 }
 
 function failBuildNonComplianceIssuesClicked(e){
-    if (e.checked){
-        var table = getAncestorByType(e, 'table');
-		var waitCheckbox = table.querySelector('input[name=wait]');
-		waitCheckbox.checked = true;
-        var failCheckbox = table.querySelector('input[name=failBuild]');
-        failCheckbox.checked=false;                
-    }
+	if (e.checked) {
+		var waitCheckbox = getComponent(e, 'wait');
+		if (waitCheckbox != null) {
+			waitCheckbox.checked = true;
+		}
+		var failCheckbox = getComponent(e, 'failBuild');
+		if (failCheckbox != null) {
+			failCheckbox.checked = false;
+		}
+	}
 }
 
 function waitClicked(e) {
 	if(!e.checked) {
-		var table = getAncestorByType(e, 'table');
-		var failCheckbox = table.querySelector('input[name=failBuild]');
-        var failNonCompliantIssuesCheckbox=table.querySelector('input[name=failBuildNonCompliance]');
-		failCheckbox.checked = false;
-        failNonCompliantIssuesCheckbox.checked=false;
+		var failCheckbox = getComponent(e, 'failBuild');
+		var failNonCompliantIssuesCheckbox = getComponent(e, 'failBuildNonCompliance');
+		if (failCheckbox != null) {
+			failCheckbox.checked = false;
+		}
+		if (failNonCompliantIssuesCheckbox != null) {
+			failNonCompliantIssuesCheckbox.checked = false;
+		}
+	}
+}
+
+function aseFailBuildClicked(e) {
+	if(e.checked) {
+		var waitCheckbox = getComponent(e, 'wait');
+		if (waitCheckbox != null) {
+			waitCheckbox.checked = true;
+		}
 	}
 }
 
 function aseWaitClicked(e) {
 	if(!e.checked) {
-		var table = getAncestorByType(e, 'table');
-		var failCheckbox = table.querySelector('input[name=failBuild]');        
-		failCheckbox.checked = false;        
+		var failCheckbox = getComponent(e, 'failBuild');
+		if (failCheckbox != null) {
+			failCheckbox.checked = false;
+		}
 	}
 }
 

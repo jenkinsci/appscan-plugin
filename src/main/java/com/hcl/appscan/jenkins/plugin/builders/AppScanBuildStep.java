@@ -67,6 +67,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
+import hudson.model.Result;
 import hudson.model.Items;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -310,9 +311,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			m_scanStatus = provider.getStatus();
 		    			
-		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING))) {
-		    				Thread.sleep(60000);
-		    				m_scanStatus = provider.getStatus();
+                                        int requestCounter=0;
+		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING) || m_scanStatus.equalsIgnoreCase(CoreConstants.UNKNOWN)) && requestCounter<10) {
+                                            Thread.sleep(60000);
+                                            if(m_scanStatus.equalsIgnoreCase(CoreConstants.UNKNOWN))
+                                                requestCounter++;   // In case of internet disconnect, polling the server 10 times to check the connection has established 
+                                            else
+                                                requestCounter=0;
+                                            m_scanStatus = provider.getStatus();
 		    			}
 		    		}
 		    		
@@ -323,6 +329,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    	}
 			}
 		});
+        
+        if(suspend && m_scanStatus == null) // to address the status in association with Master and Slave congifuration
+            m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
 			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
@@ -333,6 +342,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
 					", Scan Name: " + scan.getName())));
 		  }
+        else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
+            progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));
+            build.setDescription(Messages.error_server_unavailable());
+            build.setResult(Result.UNSTABLE);
+        }
+        else {
       provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
     	String scanName = m_name;
     	if (build instanceof AbstractBuild) {
@@ -344,6 +359,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 
         if(m_wait)
             shouldFailBuild(provider,build);	
+    }
     }
     
     private void setInstallDir() {
