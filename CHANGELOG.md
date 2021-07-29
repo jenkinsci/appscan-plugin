@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+1.0.8 (July, 2021)
+------
+* Fix to handle the network disconnection scenario while Jenkins job is awaiting scan results from ASoC.
+* Fix to support Jenkins Environment variables for ASoC scan name field. Refer [JENKINS-60883](https://issues.jenkins-ci.org/browse/JENKINS-60883) for more details.
+* Support for .login file in AppScan Enterprise scans.
+* Display of new AppScan icon in scan results.
+* Minimum Jenkins Version updated to 2.222.4.
+
 1.0.7 (November, 2020)
 ------
 * Support for additional data centers.
@@ -23,7 +31,7 @@ CHANGELOG
 ------
 * ASE Template, Folder, and Application fields now support type-ahead search.
 * Enhanced error reporting for ASE jobs.
-* Documentaion and help updates.
+* Documentation and help updates.
 * General bug fixes.
 
 1.0.2 (May, 2020)
