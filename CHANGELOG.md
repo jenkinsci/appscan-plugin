@@ -3,7 +3,7 @@ CHANGELOG
 1.0.8 (July, 2021)
 ------
 * Fix to handle the network disconnection scenario while Jenkins job is awaiting scan results from ASoC.
-* Fix to support Jenkins Environment variables for ASoC scan name field.
+* Fix to support Jenkins Environment variables for ASoC scan name field. Refer [JENKINS-60883](https://issues.jenkins-ci.org/browse/JENKINS-60883) for more details.
 * Support for .login file in AppScan Enterprise scans.
 * Display of new AppScan icon in scan results.
 * Minimum Jenkins Version updated to 2.222.4, owing to upgrade to secure dependent libraries.
