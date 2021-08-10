@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019, 2021.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -21,6 +21,7 @@ import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 
 import hudson.Extension;
 import hudson.RelativePath;
+import hudson.Util;
 import hudson.model.ItemGroup;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -102,12 +103,20 @@ public class MobileAnalyzer extends Scanner {
 	
 	@Override
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
-		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
+		Map<String, String> properties = new HashMap();
+                if(resolver == null) {
+		properties.put(TARGET, getTarget());
 		properties.put(LOGIN_USER, m_loginUser);
 		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 		properties.put(EXTRA_FIELD, m_extraField);
-		properties.put(PRESENCE_ID, m_presenceId);
+                }
+                else {
+                properties.put(TARGET, resolvePath(getTarget(), resolver));
+		properties.put(LOGIN_USER, Util.replaceMacro(m_loginUser, resolver));
+		properties.put(LOGIN_PASSWORD, Util.replaceMacro(Secret.toString(m_loginPassword), resolver));
+		properties.put(EXTRA_FIELD, Util.replaceMacro(m_extraField, resolver));
+                }
+                properties.put(PRESENCE_ID, m_presenceId);
 		return properties;
 	}
 
