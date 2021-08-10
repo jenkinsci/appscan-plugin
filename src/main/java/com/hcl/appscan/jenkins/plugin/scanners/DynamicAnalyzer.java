@@ -18,7 +18,6 @@ import org.kohsuke.stapler.QueryParameter;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
 import com.hcl.appscan.jenkins.plugin.Messages;
-import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 
 import hudson.Extension;
@@ -28,6 +27,11 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import hudson.util.VariableResolver;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 public class DynamicAnalyzer extends Scanner {
 
@@ -217,10 +221,26 @@ public class DynamicAnalyzer extends Scanner {
     		model.add(""); //$NON-NLS-1$
     		
     		if(presences != null) {
-	    		for(Map.Entry<String, String> entry : presences.entrySet())
+                    List<Map.Entry<String , String>> list=sortPresences(presences.entrySet());
+                    
+	    		for(Map.Entry<String, String> entry : list)
 	    			model.add(entry.getValue(), entry.getKey());
     		}
     		return model;
+    	}
+        
+        private List<Map.Entry<String , String>> sortPresences(Set<Map.Entry<String , String>> set) {
+    		List<Map.Entry<String , String>> list= new ArrayList<>(set);
+    		if (list.size()>1) {
+    			Collections.sort( list, new Comparator<Map.Entry<String, String>>()
+                {
+                    public int compare( Map.Entry<String, String> o1, Map.Entry<String, String> o2 )
+                    {
+                        return (o1.getValue().toLowerCase()).compareTo( o2.getValue().toLowerCase() );
+                    }
+                } );
+    		}
+		return list;
     	}
 		
     	public FormValidation doCheckScanFile(@QueryParameter String scanFile) {
