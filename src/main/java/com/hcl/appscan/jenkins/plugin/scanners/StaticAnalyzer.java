@@ -1,13 +1,12 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019, 2021.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.sdk.CoreConstants;
-import com.hcl.appscan.sdk.scanners.sast.SASTConstants;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,8 +55,9 @@ public class StaticAnalyzer extends Scanner {
             m_openSourceOnly = openSourceOnly;
         }
 	
+        @Override
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
                 if (m_openSourceOnly)
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");

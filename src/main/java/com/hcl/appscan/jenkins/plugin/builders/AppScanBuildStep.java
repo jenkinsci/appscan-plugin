@@ -166,7 +166,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	
 	public List<FailureCondition> getFailureConditions() {
 		if(m_failureConditions == null)
-			return new ArrayList<FailureCondition>();
+			return new ArrayList();
 		return m_failureConditions;
 	}
 	
@@ -235,16 +235,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
-    	VariableResolver<String> resolver = null;
-    	String scanName = m_name;
-    	if (build instanceof AbstractBuild) {
-    		resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
-    		scanName = Util.replaceMacro(m_name, resolver);
-    	}
+    	VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
     	Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
         properties.put(CoreConstants.APP_ID,  m_application);
-        properties.put(CoreConstants.SCAN_NAME, scanName + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+        properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
@@ -334,14 +329,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
-			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
-			  if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
-				  message += ", " + provider.getMessage();
-			  }
-			  build.setDescription(message);
-			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
-					", Scan Name: " + scan.getName())));
-		  }
+            String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+            if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+                    message += ", " + provider.getMessage();
+            }
+            build.setDescription(message);
+            throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
+                          ", Scan Name: " + scan.getName())));
+	}
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
             progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));
             build.setDescription(Messages.error_server_unavailable());
@@ -349,13 +344,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
         else {
       provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-    	String scanName = m_name;
-    	if (build instanceof AbstractBuild) {
-    		VariableResolver<String> resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
-    		scanName = Util.replaceMacro(m_name, resolver);
-    	}
+      VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
     	String asocAppUrl = m_authProvider.getServer() + "/serviceui/main/myapps/portfolio";
-		  build.addAction(new ResultsRetriever(build, provider, scanName, asocAppUrl, Messages.label_asoc_homepage()));
+		  build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, Messages.label_asoc_homepage()));
                 
         if(m_wait)
             shouldFailBuild(provider,build);	
@@ -423,7 +414,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    		for(Map.Entry<String, String> entry : list)
 	    			model.add(entry.getValue(), entry.getKey());
     		}
-    		return model;
+    		return model; 
     	}
     	
     	private List<Entry<String , String>> sortApplications(Set<Entry<String , String>> set) {
