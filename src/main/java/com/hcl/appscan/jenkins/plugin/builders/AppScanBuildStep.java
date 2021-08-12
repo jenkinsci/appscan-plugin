@@ -166,7 +166,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	
 	public List<FailureCondition> getFailureConditions() {
 		if(m_failureConditions == null)
-			return new ArrayList();
+			return new ArrayList<FailureCondition>();
 		return m_failureConditions;
 	}
 	
