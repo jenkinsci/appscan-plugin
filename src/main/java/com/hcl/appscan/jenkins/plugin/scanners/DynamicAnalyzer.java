@@ -153,18 +153,18 @@ public class DynamicAnalyzer extends Scanner {
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
                 if(resolver == null) {
-                properties.put(TARGET, getTarget());
-		properties.put(LOGIN_USER, m_loginUser);
-		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
-		properties.put(SCAN_FILE, m_scanFile);
-		properties.put(EXTRA_FIELD, m_extraField);
+			properties.put(TARGET, getTarget());
+			properties.put(LOGIN_USER, m_loginUser);
+			properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
+			properties.put(SCAN_FILE, m_scanFile);
+			properties.put(EXTRA_FIELD, m_extraField);
                 }
                 else {
-                properties.put(TARGET, Util.replaceMacro(getTarget(), resolver));
-		properties.put(LOGIN_USER, Util.replaceMacro(m_loginUser, resolver));
-		properties.put(LOGIN_PASSWORD, Util.replaceMacro(Secret.toString(m_loginPassword), resolver));
-		properties.put(SCAN_FILE, resolvePath(m_scanFile, resolver));
-		properties.put(EXTRA_FIELD, Util.replaceMacro(m_extraField, resolver));
+			properties.put(TARGET, Util.replaceMacro(getTarget(), resolver));
+			properties.put(LOGIN_USER, Util.replaceMacro(m_loginUser, resolver));
+			properties.put(LOGIN_PASSWORD, Util.replaceMacro(Secret.toString(m_loginPassword), resolver));
+			properties.put(SCAN_FILE, resolvePath(m_scanFile, resolver));
+			properties.put(EXTRA_FIELD, Util.replaceMacro(m_extraField, resolver));
                 }
                 properties.put(SCAN_TYPE, m_scanType);
                 properties.put(TEST_OPTIMIZATION_LEVEL, m_optimization);
