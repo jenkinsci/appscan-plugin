@@ -56,7 +56,6 @@ public class StaticAnalyzer extends Scanner {
             m_openSourceOnly = openSourceOnly;
         }
 	
-        @Override
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
