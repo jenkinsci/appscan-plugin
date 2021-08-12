@@ -329,14 +329,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
-			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
-			  if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
-				  message += ", " + provider.getMessage();
-			  }
-			  build.setDescription(message);
-			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
-					", Scan Name: " + scan.getName())));
-		  }
+            String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+            if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+                    message += ", " + provider.getMessage();
+            }
+            build.setDescription(message);
+            throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
+                          ", Scan Name: " + scan.getName())));
+	}
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
             progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));
             build.setDescription(Messages.error_server_unavailable());
@@ -414,7 +414,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    		for(Map.Entry<String, String> entry : list)
 	    			model.add(entry.getValue(), entry.getKey());
     		}
-    		return model;
+    		return model; 
     	}
     	
     	private List<Entry<String , String>> sortApplications(Set<Entry<String , String>> set) {

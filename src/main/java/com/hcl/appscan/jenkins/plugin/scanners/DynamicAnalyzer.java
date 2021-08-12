@@ -19,7 +19,6 @@ import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import static com.hcl.appscan.jenkins.plugin.scanners.ScannerConstants.TEMPLATE_EXTENSION2;
 
 import hudson.Extension;
 import hudson.RelativePath;
