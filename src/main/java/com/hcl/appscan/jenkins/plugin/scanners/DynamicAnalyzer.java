@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -22,6 +22,7 @@ import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 
 import hudson.Extension;
 import hudson.RelativePath;
+import hudson.Util;
 import hudson.model.ItemGroup;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -41,25 +42,23 @@ public class DynamicAnalyzer extends Scanner {
 	private Secret m_loginPassword;
 	private String m_presenceId;
 	private String m_scanFile;
-	private String m_testPolicy;
 	private String m_scanType;
 	private String m_optimization;
 	private String m_extraField;
 	
 	@Deprecated
 	public DynamicAnalyzer(String target) {
-		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY); 
+		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY); 
 	}
 	
 	@Deprecated
 	public DynamicAnalyzer(String target, boolean hasOptions, String loginUser, String loginPassword, String presenceId, String scanFile, 
-			String testPolicy, String scanType,String optimization, String extraField) {
+			String scanType,String optimization, String extraField) {
 		super(target, hasOptions);
 		m_loginUser = loginUser;
 		m_loginPassword = Secret.fromString(loginPassword);
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
-		m_testPolicy = EMPTY;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
 		m_optimization = optimization;
 		m_extraField = extraField;
@@ -72,7 +71,6 @@ public class DynamicAnalyzer extends Scanner {
 		m_loginPassword = Secret.fromString(EMPTY);
 		m_presenceId = EMPTY;
 		m_scanFile = EMPTY;
-		m_testPolicy = EMPTY;
 		m_scanType = EMPTY;
 		m_optimization = EMPTY;
 		m_extraField = EMPTY;
@@ -115,15 +113,6 @@ public class DynamicAnalyzer extends Scanner {
 	}
 	
 	@DataBoundSetter
-	public void setTestPolicy(String testPolicy) {
-		m_testPolicy = testPolicy;
-	}
-	
-	public String getTestPolicy() {
-		return m_testPolicy;
-	}
-	
-	@DataBoundSetter
 	public void setScanType(String scanType) {
 		m_scanType = m_scanFile != null && !m_scanFile.equals(EMPTY) ? CUSTOM : scanType;
 	}
@@ -163,15 +152,23 @@ public class DynamicAnalyzer extends Scanner {
 	@Override
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(TARGET, getTarget());
-		properties.put(LOGIN_USER, m_loginUser);
-		properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
-		properties.put(PRESENCE_ID, m_presenceId);
-		properties.put(SCAN_FILE, resolver == null ? m_scanFile : resolvePath(m_scanFile, resolver));
-		properties.put(TEST_POLICY, m_testPolicy);
-		properties.put(SCAN_TYPE, m_scanType);
-		properties.put(TEST_OPTIMIZATION_LEVEL, m_optimization);
-		properties.put(EXTRA_FIELD, m_extraField);
+                if(resolver == null) {
+			properties.put(TARGET, getTarget());
+			properties.put(LOGIN_USER, m_loginUser);
+			properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
+			properties.put(SCAN_FILE, m_scanFile);
+			properties.put(EXTRA_FIELD, m_extraField);
+                }
+                else {
+			properties.put(TARGET, Util.replaceMacro(getTarget(), resolver));
+			properties.put(LOGIN_USER, Util.replaceMacro(m_loginUser, resolver));
+			properties.put(LOGIN_PASSWORD, Util.replaceMacro(Secret.toString(m_loginPassword), resolver));
+			properties.put(SCAN_FILE, resolvePath(m_scanFile, resolver));
+			properties.put(EXTRA_FIELD, Util.replaceMacro(m_extraField, resolver));
+                }
+                properties.put(SCAN_TYPE, m_scanType);
+                properties.put(TEST_OPTIMIZATION_LEVEL, m_optimization);
+                properties.put(PRESENCE_ID, m_presenceId);
 		return properties;
 	}
 
@@ -244,7 +241,7 @@ public class DynamicAnalyzer extends Scanner {
     	}
 		
     	public FormValidation doCheckScanFile(@QueryParameter String scanFile) {
-    		if(!scanFile.trim().equals(EMPTY) && !scanFile.endsWith(TEMPLATE_EXTENSION) && !scanFile.endsWith(TEMPLATE_EXTENSION2))
+    		if(!scanFile.trim().equals(EMPTY) && !scanFile.endsWith(TEMPLATE_EXTENSION) && !scanFile.endsWith(TEMPLATE_EXTENSION2) && !scanFile.startsWith("${") )
     			return FormValidation.error(Messages.error_invalid_template_file());
     		return FormValidation.ok();
     	}

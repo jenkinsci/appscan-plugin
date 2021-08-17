@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -235,16 +235,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
-    	VariableResolver<String> resolver = null;
-    	String scanName = m_name;
-    	if (build instanceof AbstractBuild) {
-    		resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
-    		scanName = Util.replaceMacro(m_name, resolver);
-    	}
+    	VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
     	Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
         properties.put(CoreConstants.APP_ID,  m_application);
-        properties.put(CoreConstants.SCAN_NAME, scanName + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+        properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
@@ -349,13 +344,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
         else {
       provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-    	String scanName = m_name;
-    	if (build instanceof AbstractBuild) {
-    		VariableResolver<String> resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
-    		scanName = Util.replaceMacro(m_name, resolver);
-    	}
+      VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
     	String asocAppUrl = m_authProvider.getServer() + "/serviceui/main/myapps/portfolio";
-		  build.addAction(new ResultsRetriever(build, provider, scanName, asocAppUrl, Messages.label_asoc_homepage()));
+		  build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, Messages.label_asoc_homepage()));
                 
         if(m_wait)
             shouldFailBuild(provider,build);	
