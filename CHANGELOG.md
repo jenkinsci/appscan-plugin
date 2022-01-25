@@ -2,7 +2,7 @@ CHANGELOG
 =========
 1.0.9 (January, 2022)
 ------
-* Fix to handle the ASoC exceptions while Jenkins job is running.
+* Fix to handle ASoC communication interruptions while Jenkins job is running.
 * Fix to support Jenkins Environment variables for ASoC scan fields.
 * Sort the presence list in the ASoC task.
 * Modified the SAClient logs to display Jenkins.
