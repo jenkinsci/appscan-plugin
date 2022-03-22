@@ -115,7 +115,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
         }
-	
+
 	@DataBoundConstructor
 	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
 		m_scanner = scanner;
@@ -211,15 +211,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         return (DescriptorImpl)super.getDescriptor();
     }
     
-    @Override
-    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-    	perform((Run<?,?>)build, launcher, listener);
-		return true;
-    }
-    
 	@Override
-	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-		perform(run, launcher, listener);
+	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException, AbortException {
+		if(m_scanner !=null) {
+			perform(run, launcher, listener);
+		}else{
+			throw new AbortException("Mobile Analyzer is no longer supported, try Static Analyzer for mobile application");
+		}
 	}
     
     @Override
@@ -369,7 +367,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.builders.AppScanBuildStep", com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.StaticAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.StaticAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.DynamicAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.DynamicAnalyzer.class);
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.MobileAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.MobileAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
 		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
     	}
