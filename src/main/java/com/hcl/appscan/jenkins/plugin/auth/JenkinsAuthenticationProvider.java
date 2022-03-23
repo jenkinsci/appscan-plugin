@@ -24,6 +24,8 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.hcl.appscan.sdk.auth.AuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.auth.LoginType;
+import com.hcl.appscan.sdk.utils.SystemUtil;
+import hudson.Plugin;
 
 import hudson.ProxyConfiguration;
 import hudson.model.ItemGroup;
@@ -46,7 +48,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		AuthenticationHandler handler = new AuthenticationHandler(this);
 
 		try {
-			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated);
+			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated,"jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
 		} catch (IOException | JSONException e) {
 			isExpired = false;
 		}
@@ -111,5 +113,15 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 			}
 		}
 		m_credentials = new ASoCCredentials("", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+        
+        private String getPluginVersion() {
+            Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
+
+            if(tempPlugin != null) {
+    		return tempPlugin.getWrapper().getVersion();
+            }
+
+            return "";
 	}
 }
