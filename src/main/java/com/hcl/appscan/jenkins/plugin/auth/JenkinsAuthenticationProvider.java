@@ -37,8 +37,14 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	private static final long serialVersionUID = 1L;
 	
 	private ASoCCredentials m_credentials;
+        private String m_clientType;
+        
+        public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
+		this(id, context, null);
+	}
 	
-	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
+	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context,String clientType) {
+                m_clientType=clientType;
 		configureCredentials(id, context);
 	}
 	
@@ -48,7 +54,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		AuthenticationHandler handler = new AuthenticationHandler(this);
 
 		try {
-			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated,"jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
+			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated, m_clientType);
 		} catch (IOException | JSONException e) {
 			isExpired = false;
 		}
@@ -113,15 +119,5 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 			}
 		}
 		m_credentials = new ASoCCredentials("", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	}
-        
-        private String getPluginVersion() {
-            Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
-
-            if(tempPlugin != null) {
-    		return tempPlugin.getWrapper().getVersion();
-            }
-
-            return "";
 	}
 }

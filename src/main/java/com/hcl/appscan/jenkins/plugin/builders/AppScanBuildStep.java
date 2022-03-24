@@ -244,7 +244,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
-		properties.put("ClientType", "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
+		properties.put("ClientType", getClientType());
 		return properties;
     }
     
@@ -257,6 +257,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
     	return "";
 	}
+    private String getClientType(){
+        return "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion();
+    }
 
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
@@ -281,7 +284,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
+    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent(),getClientType());
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
     	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
