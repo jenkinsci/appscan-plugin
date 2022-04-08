@@ -6,6 +6,7 @@
 
 package com.hcl.appscan.jenkins.plugin.actions;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
 import hudson.model.Run;
 
 import java.io.File;
@@ -19,8 +20,6 @@ import org.apache.wink.json4j.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-
-import com.hcl.appscan.jenkins.plugin.Messages;
 
 public class ScanResultsTrend extends AppScanAction {
 

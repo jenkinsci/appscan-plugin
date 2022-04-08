@@ -14,6 +14,14 @@
      }
     </style>
 
+    <f:entry field="newJob">
+        <f:checkbox title="Create a new AppScan job for every build" name="newJob"/>
+    </f:entry>
+
+    <f:entry title="Reports Path" field="reportsPath">
+        <f:textbox />
+    </f:entry>
+
     <f:entry title="${%label.credentials}" field="credentials">
         <f:select onchange="resetFields(this)"/>
     </f:entry>
@@ -48,6 +56,11 @@
 	    <f:entry title="${%label.starting.url}" field="target">
 	        <f:textbox />
 	    </f:entry>
+
+        <f:entry title="Additional Domains separated by comma" field="additionalDomains">
+            <f:textbox />
+        </f:entry>
+
      </f:section>
    
     <f:section title="${%label.login.management}" field="loginTypeOptions">
@@ -157,7 +170,7 @@
     </f:entry>
 
     <f:entry field="failBuild">
-        <f:checkbox title="${%label.fail.build}" onclick="aseFailBuildClicked(this);" name="failBuild"/>
+        <f:checkbox title="${%label.fail.build}" onclick="failBuildClicked(this);" name="failBuild"/>
     </f:entry>
     
     <f:entry field="failureConditions">

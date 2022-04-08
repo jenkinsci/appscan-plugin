@@ -20,8 +20,13 @@ import java.util.Set;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
+import com.hcl.appscan.jenkins.plugin.util.ExecutorUtil;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
+import groovy.ui.SystemOutputInterceptor;
+import hudson.model.*;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -47,7 +52,6 @@ import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.sdk.scan.IScan;
 
 import com.hcl.appscan.sdk.utils.SystemUtil;
-import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.ScanFactory;
 import com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever;
 import com.hcl.appscan.jenkins.plugin.auth.ASEJenkinsAuthenticationProvider;
@@ -61,14 +65,7 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
-import hudson.model.ItemGroup;
-import hudson.model.Run;
-import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
-import hudson.model.AutoCompletionCandidates;
 import hudson.remoting.Callable;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -86,8 +83,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private static final String SHOW_ALL = "Show All";
 
 	private String m_credentials;
-	private String m_application;
+	private String m_applicationId;
+	private String m_applicationName;
 	private String m_target;
+
+	private boolean m_newJob;
+	private String m_reportsPath;
+	private String m_additionalDomains;
 	private String m_folder;
 	private String m_testPolicy;
 	private String m_template;
@@ -112,13 +114,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final String pluginVersion = "1.0.8-v11";
 
 	@DataBoundConstructor
 	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
 		
 		m_credentials = credentials;
-		m_application = "";
+		m_applicationId = "";
+		m_applicationName = "";
 		m_target = "";
+		m_newJob = false;
 		// Post autocomplete feature, we need to explicitly map 
 		// folder name to folder id before saving it in
 		// job configuration file.
@@ -197,7 +202,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// Post autocomplete feature, we need to explicitly map 
 		// application name to application id before saving it in
 		// job configuration file.
-		m_application = getDescriptor().getApplicationId(application);
+		m_applicationId = getDescriptor().getApplicationId(application);
+		m_applicationName = application;
 	}
 
 	public String getApplication() {
@@ -205,12 +211,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// id to application name before displaying the value in jenkins's job
 		// configuration. 
 		if (getDescriptor().applicationMap != null &&
-				getDescriptor().applicationMap.get(m_application) != null) {
+				getDescriptor().applicationMap.get(m_applicationId) != null) {
 			String appName = StringEscapeUtils.unescapeHtml(
-					getDescriptor().applicationMap.get(m_application));
+					getDescriptor().applicationMap.get(m_applicationId));
 			return appName;
 		}
-		return m_application;
+		return m_applicationId;
 	}
 
 	@DataBoundSetter
@@ -221,7 +227,24 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getTarget() {
 		return m_target;
 	}
-	
+
+	@DataBoundSetter
+	public void setNewJob(boolean newJob) {
+		this.m_newJob = newJob;
+	}
+
+	public boolean getNewJob() {
+		return this.m_newJob;
+	}
+
+	@DataBoundSetter
+	public void setReportsPath(String reportsPath){ this.m_reportsPath = reportsPath; }
+	public String getReportsPath(){ return m_reportsPath; }
+
+	@DataBoundSetter
+	public void setAdditionalDomains(String additionalDomains){ this.m_additionalDomains = additionalDomains; }
+	public String getAdditionalDomains(){ return m_additionalDomains; }
+
 	@DataBoundSetter
 	public void setLoginType(String loginType) {
 		m_loginType = loginType;
@@ -387,8 +410,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(CoreConstants.SCANNER_TYPE, ASE_DYNAMIC_ANALYZER);
 		properties.put("credentials", m_credentials);
-		properties.put("application", m_application);
+		properties.put("application", m_applicationId);
+		properties.put("applicationName", m_applicationName);
 		properties.put("startingURL", m_target);
+		properties.put("newJob", m_newJob ? "true":"false");
 		properties.put("folder", m_folder);
 		properties.put("testPolicyId", m_testPolicy);
 		properties.put("templateId", m_template);
@@ -405,7 +430,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 		properties.put("scanType", m_scanType);
 		properties.put("testOptimization", m_testOptimization);
-		properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
+		properties.put("additionalDomains", m_additionalDomains);
+		if (m_newJob)
+			properties.put(CoreConstants.SCAN_NAME, m_jobName+ "_" + SystemUtil.getTimeStamp());
+		else
+			properties.put(CoreConstants.SCAN_NAME, m_jobName);
+
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));		
 		return properties;
 	}
@@ -427,12 +457,18 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
+
 		Map<String, String> properties = getScanProperties(build, listener);
+
 		m_authProvider = new ASEJenkinsAuthenticationProvider(properties.get("credentials"),
 				build.getParent().getParent());
 		final IProgress progress = new ScanProgress(listener);
-		final boolean suspend = m_wait;
 		final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider); // Call ASEScanFactory directly
+		final File buildRootDir = build.getRootDir();
+		final String buildNumber = build.getId();
+
+		progress.setStatus(new Message(Message.INFO, "Plugin Version: "+pluginVersion));
+		//progress.setStatus(new Message(Message.INFO, "Reports path = "+getReportsPath()));
 
 		IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
@@ -446,36 +482,42 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				try {
 					setInstallDir();
 					scan.run();
-
+					File reportsPath = (m_reportsPath != null && m_reportsPath.length()>0) ? new File(m_reportsPath) : buildRootDir;
 					IResultsProvider provider = new ASEResultsProvider(scan.getScanId(), scan.getType(),
-							scan.getServiceProvider(), progress, scan.getName());
+							scan.getServiceProvider(), progress, scan.getName(), scan.getServiceProvider().getApplicationId(), reportsPath, buildNumber);
 					provider.setReportFormat(scan.getReportFormat());
+
+
 					try {
 						String ASE_SCAN_STATS = "/Jobs/QuickScanStats.aspx?fiid=%s";
 						URL url = new URL(m_authProvider.getServer() + String.format(ASE_SCAN_STATS, scan.getScanId()));
 						progress.setStatus(new Message(Message.INFO, Messages.logs_link(scan.getScanId(), new URL(url.getProtocol(), url.getHost(), url.getFile()).toString())));
+
+						if (m_wait) {
+							progress.setStatus(new Message(Message.INFO, "The Scan job status will be fetched from AppScan every 60 seconds...."));
+							provider.run();
+						}
+						else {
+							progress.setStatus(new Message(Message.INFO, "Check the scan status in 'Status' page. Once the scan job completes its run, download reports from 'Status' page."));
+							ExecutorUtil.executeTask(provider);
+							Thread.sleep(10000);
+						}
+
 					} catch (MalformedURLException e) {
 						progress.setStatus(new Message(Message.ERROR, Messages.error_malformed_url(m_authProvider.getServer())));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
-					if (suspend) {
-						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
-						m_scanStatus = provider.getStatus();
 
-						while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase("Waiting to Auto Run") || m_scanStatus.equalsIgnoreCase("Waiting to Run")
-								|| m_scanStatus.equalsIgnoreCase("Starting") || m_scanStatus.equalsIgnoreCase("Running")
-								|| m_scanStatus.equals("Post Processing") || m_scanStatus.equals("Waiting to Generate Results") || m_scanStatus.equals("Generating Results"))) {
-							Thread.sleep(60000);
-							m_scanStatus = provider.getStatus();
-						}
-					}
 					return provider;
-				} catch (ScannerException | InvalidTargetException | InterruptedException e) {
+				}catch (ScannerException | InvalidTargetException e) {
 					progress.setStatus(new Message(Message.INFO, Messages.label_ase_homepage() + ": " + m_authProvider.getServer()));
 					throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
 				}
 			}
 		});
 
+		m_scanStatus = provider.getStatus();
 		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
 			String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
 			if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
@@ -489,15 +531,20 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		provider.setProgress(new StdOutProgress()); // Avoid serialization problem with StreamBuildListener.
 		String aseScanUrl = m_authProvider.getServer();
 		String label = Messages.label_ase_homepage();
-		if (m_application != null && m_application.trim().length() > 0) {
+		if (m_applicationId != null && m_applicationId.trim().length() > 0) {
 			String applicationUrl = "/api/pages/applications.html#appProfile/%s/issues";
-			aseScanUrl += String.format(applicationUrl, m_application);
+			aseScanUrl += String.format(applicationUrl, m_applicationId);
 			label = Messages.label_ase_application();
 		}
-		build.addAction(new ResultsRetriever(build, provider, m_jobName, aseScanUrl, label));
+		ResultsRetriever resultsRetriever = new ResultsRetriever(build, provider, m_jobName, aseScanUrl, label, m_applicationId, m_reportsPath);
+		build.addAction(resultsRetriever);
 
-		if (m_wait)
+		if (m_wait) {
 			shouldFailBuild(provider, build);
+		}
+		else {
+			Thread.sleep(30000);
+		}
 	}
 
 	private void setInstallDir() {
@@ -716,7 +763,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 					}
 				}
 			}
-			return application;
+			return "";
 		}
 
 		/**

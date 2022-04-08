@@ -1,0 +1,60 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<!--
+© Copyright IBM Corporation 2016.
+LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+-->
+	<style type="text/css">
+
+		.stats table,
+		.stats td {
+			width:50%;
+		    color:black;
+			font-size: 130%;
+			padding: 10px;
+
+			border: 1px solid black;
+			border-collapse: collapse;
+			background: lightgrey;
+
+		}
+
+	</style>
+	<table class="stats">
+		<th>
+			<h3 style="color: Grey; font-size:200%; text-align:left">Scan Statistics</h3>
+			<h1 style="color: Grey; font-size:100%; text-align:left">(While the scan is running the data is updated every minute)</h1>
+		</th>
+
+		<tr>
+			<td>Scan Job Id</td><td>${it.jobId}</td>
+		</tr>
+		<tr>
+			<td>Status</td><td>${it.status}</td>
+		</tr>
+		<tr>
+			<td>Net scan time</td><td>${it.netScanTime}</td>
+		</tr>
+		<tr>
+			<td>Securities entities found</td><td>${it.secEntitiesFound}</td>
+		</tr>
+		<tr>
+			<td>Securities entities tested</td><td>${it.secEntitiesTested}</td>
+		</tr>
+		<tr>
+			<td>Scan start time</td><td>${it.scanStartTime}</td>
+		</tr>
+		<tr>
+			<td>Pages found</td><td>${it.pagesFound}</td>
+		</tr>
+		<tr>
+			<td>Pages scanned</td><td>${it.pagesTested}</td>
+		</tr>
+		<tr>
+			<td>Scanning phase</td><td>${it.scanningPhase}</td>
+		</tr>
+		<tr>
+			<td>Requests sent</td><td>${it.reqSent}</td>
+		</tr>
+	</table>
+</j:jelly>
