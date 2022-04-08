@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -20,6 +20,7 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
@@ -43,7 +44,6 @@ import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
 
 import com.hcl.appscan.sdk.utils.SystemUtil;
-import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.ScanFactory;
 import com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever;
 import com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials;
@@ -67,7 +67,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
-import hudson.model.Result;
 import hudson.model.Items;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -235,13 +234,18 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
     
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
-    	VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+    	VariableResolver<String> resolver = null;
+    	String scanName = m_name;
+    	if (build instanceof AbstractBuild) {
+    		resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
+    		scanName = Util.replaceMacro(m_name, resolver);
+    	}
     	Map<String, String> properties = m_scanner.getProperties(resolver);
 		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
         properties.put(CoreConstants.APP_ID,  m_application);
-        properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+        properties.put(CoreConstants.SCAN_NAME, scanName + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
+		properties.put("APPSCAN_IRGEN_CLIENT", "jenkins");
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
 		properties.put("ClientType", "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
@@ -261,7 +265,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
     		return ;
-        String failureMessage=Messages.error_threshold_exceeded();
+        String failureMessage= Messages.error_threshold_exceeded();
 		try {
                     List<FailureCondition> failureConditions=m_failureConditions;
                     if (m_failBuildNonCompliance){
@@ -306,14 +310,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			m_scanStatus = provider.getStatus();
 		    			
-                                        int requestCounter=0;
-		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING) || m_scanStatus.equalsIgnoreCase(CoreConstants.UNKNOWN)) && requestCounter<10) {
-                                            Thread.sleep(60000);
-                                            if(m_scanStatus.equalsIgnoreCase(CoreConstants.UNKNOWN))
-                                                requestCounter++;   // In case of internet disconnect, polling the server 10 times to check the connection has established 
-                                            else
-                                                requestCounter=0;
-                                            m_scanStatus = provider.getStatus();
+		    			while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase(CoreConstants.INQUEUE) || m_scanStatus.equalsIgnoreCase(CoreConstants.RUNNING))) {
+		    				Thread.sleep(60000);
+		    				m_scanStatus = provider.getStatus();
 		    			}
 		    		}
 		    		
@@ -324,9 +323,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    	}
 			}
 		});
-        
-        if(suspend && m_scanStatus == null) // to address the status in association with Master and Slave congifuration
-            m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
 			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
@@ -337,20 +333,17 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
 					", Scan Name: " + scan.getName())));
 		  }
-        else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
-            progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));
-            build.setDescription(Messages.error_server_unavailable());
-            build.setResult(Result.UNSTABLE);
-        }
-        else {
       provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-      VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+    	String scanName = m_name;
+    	if (build instanceof AbstractBuild) {
+    		VariableResolver<String> resolver = new BuildVariableResolver((AbstractBuild<?,?>)build, listener);
+    		scanName = Util.replaceMacro(m_name, resolver);
+    	}
     	String asocAppUrl = m_authProvider.getServer() + "/serviceui/main/myapps/portfolio";
-		  build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, Messages.label_asoc_homepage()));
+		  build.addAction(new ResultsRetriever(build, provider, scanName, asocAppUrl, Messages.label_asoc_homepage(), m_application, ""));
                 
         if(m_wait)
             shouldFailBuild(provider,build);	
-    }
     }
     
     private void setInstallDir() {

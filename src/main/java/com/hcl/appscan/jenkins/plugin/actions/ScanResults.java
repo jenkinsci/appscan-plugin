@@ -6,8 +6,8 @@
 
 package com.hcl.appscan.jenkins.plugin.actions;
 
-import hudson.model.Action;
-import hudson.model.Run;
+import com.hcl.appscan.jenkins.plugin.Messages;
+import hudson.model.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +17,7 @@ import java.util.HashSet;
 
 import javax.servlet.ServletException;
 
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -25,13 +26,9 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.results.IResultsProvider;
-import com.hcl.appscan.jenkins.plugin.Messages;
 
 public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBuildAction {
-
-	private static final String REPORT_SUFFIX = "_report"; //$NON-NLS-1$
-	
-	private final Run<?,?> m_build;	
+	private final Run<?,?> m_build;
 	private IResultsProvider m_provider;
 	private String m_name;
 	private String m_status;
@@ -42,10 +39,26 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	private int m_mediumCount;
 	private int m_lowCount;
 	private int m_infoCount;
-	
-	@DataBoundConstructor
+	private String m_application;
+	private String m_reportsPath;
+
+
+	private String m_jobId;
+	private String m_jobStatus;
+	private String m_netScanTime;
+	private String m_secEntitiesFound;
+	private String m_secEntitiesTested;
+	private String m_scanStartTime;
+	private String m_pagesFound;
+	private String m_pagesScanned;
+	private String m_scanningPhase;
+	private String m_requestsSent;
+	private String m_secIssueVariants;
+
 	public ScanResults(Run<?,?> build, IResultsProvider provider, String name, String status,
-			int totalFindings, int highCount, int mediumCount, int lowCount, int infoCount, String scanServerUrl, String label) {
+					   int totalFindings, int highCount, int mediumCount, int lowCount, int infoCount, String scanServerUrl, String label,String applicationId, String reportsPath,
+					   String jobId, String jobStatus, String netScanTime, String secEntitiesFound, String secEntitiesTested, String scanStartTime, String pagesFound,
+					   String pagesScanned, String scanningPhase, String requestsSent, String secIssueVariants) {
 		super(build.getParent());
 		m_build = build;
 		m_provider = provider;
@@ -58,13 +71,46 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		m_infoCount = infoCount;
 		m_label = label;
 		m_scanServerUrl = scanServerUrl;
-                getReport();
+		m_application = applicationId;
+		m_reportsPath = reportsPath;
+
+		m_jobId = jobId;
+		m_jobStatus = jobStatus;
+		m_netScanTime = netScanTime;
+		m_secEntitiesFound = secEntitiesFound;
+		m_secEntitiesTested = secEntitiesTested;
+		m_scanStartTime = scanStartTime;
+		m_pagesFound = pagesFound;
+		m_pagesScanned = pagesScanned;
+		m_scanningPhase = scanningPhase;
+		m_requestsSent = requestsSent;
+		m_secIssueVariants = secIssueVariants;
 	}
-	
+
+	@DataBoundConstructor
+	public ScanResults(Run<?,?> build, IResultsProvider provider, String name, String status,
+					   int totalFindings, int highCount, int mediumCount, int lowCount, int infoCount, String scanServerUrl, String label,String applicationId) {
+		super(build.getParent());
+		m_build = build;
+		m_provider = provider;
+		m_name = name;
+		m_status = status;
+		m_totalFindings = totalFindings;
+		m_highCount = highCount;
+		m_mediumCount = mediumCount;
+		m_lowCount = lowCount;
+		m_infoCount = infoCount;
+		m_label = label;
+		m_scanServerUrl = scanServerUrl;
+		m_application = applicationId;
+	}
+
 	@Override
 	public String getUrlName() {
-		return getReportName();
+		return getPDFReport();
 	}
+
+	public String getXMLReportName(){ return getXMLReport();}
 	
 	@Override
 	public String getDisplayName() {
@@ -118,6 +164,10 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		String status = m_status == null ? m_provider.getStatus() : m_status;
 		return status.equalsIgnoreCase(CoreConstants.FAILED);
 	}
+	public boolean getRunning() {
+		String status = m_status == null ? m_provider.getStatus() : m_status;
+		return status.equalsIgnoreCase(CoreConstants.RUNNING);
+	}
 
 	public String getScanServerUrl()  {
 		return m_scanServerUrl;
@@ -132,26 +182,83 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	}
 	
 	public void doDynamic(StaplerRequest request, StaplerResponse response) throws MalformedURLException, ServletException, IOException {
-		File report = getReport();
-		if(report.isFile())
+		File report = null;
+		File path = (m_reportsPath != null && m_reportsPath.length()>0) ? new File(m_reportsPath) : m_build.getRootDir();
+
+		if (request.getParameter("type").equalsIgnoreCase("pdf")) {
+			report = new File(path, getPDFReport());
+		}
+		if (request.getParameter("type").equalsIgnoreCase("xml")) {
+			report = new File(path, getXMLReport());
+		}
+
+		if(report!= null && report.isFile())
 			response.serveFile(request, report.toURI().toURL());
 	}
-	
+
 	public File getReport() {
-		File report = new File(m_build.getRootDir(), getReportName());
+		File path = (m_reportsPath != null && m_reportsPath.length()>0) ? new File(m_reportsPath) : m_build.getRootDir();
+		File report = new File(path, getReportName());
 		if(!report.isFile())
 			m_provider.getResultsFile(report, null);
 		return report;
 	}
-	
+
+	private String getPDFReport()
+	{
+		return "Report_"+m_build.getId()+".pdf";
+	}
+
+	private String getXMLReport() {
+		return "Report_"+m_build.getId()+".xml";
+	}
+
 	private String getReportName() {
-		String name = (getScanType() + getName()).replaceAll(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$
-		return name + REPORT_SUFFIX + "." + m_provider.getResultsFormat().toLowerCase(); //$NON-NLS-1$
+		return "Report_"+m_build.getId()+".pdf";
 	}
 	
 	private int getLastFindingsCount() {
 		if(m_project.getLastSuccessfulBuild() != null && m_project.getLastSuccessfulBuild().getAction(ScanResults.class) != null)
 			return m_project.getLastSuccessfulBuild().getAction(ScanResults.class).getTotalFindings();
 		return Integer.MAX_VALUE;
+	}
+
+	public String getJobId() {
+		return m_jobId;
+	}
+
+	public String getStatus() {
+		if (m_jobStatus.equalsIgnoreCase(CoreConstants.READY))
+			return "Completed";
+		else
+			return m_jobStatus;
+	}
+
+	public String getNetScanTime() {
+		return m_netScanTime;
+	}
+	public String getSecEntitiesFound() {
+		return m_secEntitiesFound;
+	}
+	public String getSecEntitiesTested() {
+		return m_secEntitiesTested;
+	}
+	public String getScanStartTime() {
+		return m_scanStartTime;
+	}
+	public String getPagesFound() {
+		return m_pagesFound;
+	}
+	public String getPagesTested() {
+		return m_pagesScanned;
+	}
+	public String getScanningPhase() {
+		return m_scanningPhase;
+	}
+	public String getReqSent() {
+		return m_requestsSent;
+	}
+	public String getSecIssueVariants() {
+		return m_secIssueVariants;
 	}
 }

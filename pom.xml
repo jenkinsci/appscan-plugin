@@ -1,105 +1,163 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <name>HCL AppScan</name>
-  <organization>
-  	<name>HCL</name>
-  	<url>https://www.hcl.com/</url>
-  </organization>
-  
-  <url>https://github.com/jenkinsci/appscan-plugin</url>
-	
-  <licenses>
-  	<license>
-  		<name>Apache License, Version 2.0</name>
-  		<url> https://www.apache.org/licenses/LICENSE-2.0</url>
-  	</license>
-  </licenses>
-  
-  <developers>
-  	<developer>
-      		<id>mattmurp</id>
-      		<name>Matt Murphy</name>
-      		<email>matthew.murphy@hcl.com</email>
-    	</developer>
-  </developers>
-	
-  <parent>
-    <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>plugin</artifactId>
-    <version>3.2</version>
-    <relativePath />
-  </parent>
+	<modelVersion>4.0.0</modelVersion>
 
-  <properties>
-        <slf4jVersion>1.7.26</slf4jVersion>
-        <java.level>8</java.level>
-	<jenkins.version>2.222.4</jenkins.version>
-	<findbugs.failOnError>false</findbugs.failOnError>
-  </properties>
-	
-  <groupId>com.hcl.security</groupId>
-  <artifactId>appscan</artifactId>
-  <version>1.0.10-SNAPSHOT</version>
-  <description>This plugin allows you to execute security scans with HCL AppScan</description>
-  <packaging>hpi</packaging>
+	<name>HCL AppScan</name>
+	<organization>
+		<name>HCL</name>
+		<url>https://www.hcl.com/</url>
+	</organization>
 
-  <repositories>
-    	<repository>
-      		<id>repo.jenkins-ci.org</id>
-      		<url>https://repo.jenkins-ci.org/public/</url>
-    	</repository>
-  </repositories>
+	<url>https://github.com/jenkinsci/appscan-plugin</url>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </pluginRepository>
-  </pluginRepositories>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url> https://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-  	    <groupId>org.jenkins-ci.tools</groupId>
-    	<artifactId>maven-hpi-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-  
-  <dependencies>
-	<dependency>
-		<groupId>com.hcl</groupId>
-		<artifactId>appscan.sdk</artifactId>
-		<version>1.0.24</version>
-  	</dependency>
-	<dependency>
-  	  	<groupId>org.apache.wink</groupId>
-  		<artifactId>wink-json4j</artifactId>
-  		<version>1.4</version>
-  	</dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>credentials</artifactId>
-            <version>2.3.19</version>
-        </dependency>
-  </dependencies>
-  
-  <scm>
-  	<connection>scm:git:ssh://github.com/jenkinsci/appscan-plugin.git</connection>
-  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
-  	<url>https://github.com/jenkinsci/appscan-plugin</url>
-    <tag>HEAD</tag>
-  </scm>
+	<developers>
+		<developer>
+			<id>mattmurp</id>
+			<name>Matt Murphy</name>
+			<email>matthew.murphy@hcl.com</email>
+		</developer>
+	</developers>
+
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>4.16</version>
+		<relativePath />
+	</parent>
+
+	<properties>
+		<jenkins.version>2.277.1</jenkins.version>
+		<java.level>8</java.level>
+	</properties>
+
+	<groupId>com.hcl.security</groupId>
+	<artifactId>appscan</artifactId>
+	<version>1.0.8-v11</version>
+	<description>This plugin allows you to execute security scans with HCL AppScan</description>
+	<packaging>hpi</packaging>
+
+	<repositories>
+		<repository>
+			<id>repo.jenkins-ci.org</id>
+			<url>https://repo.jenkins-ci.org/public/</url>
+		</repository>
+	</repositories>
+
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>repo.jenkins-ci.org</id>
+			<url>https://repo.jenkins-ci.org/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jenkins-ci.tools</groupId>
+				<artifactId>maven-hpi-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-maven-plugin</artifactId>
+				<configuration>
+					<signature>
+						<groupId>org.codehaus.mojo.signature</groupId>
+						<artifactId>java18</artifactId>
+					</signature>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+<!--
+		<dependency>
+			<groupId>com.hcl</groupId>
+			<artifactId>appscan.sdk</artifactId>
+			<version>1.0.18</version>
+		</dependency>
+-->
+		<dependency>
+			<groupId>org.apache.wink</groupId>
+			<artifactId>wink-json4j</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>credentials</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>structs</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-cps</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-job</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-basic-steps</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins.workflow</groupId>
+			<artifactId>workflow-durable-task-step</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
+				<groupId>io.jenkins.tools.bom</groupId>
+				<artifactId>bom-2.277.x</artifactId>
+				<version>25</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<scm>
+		<connection>scm:git:ssh://github.com/jenkinsci/appscan-plugin.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
+		<url>https://github.com/jenkinsci/appscan-plugin</url>
+		<tag>HEAD</tag>
+	</scm>
 
 </project>

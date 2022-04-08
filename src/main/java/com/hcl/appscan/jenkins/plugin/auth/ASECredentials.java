@@ -8,10 +8,8 @@ package com.hcl.appscan.jenkins.plugin.auth;
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-import com.hcl.appscan.jenkins.plugin.Messages;
-import com.hcl.appscan.sdk.CoreConstants;
-import com.hcl.appscan.sdk.utils.SystemUtil;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
 import hudson.Extension;
 import hudson.util.FormValidation;
 import hudson.util.Secret;

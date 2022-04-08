@@ -5,7 +5,10 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 	<table>
-    	<h3><a href="${it.urlName}">${it.displayName}</a></h3>
+		<h3><b>${it.displayName}  -  </b>
+			<a href="${it.urlName}?type=pdf" download="${it.urlName}">PDF</a>
+			<a href="${it.urlName}?type=xml" download="${it.xMLReportName}">   XML</a>
+		</h3>
 		<tr>
 			<td style="width: 20%">${%Total Issues}</td>
 			<td style="width: 20%">${%High}</td>

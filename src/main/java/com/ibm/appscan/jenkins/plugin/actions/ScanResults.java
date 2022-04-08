@@ -13,6 +13,6 @@ public class ScanResults extends com.hcl.appscan.jenkins.plugin.actions.ScanResu
 
 	public ScanResults(Run<?, ?> build, IResultsProvider provider, String name, String status, int totalFindings,
 			int highCount, int mediumCount, int lowCount, int infoCount) {
-		super(build, provider, name, status, totalFindings, highCount, mediumCount, lowCount, infoCount, null, null);
+		super(build, provider, name, status, totalFindings, highCount, mediumCount, lowCount, infoCount, null, null, null);
 	}	
 }

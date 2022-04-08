@@ -15,6 +15,11 @@
 					</j:choose>
 				</div>
 			</j:otherwise>
-		</j:choose>	
+		</j:choose>
    	</t:summary>
+	<Br></Br><Br></Br><Br></Br>
+
+	<div style="float:right;">
+		<st:include page="statistics.jelly"/>
+	</div>
 </j:jelly>

@@ -16,4 +16,8 @@ public class ExecutorUtil {
     public static Future submitTask(Callable task) {
         return executorService.submit(task);
     }
+
+    public static void executeTask(Runnable task) {
+        executorService.execute(task);
+    }
 }
