@@ -51,12 +51,12 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
                     site (under development) or a Production site (live
                     and in use).
                 -   **Test Optimization**: Following options are available:
-                    - **Fast**: Select this option for approximately 97% issue coverage and twice as fast test stage speed.
-                      Recommended for security experts for more frequent scans.
+                    - **Fast**:Select this option for approximately 97% issue coverage and twice as fast test stage speed.
+                                  Recommended for security experts for more frequent scans.
                     - **Faster**: Select this option for approximately 85% issue coverage and five times as fast test stage speed.
-                      Recommended for DevSecOps during ongoing evaluation.
+                                  Recommended for DevSecOps during ongoing evaluation.
                     - **Fastest**: Select this option for approximately 70% issue coverage and ten times as fast test stage speed.
-                      Recommended for Dev and QA during initial evaluation.
+                                  Recommended for Dev and QA during initial evaluation.
                     - **No Optimization**: Select this option for maximum issue coverage and longest scan. Recommended for security
                       experts before major releases, compliance testing and benchmarks.								
                 -   **Login User** and **Login Password**: If your app
