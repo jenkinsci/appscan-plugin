@@ -114,8 +114,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_wait = wait;
         m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
-        }
-        
+	}
+	 
 	@DataBoundConstructor
 	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
 		m_scanner = scanner;
