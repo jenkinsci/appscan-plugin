@@ -42,7 +42,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
         others.
     -   **Test Type:** Select the type of scan to run from the available
         options.
-        -  **Dynamic Analyzer**
+        -   **Dynamic Analyzer**
             -   **Starting URL**: Enter the URL from where you want the
                 scan to start exploring the site.
             -   **Additional Options**: If selected, the following
@@ -75,7 +75,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
                     field. To learn more about AppScan Standard scan
                     files, see [this
                     topic](https://help.hcltechsw.com/appscan/ASoC/asd_AppScanStandard.html).
-        -  **Static Analyzer**
+        -   **Static Analyzer**
             -   **Target**: Enter the full path to the directory that
                 contains the files that you want to scan or enter the
                 full path to an existing .irx file.
