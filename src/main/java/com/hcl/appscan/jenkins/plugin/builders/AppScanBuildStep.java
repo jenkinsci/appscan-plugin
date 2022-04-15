@@ -187,7 +187,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_intervention = intervention;
 	}
 	
-	public boolean getIntervention() {
+	public boolean isIntervention() {
 		return m_intervention;
 	}
 	
