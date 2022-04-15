@@ -216,7 +216,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		if(m_scanner !=null) {
 			perform(run, launcher, listener);
 		}else{
-			throw new AbortException("Mobile Analyzer is no longer supported, try Static Analyzer for mobile application");
+			throw new AbortException("ERROR: Incorrect user input. The legacy Mobile Analyzer technology is no longer supported, we recommend using our using Static Analyzer scanning for Mobile Applications");
 		}
 	}
     
