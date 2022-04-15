@@ -1,5 +1,5 @@
 # HCL AppScan Jenkins plugin
-Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scan using HCL AppScan On Cloud and DAST (Dynamic Application Security Testing) scans using both HCL AppScan On Cloud and HCL AppScan Enterprise.
+Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scan using HCL AppScan on Cloud and DAST (Dynamic Application Security Testing) scans using both HCL AppScan on Cloud and HCL AppScan Enterprise.
 
 ## Prerequisites
 
@@ -18,10 +18,10 @@ on the service to associate your scans with.
 HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for creation and execution of ADAC jobs. To use this integration, you must have access to a running instance of AppScan Enterprise Server  version 9.0.3.14 or later. Please note that Content Scan jobs are not supported through this integration.
 
 ## Usage
-**Integration with HCL AppScan On Cloud**
+**Integration with HCL AppScan on Cloud**
 
 [This video](http://ibm.biz/ASoC-Jenkins) demonstrates
-installation and configuration of the plugin for HCL AppScan On Cloud.
+installation and configuration of the plugin for HCL AppScan on Cloud.
 
 1.  Add your AppScan on Cloud credentials on the Jenkins
     **Credentials** page.
@@ -29,7 +29,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
     -   Add new global credentials.
     -   In the **Kind** drop-down list, select **HCL AppScan on Cloud Credentials**.
     -   Enter your API key details.
-2.  Add a **Run AppScan On Cloud Security Test** build step to your Jenkins project
+2.  Add a **Run AppScan on Cloud Security Test** build step to your Jenkins project
     configuration and enter the following information:
     -   **Credentials:** Select the credentials you added to Jenkins in
         step 1 above.
@@ -42,7 +42,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
         others.
     -   **Test Type:** Select the type of scan to run from the available
         options.
-        -    **Dynamic Analyzer**
+        -   **Dynamic Analyzer**
             -   **Starting URL**: Enter the URL from where you want the
                 scan to start exploring the site.
             -   **Additional Options**: If selected, the following
@@ -51,7 +51,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
                     site (under development) or a Production site (live
                     and in use).
                 -   **Test Optimization**: Following options are available:
-                    - **Fast**:Select this option for approximately 97% issue coverage and twice as fast test stage speed.
+                    - **Fast**: Select this option for approximately 97% issue coverage and twice as fast test stage speed.
                                   Recommended for security experts for more frequent scans.
                     - **Faster**: Select this option for approximately 85% issue coverage and five times as fast test stage speed.
                                   Recommended for DevSecOps during ongoing evaluation.
@@ -75,7 +75,7 @@ installation and configuration of the plugin for HCL AppScan On Cloud.
                     field. To learn more about AppScan Standard scan
                     files, see [this
                     topic](https://help.hcltechsw.com/appscan/ASoC/asd_AppScanStandard.html).
-        -    **Static Analyzer**
+        -   **Static Analyzer**
             -   **Target**: Enter the full path to the directory that
                 contains the files that you want to scan or enter the
                 full path to an existing .irx file.
