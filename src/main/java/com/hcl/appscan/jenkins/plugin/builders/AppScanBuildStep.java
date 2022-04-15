@@ -115,7 +115,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
         }
-
+        
 	@DataBoundConstructor
 	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
 		m_scanner = scanner;
@@ -215,7 +215,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException, AbortException {
 		if(m_scanner !=null) {
 			perform(run, launcher, listener);
-		}else{
+		}
+		else {
 			throw new AbortException("ERROR: Incorrect user input. The legacy Mobile Analyzer technology is no longer supported, we recommend using our using Static Analyzer scanning for Mobile Applications");
 		}
 	}
