@@ -211,16 +211,16 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         return (DescriptorImpl)super.getDescriptor();
     }
 	
-	@Override
-	public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-		perform((Run<?,?>)build, launcher, listener);
-		return true;
-	}
+    @Override
+    public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+	   perform((Run<?,?>)build, launcher, listener);
+	 return true;
+    }
     
-	@Override
-	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-	        perform(run, launcher, listener);
-	}
+    @Override
+    public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+	   perform(run, launcher, listener);
+    }
     
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
