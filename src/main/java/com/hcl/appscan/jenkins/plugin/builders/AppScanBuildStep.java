@@ -210,15 +210,16 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl)super.getDescriptor();
     }
+	
+	@Override
+	public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
+		perform((Run<?,?>)build, launcher, listener);
+		return true;
+	}
     
 	@Override
-	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException, AbortException {
-		if(m_scanner !=null) {
-			perform(run, launcher, listener);
-		}
-		else {
-			throw new AbortException("ERROR: Incorrect user input. The legacy Mobile Analyzer technology is no longer supported, we recommend using our using Static Analyzer scanning for Mobile Applications");
-		}
+	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+	        perform(run, launcher, listener);
 	}
     
     @Override
@@ -233,19 +234,25 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	return this;
     }
     
-    private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
-    	VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
-    	Map<String, String> properties = m_scanner.getProperties(resolver);
-		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-        properties.put(CoreConstants.APP_ID,  m_application);
-        properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
-		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
-		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
-		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
-		properties.put("ClientType", "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
-		return properties;
-    }
+    private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) throws AbortException {
+
+		VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+		try {
+			Map<String, String> properties = m_scanner.getProperties(resolver);
+			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
+			properties.put(CoreConstants.APP_ID, m_application);
+			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
+			properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
+			properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
+			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
+			properties.put("ClientType", "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
+			return properties;
+		} 
+		catch(NullPointerException e) {
+			throw new AbortException("Incorrect user input. The legacy Mobile Analyzer technology is no longer supported, we recommend using our Static Analyzer scanning for Mobile Applications");
+		}
+	}
     
     private String getPluginVersion() {
     	Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
