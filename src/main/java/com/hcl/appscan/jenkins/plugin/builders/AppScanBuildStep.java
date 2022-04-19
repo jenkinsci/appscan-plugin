@@ -94,6 +94,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private String m_credentials;
 	private List<FailureCondition> m_failureConditions;
 	private boolean m_emailNotification;
+        private boolean m_intervention;
 	private boolean m_wait;
     private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
@@ -102,7 +103,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
-	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email) {
+	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email, boolean intervention) {
 		m_scanner = scanner;
 		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
@@ -111,6 +112,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_credentials = credentials;
 		m_failureConditions = failureConditions;
 		m_emailNotification = email;
+                m_intervention = intervention;
 		m_wait = wait;
         m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
@@ -125,6 +127,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_application = application;
 		m_credentials = credentials;
 		m_emailNotification = false;
+                m_intervention = true;
 		m_wait = false;
         m_failBuildNonCompliance=false;
 		m_failBuild = false;
@@ -177,6 +180,15 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	
 	public boolean getFailBuild() {
 		return m_failBuild;
+	}
+        
+        @DataBoundSetter
+	public void setIntervention(boolean intervention) {
+		m_intervention = intervention;
+	}
+	
+	public boolean isIntervention() {
+		return m_intervention;
 	}
 	
 	@DataBoundSetter
@@ -243,6 +255,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			properties.put(CoreConstants.APP_ID, m_application);
 			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
+      properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
 			properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 			properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
@@ -263,6 +276,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
     	return "";
 	}
+    private String getClientType(){
+        return "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion();
+    }
 
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
@@ -287,7 +303,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
+    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent(),getClientType());
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
     	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
