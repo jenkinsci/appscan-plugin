@@ -79,6 +79,10 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
             -   **Target**: Enter the full path to the directory that
                 contains the files that you want to scan or enter the
                 full path to an existing .irx file.
+    -   **Allow intervention by scan enablement team:** When selected (default),
+        our scan enablement team will step in if the scan fails, or if 
+        no issues are found, and try to fix the configuration. This may delay 
+        the scan result.            
     -   **Suspend job until security analysis completes:** If selected,
         the Jenkins job will pause until security analysis has completed
         and the results have been retrieved from the service. If
