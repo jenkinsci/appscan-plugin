@@ -167,6 +167,10 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
         they are separated by a logical OR.
 
 ## Additional Information
+**Known Issues**
+ ASoC is no longer providing Mobile Scan support. The Mobile Scan functionality
+ has been removed from Jenkins since revision 1.0.10. The existing jobs that 
+ have Mobile Scan configurations must therefore be updated accordingly.
 
 <http://help.hcltechsw.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins>
 
