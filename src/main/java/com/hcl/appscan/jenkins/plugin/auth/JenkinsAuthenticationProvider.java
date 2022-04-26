@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019, 2022.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -24,6 +24,7 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.hcl.appscan.sdk.auth.AuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.auth.LoginType;
+import com.hcl.appscan.jenkins.plugin.util.JenkinsUtil;
 
 import hudson.ProxyConfiguration;
 import hudson.model.ItemGroup;
@@ -35,7 +36,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	private static final long serialVersionUID = 1L;
 	
 	private ASoCCredentials m_credentials;
-	
+        
 	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
 		configureCredentials(id, context);
 	}
@@ -46,7 +47,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		AuthenticationHandler handler = new AuthenticationHandler(this);
 
 		try {
-			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated);
+			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated,JenkinsUtil.getClientType());
 		} catch (IOException | JSONException e) {
 			isExpired = false;
 		}

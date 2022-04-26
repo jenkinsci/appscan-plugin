@@ -54,6 +54,7 @@ import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
+import com.hcl.appscan.jenkins.plugin.util.JenkinsUtil;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -246,6 +247,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	return this;
     }
     
+  
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) throws AbortException {
 
 		VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
