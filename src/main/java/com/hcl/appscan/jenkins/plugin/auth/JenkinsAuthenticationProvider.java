@@ -24,7 +24,6 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.hcl.appscan.sdk.auth.AuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.auth.LoginType;
-import hudson.Plugin;
 
 import hudson.ProxyConfiguration;
 import hudson.model.ItemGroup;
@@ -36,14 +35,8 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	private static final long serialVersionUID = 1L;
 	
 	private ASoCCredentials m_credentials;
-        private String m_clientType;
-        
-        public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
-		this(id, context, null);
-	}
 	
-	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context,String clientType) {
-                m_clientType=clientType;
+	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
 		configureCredentials(id, context);
 	}
 	
