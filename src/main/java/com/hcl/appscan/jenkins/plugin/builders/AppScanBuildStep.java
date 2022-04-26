@@ -276,9 +276,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
     	return "";
 	}
-    private String getClientType(){
-        return "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion();
-    }
 
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
@@ -303,7 +300,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent(),getClientType());
+    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
     	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
