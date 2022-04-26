@@ -24,7 +24,6 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.hcl.appscan.sdk.auth.AuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.auth.LoginType;
-import com.hcl.appscan.sdk.utils.SystemUtil;
 import hudson.Plugin;
 
 import hudson.ProxyConfiguration;
@@ -54,7 +53,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		AuthenticationHandler handler = new AuthenticationHandler(this);
 
 		try {
-			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated, m_clientType);
+			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated);
 		} catch (IOException | JSONException e) {
 			isExpired = false;
 		}
