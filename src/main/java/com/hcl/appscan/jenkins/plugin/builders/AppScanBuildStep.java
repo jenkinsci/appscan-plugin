@@ -54,6 +54,7 @@ import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
+import com.hcl.appscan.jenkins.plugin.util.JenkinsUtil;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -256,20 +257,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
 		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
-		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
-		properties.put("ClientType", "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
+		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", JenkinsUtil.getPluginVersion());
+		properties.put("ClientType", JenkinsUtil.getClientType());
 		return properties;
     }
-    
-    private String getPluginVersion() {
-    	Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
-
-    	if(tempPlugin != null) {
-    		return tempPlugin.getWrapper().getVersion();
-    	}
-
-    	return "";
-	}
 
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
