@@ -117,7 +117,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_wait = wait;
         m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
-        }
+	}
 	
 	@DataBoundConstructor
 	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
@@ -226,14 +226,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-    	perform((Run<?,?>)build, launcher, listener);
-		return true;
+	perform((Run<?,?>)build, launcher, listener);
+	        return true;
     }
     
-	@Override
-	public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-		perform(run, launcher, listener);
-	}
+        @Override
+        public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
+	        perform(run, launcher, listener);
+        }
     
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
@@ -247,20 +247,26 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	return this;
     }
     
-    private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) {
-    	VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
-    	Map<String, String> properties = m_scanner.getProperties(resolver);
-		properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
-        properties.put(CoreConstants.APP_ID,  m_application);
-        properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
-		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-                properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
-		properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
-		properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
-		properties.put("IRGEN_CLIENT_PLUGIN_VERSION", JenkinsUtil.getPluginVersion());
-		properties.put("ClientType", JenkinsUtil.getClientType());
-		return properties;
-    }
+  
+    private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) throws AbortException {
+
+		VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+		if(m_scanner == null){
+			throw new AbortException(Messages.error_mobile_analyzer());
+		}else{
+			Map<String, String> properties = m_scanner.getProperties(resolver);
+			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
+			properties.put(CoreConstants.APP_ID, m_application);
+			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
+			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
+			properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
+			properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
+			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", JenkinsUtil.getPluginVersion());
+			properties.put("ClientType", JenkinsUtil.getClientType());
+			return properties;
+		}
+	}
 
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
@@ -373,7 +379,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.builders.AppScanBuildStep", com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.StaticAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.StaticAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.DynamicAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.DynamicAnalyzer.class);
-    		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.MobileAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.MobileAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
 		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
     	}
