@@ -54,6 +54,7 @@ import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
+import com.hcl.appscan.jenkins.plugin.util.JenkinsUtil;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -246,39 +247,26 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	return this;
     }
     
+  
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) throws AbortException {
 
 		VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
-		try {
+		if(m_scanner == null){
+			throw new AbortException(Messages.error_mobile_analyzer());
+		}else{
 			Map<String, String> properties = m_scanner.getProperties(resolver);
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
 			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-      properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
+			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
 			properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 			properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
-			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", getPluginVersion());
-			properties.put("ClientType", "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion());
+			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", JenkinsUtil.getPluginVersion());
+			properties.put("ClientType", JenkinsUtil.getClientType());
 			return properties;
-		} 
-		catch(NullPointerException e) {
-			throw new AbortException("Incorrect user input. The legacy Mobile Analyzer technology is no longer supported, we recommend using our Static Analyzer scanning for Mobile Applications");
 		}
 	}
-    
-    private String getPluginVersion() {
-    	Plugin tempPlugin = Jenkins.getInstance().getPlugin("appscan");
-
-    	if(tempPlugin != null) {
-    		return tempPlugin.getWrapper().getVersion();
-    	}
-
-    	return "";
-	}
-    private String getClientType(){
-        return "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion();
-    }
 
     private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
@@ -303,7 +291,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent(),getClientType());
+    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
     	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
