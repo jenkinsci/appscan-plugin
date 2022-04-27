@@ -79,6 +79,10 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
             -   **Target**: Enter the full path to the directory that
                 contains the files that you want to scan or enter the
                 full path to an existing .irx file.
+    -   **Allow intervention by scan enablement team:** When selected (default),
+        our scan enablement team will step in if the scan fails, or if 
+        no issues are found, and try to fix the configuration. This may delay 
+        the scan result.            
     -   **Suspend job until security analysis completes:** If selected,
         the Jenkins job will pause until security analysis has completed
         and the results have been retrieved from the service. If
@@ -163,6 +167,10 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
         they are separated by a logical OR.
 
 ## Additional Information
+**Known Issues**
+- ASoC is no longer providing Mobile Scan support. The Mobile Scan functionality
+has been removed from Jenkins since revision 1.0.10. The existing jobs that 
+have Mobile Scan configurations must therefore be updated accordingly.
 
 <http://help.hcltechsw.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins>
 

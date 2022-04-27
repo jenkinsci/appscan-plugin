@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+1.0.10 (April, 2022)
+------
+* Discontinued Mobile Application Security Testing (MAST) support from HCL AppScan on Cloud task.
+* Included an option in AppScan on Cloud task to control intervention by scan enablement team
+* Bug Fixes
+
 1.0.9 (January, 2022)
 ------
 * Fix to handle ASoC communication interruptions while Jenkins job is running.
