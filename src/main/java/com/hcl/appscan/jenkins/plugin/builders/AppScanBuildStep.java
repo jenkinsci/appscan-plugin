@@ -251,21 +251,20 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     private Map<String, String> getScanProperties(Run<?,?> build, TaskListener listener) throws AbortException {
 
 		VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
-		try {
+		if(m_scanner == null){
+			throw new AbortException(Messages.error_mobile_analyzer());
+		}else{
 			Map<String, String> properties = m_scanner.getProperties(resolver);
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
 			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
-      properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
+			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
 			properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 			properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", JenkinsUtil.getPluginVersion());
 			properties.put("ClientType", "jenkins-" + SystemUtil.getOS() + "-" + JenkinsUtil.getPluginVersion());
 			return properties;
-		} 
-		catch(NullPointerException e) {
-			throw new AbortException(Messages.error_mobile_analyzer());
 		}
 	}
 
