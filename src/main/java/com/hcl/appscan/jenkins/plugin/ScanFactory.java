@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2022.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -40,7 +40,7 @@ public final class ScanFactory {
 	}
 	
 	private static ServiceLoader<IScanFactory> createServiceLoader() {
-		Jenkins jenkins = Jenkins.getInstance();
+		Jenkins jenkins = Jenkins.getInstanceOrNull();
 		return jenkins == null ? ServiceLoader.load(IScanFactory.class) : ServiceLoader.load(IScanFactory.class, jenkins.getPluginManager().uberClassLoader); 
 	}
 }
