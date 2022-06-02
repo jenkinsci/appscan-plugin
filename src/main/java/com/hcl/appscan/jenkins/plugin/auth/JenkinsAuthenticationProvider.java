@@ -75,7 +75,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	
 	@Override
 	public Proxy getProxy() {
-		Jenkins jenkins = Jenkins.getInstance();
+		Jenkins jenkins = Jenkins.getInstanceOrNull();
 		if(jenkins == null)
 			return Proxy.NO_PROXY;
 		
