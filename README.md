@@ -96,6 +96,8 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
         If multiple conditions are added, they will be treated as though
         they are separated by a logical OR.
 
+ For more information on adding security analysis to Jenkins automation server, please visit this [link](http://help.hcltechsw.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins).
+
 **Integration with HCL AppScan Enterprise**
 
 1.  Add your AppScan Enterprise credentials on the Jenkins
@@ -173,7 +175,5 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
 The Mobile Scan functionality
 has been removed from Jenkins since version 1.0.10. The existing jobs that 
 have Mobile Scan configurations must therefore be updated accordingly.
-
-<http://help.hcltechsw.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins>
 
 
