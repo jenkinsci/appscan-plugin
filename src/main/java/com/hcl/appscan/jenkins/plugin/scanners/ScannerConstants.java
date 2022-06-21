@@ -10,6 +10,11 @@ public interface ScannerConstants {
 	String INCLUDE_VERIFIED_DOMAINS			= "IncludeVerifiedDomains";		//$NON-NLS-1$
 	String LOGIN_USER				= "LoginUser";				//$NON-NLS-1$
 	String LOGIN_PASSWORD				= "LoginPassword";			//$NON-NLS-1$
+	String LOGIN_TYPE				= "LoginType";			//$NON-NLS-1$
+	String AUTOMATIC                = "Automatic";
+	String RECORDED                 = "Manual";
+	String NONE                     = "None";
+	String TRAFFIC_FILE			= "trafficFile";			//$NON-NLS-1$
 	String PRESENCE_ID				= "PresenceId";				//$NON-NLS-1$
 	String SCAN_FILE				= "ScanFile";				//$NON-NLS-1$
 	String SCAN_TYPE				= "ScanType";				//$NON-NLS-1$
@@ -17,9 +22,9 @@ public interface ScannerConstants {
 	String TARGET					= CoreConstants.TARGET;			//$NON-NLS-1$
 	String TEMPLATE_EXTENSION			= ".scant";				//$NON-NLS-1$
 	String TEMPLATE_EXTENSION2			= ".scan";				//$NON-NLS-1$
+	String TEMPLATE_EXTENSION3       = ".config";
 	
 	String DYNAMIC_ANALYZER				= "Dynamic Analyzer";			//$NON-NLS-1$
-	String MOBILE_ANALYZER				= "Mobile Analyzer";			//$NON-NLS-1$
 	String STATIC_ANALYZER				= "Static Analyzer";			//$NON-NLS-1$
 
 	String CUSTOM					= "Custom";				//$NON-NLS-1$

@@ -221,22 +221,22 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getTarget() {
 		return m_target;
 	}
-	
+
 	@DataBoundSetter
 	public void setLoginType(String loginType) {
 		m_loginType = loginType;
 	}
-	
+
 	public String getLoginType() {
 		return m_loginType;
 	}
-	
+
 	@DataBoundSetter
 	public void setTrafficFile(String trafficFile) {
 		if("Manual".equals(m_loginType))
 			m_trafficFile = trafficFile;
 	}
-	
+
 	public String getTrafficFile() {
 		return m_trafficFile;
 	}

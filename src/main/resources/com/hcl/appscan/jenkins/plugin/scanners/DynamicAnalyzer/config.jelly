@@ -20,24 +20,36 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 			<f:select />
 		</f:entry>
 
-		<f:entry title="${%label.login.user}" field="loginUser">
-			<f:textbox />
-		</f:entry>
-
-		<f:entry title="${%label.login.password}" field="loginPassword">
-			<f:password />
-		</f:entry>
-
-        <f:entry title="${%label.extra.field}" field="extraField">
-                <f:textbox />
-        </f:entry>
-
 		<f:entry title="${%label.presence.id}" field="presenceId">
 			<f:select />
 		</f:entry>
 		
-		<f:entry title="${%label.scan.file}" field="scanFile">
+		<f:entry title="${%label.scan.file}" field="scanFile" >
 			<f:textbox />
+		</f:entry>
+
+		<f:entry title="${%label.login.management}" field="loginManagement" >
+			<f:radioBlock name="loginType" title="${%label.login.none}" checked="true" value="None" inline="true" help="/plugin/appscan/help/loginNone.html" >
+			</f:radioBlock>
+
+			<f:radioBlock name="loginType" title="${%label.login.automatic}" checked="${instance.isLoginTypes('Automatic')}" value="Automatic" inline="true" help="/plugin/appscan/help/loginAutomatic.html">
+				<f:entry title="${%label.login.user}" field="loginUser">
+					<f:textbox />
+				</f:entry>
+				<f:entry title="${%label.login.password}" field="loginPassword">
+					<f:password />
+				</f:entry>
+				<f:entry title="${%label.extra.field}" field="extraField">
+					<f:textbox />
+				</f:entry>
+			</f:radioBlock>
+
+			<f:radioBlock name="loginType" title="${%label.login.recorded}" checked="${instance.isLoginTypes('Manual')}" value="Manual" inline="true" help="/plugin/appscan/help/loginManual.html">
+				<st:nbsp/>
+				<f:entry title="${%label.traffic.file}" field="trafficFile">
+					<f:textbox />
+				</f:entry>
+			</f:radioBlock>
 		</f:entry>
 						
 	</f:optionalBlock>
