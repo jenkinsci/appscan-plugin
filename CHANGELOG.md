@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+1.0.11 (June, 2022)
+------
+* Bug Fixes
+
 1.0.10 (April, 2022)
 ------
 * Discontinued Mobile Application Security Testing (MAST) support from HCL AppScan on Cloud task.
