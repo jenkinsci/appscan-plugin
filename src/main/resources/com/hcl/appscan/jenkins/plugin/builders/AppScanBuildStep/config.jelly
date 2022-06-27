@@ -18,7 +18,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
             <f:textbox />
         </f:entry>
 
-	<f:dropdownDescriptorSelector title="${%label.type}" field="scanner" />
+	<f:dropdownDescriptorSelector title="${%label.type}" field="scanner"/>
 
 	<f:entry field="email">
 		<f:checkbox title="${%label.email}"/>
