@@ -7,8 +7,9 @@
 package com.hcl.appscan.jenkins.plugin.scanners;
 
 import java.io.File;
-import java.text.Normalizer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
@@ -30,6 +31,11 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import hudson.util.VariableResolver;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 public class DynamicAnalyzer extends Scanner {
 
@@ -127,7 +133,7 @@ public class DynamicAnalyzer extends Scanner {
 
 	@DataBoundSetter
 	public void setOptimization(String optimization) {
-		if (optimization != null) {
+		if(optimization != null) {
 			m_optimization = mapOldtoNewOptLevels(optimization);
 		} else {
 			m_optimization = optimization;
@@ -247,10 +253,10 @@ public class DynamicAnalyzer extends Scanner {
 
 	private String mapOldtoNewOptLevels(String optimization) //Backward Compatibility
 	{
-		if (optimization != null) {
-			if (optimization.equals(NORMAL)) {
+		if(optimization != null) {
+			if(optimization.equals(NORMAL)) {
 				m_optimization = NO_OPTIMIZATION;
-			} else if (optimization.equals(OPTIMIZED)) {
+			} else if(optimization.equals(OPTIMIZED)) {
 				m_optimization = FAST;
 			} else {
 				m_optimization = optimization;
@@ -330,7 +336,7 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckTrafficFile(@QueryParameter String trafficFile) {
-			if (!trafficFile.trim().equals(EMPTY) && !trafficFile.endsWith(TEMPLATE_EXTENSION3))
+			if (!trafficFile.trim().equals(EMPTY) && !trafficFile.endsWith(TEMPLATE_EXTENSION3) && !trafficFile.startsWith("${"))
 				return FormValidation.error(Messages.error_invalid_login_sequence_file());
 			return  FormValidation.ok();
 		}

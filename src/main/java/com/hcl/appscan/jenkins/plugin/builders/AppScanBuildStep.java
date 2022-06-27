@@ -21,7 +21,6 @@ import java.util.Comparator;
 import javax.annotation.Nonnull;
 
 import com.hcl.appscan.sdk.scanners.ScanConstants;
-import hudson.util.Secret;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -254,7 +253,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
 		if(m_scanner == null){
 			throw new AbortException(Messages.error_mobile_analyzer());
-		}else {
+		}else{
 			Map<String, String> properties = m_scanner.getProperties(resolver);
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
