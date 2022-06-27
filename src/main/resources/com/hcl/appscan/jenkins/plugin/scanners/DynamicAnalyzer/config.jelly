@@ -45,7 +45,6 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 			</f:radioBlock>
 
 			<f:radioBlock name="loginType" title="${%label.login.recorded}" checked="${instance.isLoginTypes('Manual')}" value="Manual" inline="true" help="/plugin/appscan/help/loginManual.html">
-				<st:nbsp/>
 				<f:entry title="${%label.traffic.file}" field="trafficFile">
 					<f:textbox />
 				</f:entry>

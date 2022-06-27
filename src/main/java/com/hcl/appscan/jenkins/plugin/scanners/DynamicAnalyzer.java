@@ -6,6 +6,7 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import java.io.File;
 import java.text.Normalizer;
 import java.util.*;
 
@@ -51,17 +52,17 @@ public class DynamicAnalyzer extends Scanner {
 
 	@Deprecated
 	public DynamicAnalyzer(String target, boolean hasOptions, String presenceId, String scanFile, String scanType, String optimization,
-						   String extraField, String loginType, String loginUser, String loginPassword, String trafficFile) {
+						   String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
 		super(target, hasOptions);
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
 		m_optimization = optimization;
 		m_extraField = extraField;
-		m_loginType = loginType;
 		m_loginUser = loginUser;
 		m_loginPassword = Secret.fromString(loginPassword);
 		m_trafficFile = trafficFile;
+		m_loginType = loginType;
 	}
 
 	@DataBoundConstructor
@@ -149,7 +150,7 @@ public class DynamicAnalyzer extends Scanner {
 
 	@DataBoundSetter
 	public void setLoginType(String loginType) {
-		m_loginType = loginType;
+			m_loginType =loginType;
 	}
 
 	public String getLoginType() {
@@ -174,8 +175,9 @@ public class DynamicAnalyzer extends Scanner {
 	public String isLoginTypes(String loginTypeName) {
 		if (m_loginType != null) {
 			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
-		} else if(!((m_loginUser.equals("") && m_loginPassword.equals(Secret.fromString(""))))){
-			return Objects.equals(m_loginType, AUTOMATIC) ? "true" : "";
+		} else if((m_loginUser != null || m_loginPassword !=null)){
+			m_loginType = AUTOMATIC;
+			return "true";
 		} else if (loginTypeName.equals(NONE)) { //Default
 			return "true";
 		} else {
@@ -200,16 +202,19 @@ public class DynamicAnalyzer extends Scanner {
 			properties.put(TARGET, getTarget());
 			properties.put(SCAN_FILE, m_scanFile);
 			properties.put(EXTRA_FIELD, m_extraField);
+			if(m_loginType == null){
+				m_loginType = upgradeLoginScenario();
+			}
 				if (m_loginType.equals(RECORDED)) {
 					properties.put(TRAFFIC_FILE, m_trafficFile);
-					if(m_trafficFile == null || (!(m_trafficFile.endsWith(TEMPLATE_EXTENSION3)))){
-						throw new hudson.AbortException("Please see the login fields");
+					if(m_trafficFile == null || (!(new File(m_trafficFile).isFile()))){
+						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
 				} else if (m_loginType.equals(AUTOMATIC)) {
 					properties.put(LOGIN_USER, m_loginUser);
 					properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 					if(m_loginUser.equals("") || m_loginPassword.equals(Secret.fromString(""))){
-						throw new hudson.AbortException("Please see the login fields");
+						throw new hudson.AbortException(Messages.error_login_fields_automatic());
 					}
 				}
 		} else {
@@ -221,14 +226,14 @@ public class DynamicAnalyzer extends Scanner {
 			}
 			if (Objects.equals(m_loginType, RECORDED)) {
 				properties.put(TRAFFIC_FILE, resolvePath(m_trafficFile, resolver));
-					if (m_trafficFile == null || (!(m_trafficFile.endsWith(TEMPLATE_EXTENSION3)))) {
-						throw new hudson.AbortException("Please see the login fields");
+					if (m_trafficFile == null || (!(new File(m_trafficFile).isFile()))) {
+						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
 			} else if (Objects.equals(m_loginType, AUTOMATIC)) {
 				properties.put(LOGIN_USER, Util.replaceMacro(m_loginUser, resolver));
 				properties.put(LOGIN_PASSWORD, Util.replaceMacro(Secret.toString(m_loginPassword), resolver));
 					if (m_loginUser.equals("") || m_loginPassword.equals(Secret.fromString(""))) {
-						throw new AbortException("Please see the login fields");
+						throw new AbortException(Messages.error_login_fields_automatic());
 					}
 			}
 		}
@@ -325,7 +330,9 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckTrafficFile(@QueryParameter String trafficFile) {
-			return FormValidation.validateRequired(trafficFile);
+			if (!trafficFile.trim().equals(EMPTY) && !trafficFile.endsWith(TEMPLATE_EXTENSION3))
+				return FormValidation.error(Messages.error_invalid_login_sequence_file());
+			return  FormValidation.ok();
 		}
 	}
 }
