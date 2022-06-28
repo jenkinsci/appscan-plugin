@@ -221,22 +221,22 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getTarget() {
 		return m_target;
 	}
-        
+
 	@DataBoundSetter
 	public void setLoginType(String loginType) {
 		m_loginType = loginType;
 	}
-        
+
 	public String getLoginType() {
 		return m_loginType;
 	}
-        
+
 	@DataBoundSetter
 	public void setTrafficFile(String trafficFile) {
 		if("Manual".equals(m_loginType))
 			m_trafficFile = trafficFile;
 	}
-        
+
 	public String getTrafficFile() {
 		return m_trafficFile;
 	}
@@ -245,11 +245,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
     public void setAccessId(String userName) {	
 		m_userName = userName;
     }
-        
+
 	public String getAccessId() {
 		return m_userName;
 	}
-        
+
 	@DataBoundSetter
     public void setSecretKey(String password) {
 		m_password = Secret.fromString(password);
@@ -267,16 +267,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getScanType() {
 		return m_scanType;
 	}
-        
+
 	@DataBoundSetter
 	public void setExploreData(String exploreData) {
 		m_exploreData = exploreData;
 	}
-        
+
 	public String getExploreData() {
 		return m_exploreData;
 	}
-        
+
 	@DataBoundSetter
 	public void setTestOptimization(String testOptimization) {
 		m_testOptimization = testOptimization;
