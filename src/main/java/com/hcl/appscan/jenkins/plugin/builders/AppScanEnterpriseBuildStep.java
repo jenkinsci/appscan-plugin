@@ -152,8 +152,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				&& getDescriptor().folderMap == null
 				&& getDescriptor().applicationMap == null
 				&& getDescriptor().templateMap == null) {
-			getDescriptor().setAutoCompleteList(m_credentials, 
-							    Jenkins.getInstance().getItemGroup());
+			getDescriptor().setAutoCompleteList(m_credentials,
+					Jenkins.getInstance().getItemGroup());
 		}
 		return m_credentials;
 	}
