@@ -57,8 +57,7 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	@Deprecated
-	public DynamicAnalyzer(String target, boolean hasOptions, String presenceId, String scanFile, String scanType, String optimization,
-						   String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
+	public DynamicAnalyzer(String target, boolean hasOptions, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
 		super(target, hasOptions);
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
@@ -192,12 +191,10 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	public String upgradeLoginScenario(){
-		if(!(m_loginUser.equals("") || m_loginPassword.equals(Secret.fromString("")))){
+		if(m_loginUser != null || m_loginPassword != null){
 			return m_loginType = AUTOMATIC;
-		} else if (m_loginUser.equals("") || m_loginPassword.equals(Secret.fromString(""))){
+		} else {
 			return m_loginType = NONE;
-		}else {
-			return "";
 		}
 	}
 
@@ -211,12 +208,14 @@ public class DynamicAnalyzer extends Scanner {
 			if(m_loginType == null){
 				m_loginType = upgradeLoginScenario();
 			}
-				if (m_loginType.equals(RECORDED)) {
+				if (Objects.equals(m_loginType, RECORDED)) {
 					properties.put(TRAFFIC_FILE, m_trafficFile);
-					if(m_trafficFile == null || (!(new File(m_trafficFile).isFile()))){
+					if (m_trafficFile.equals("")) {
+						throw new hudson.AbortException(Messages.error_login_fields_empty_manual());
+					} else if ((!(new File(m_trafficFile).isFile()))){
 						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
-				} else if (m_loginType.equals(AUTOMATIC)) {
+				} else if (Objects.equals(m_loginType, AUTOMATIC)) {
 					properties.put(LOGIN_USER, m_loginUser);
 					properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 					if(m_loginUser.equals("") || m_loginPassword.equals(Secret.fromString(""))){
@@ -227,12 +226,14 @@ public class DynamicAnalyzer extends Scanner {
 			properties.put(TARGET, Util.replaceMacro(getTarget(), resolver));
 			properties.put(SCAN_FILE, resolvePath(m_scanFile, resolver));
 			properties.put(EXTRA_FIELD, Util.replaceMacro(m_extraField, resolver));
-			if(m_loginType == null){
+			if(m_loginType == null || m_loginType.equals("")){
 				m_loginType = upgradeLoginScenario();
 			}
 			if (Objects.equals(m_loginType, RECORDED)) {
 				properties.put(TRAFFIC_FILE, resolvePath(m_trafficFile, resolver));
-					if (m_trafficFile == null || (!(new File(m_trafficFile).isFile()))) {
+					if (m_trafficFile.equals("")) {
+						throw new hudson.AbortException(Messages.error_login_fields_empty_manual());
+					} else if ((!(new File(m_trafficFile).isFile()))){
 						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
 			} else if (Objects.equals(m_loginType, AUTOMATIC)) {
@@ -336,7 +337,9 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckTrafficFile(@QueryParameter String trafficFile) {
-			if (!trafficFile.trim().equals(EMPTY) && !trafficFile.endsWith(TEMPLATE_EXTENSION3) && !trafficFile.startsWith("${"))
+			if (trafficFile.trim().equals(EMPTY))
+				return FormValidation.validateRequired(trafficFile);
+			if (!trafficFile.endsWith(TEMPLATE_EXTENSION3) && !trafficFile.startsWith("${"))
 				return FormValidation.error(Messages.error_invalid_login_sequence_file());
 			return  FormValidation.ok();
 		}

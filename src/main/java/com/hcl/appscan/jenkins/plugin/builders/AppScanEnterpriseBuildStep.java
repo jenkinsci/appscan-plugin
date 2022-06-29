@@ -152,8 +152,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				&& getDescriptor().folderMap == null
 				&& getDescriptor().applicationMap == null
 				&& getDescriptor().templateMap == null) {
-			getDescriptor().setAutoCompleteList(m_credentials,
-					Jenkins.getInstance().getItemGroup());
+			Jenkins jenkins = Jenkins.getInstanceOrNull();
+			if(jenkins != null) {
+				getDescriptor().setAutoCompleteList(m_credentials, jenkins.getItemGroup());
+			}
 		}
 		return m_credentials;
 	}
@@ -221,31 +223,31 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getTarget() {
 		return m_target;
 	}
-
+	
 	@DataBoundSetter
 	public void setLoginType(String loginType) {
 		m_loginType = loginType;
 	}
-
+	
 	public String getLoginType() {
 		return m_loginType;
 	}
-
+	
 	@DataBoundSetter
 	public void setTrafficFile(String trafficFile) {
 		if("Manual".equals(m_loginType))
 			m_trafficFile = trafficFile;
 	}
-
+	
 	public String getTrafficFile() {
 		return m_trafficFile;
 	}
-
+	
 	@DataBoundSetter
     public void setAccessId(String userName) {	
 		m_userName = userName;
     }
-
+ 
 	public String getAccessId() {
 		return m_userName;
 	}
@@ -281,7 +283,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public void setTestOptimization(String testOptimization) {
 		m_testOptimization = testOptimization;
 	}
-	
+
 	public String getTestOptimization() {
 		return m_testOptimization;
 	}

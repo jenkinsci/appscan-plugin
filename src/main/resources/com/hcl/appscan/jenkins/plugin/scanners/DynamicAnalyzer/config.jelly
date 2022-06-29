@@ -24,7 +24,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 			<f:select />
 		</f:entry>
 		
-		<f:entry title="${%label.scan.file}" field="scanFile" >
+		<f:entry title="${%label.scan.file}" field="scanFile">
 			<f:textbox />
 		</f:entry>
 
