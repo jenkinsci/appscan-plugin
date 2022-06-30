@@ -414,13 +414,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", Util.replaceMacro(m_target, resolver));
                     properties.put("folder", Util.replaceMacro(m_folder, resolver));
                     properties.put("templateId", Util.replaceMacro(m_template, resolver));
-                    properties.put("exploreData", resolvePath(m_exploreData, resolver));
+                    properties.put("exploreData", m_exploreData.equals("") ? m_exploreData : resolvePath(m_exploreData, resolver));
                     properties.put(CoreConstants.SCAN_NAME, Util.replaceMacro(m_jobName, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
                 }
 
 		if (m_loginType != null) {
                     if (m_loginType.equals("Manual")) {
-                        properties.put("trafficFile", resolver == null ? m_trafficFile : resolvePath(m_trafficFile, resolver));
+                        properties.put("trafficFile", (resolver == null || m_trafficFile.equals(""))? m_trafficFile : resolvePath(m_trafficFile, resolver));
                     } else if (m_loginType.equals("Automatic")) {
                         properties.put("userName", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
                         properties.put("password", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
