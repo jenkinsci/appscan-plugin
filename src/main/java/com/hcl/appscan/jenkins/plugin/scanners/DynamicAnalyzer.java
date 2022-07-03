@@ -9,7 +9,6 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
@@ -191,7 +190,7 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	public String upgradeLoginScenario(){
-		if(m_loginUser != null || m_loginPassword != null){
+		if(m_loginUser != null && m_loginPassword != null){
 			return m_loginType = AUTOMATIC;
 		} else {
 			return m_loginType = NONE;
@@ -208,14 +207,14 @@ public class DynamicAnalyzer extends Scanner {
 			if(m_loginType == null){
 				m_loginType = upgradeLoginScenario();
 			}
-				if (Objects.equals(m_loginType, RECORDED)) {
+				if (RECORDED.equals(m_loginType)) {
 					properties.put(TRAFFIC_FILE, m_trafficFile);
 					if (m_trafficFile.equals("")) {
 						throw new hudson.AbortException(Messages.error_login_fields_empty_manual());
 					} else if ((!(new File(m_trafficFile).isFile()))){
 						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
-				} else if (Objects.equals(m_loginType, AUTOMATIC)) {
+				} else if (AUTOMATIC.equals(m_loginType)) {
 					properties.put(LOGIN_USER, m_loginUser);
 					properties.put(LOGIN_PASSWORD, Secret.toString(m_loginPassword));
 					if(m_loginUser.equals("") || m_loginPassword.equals(Secret.fromString(""))){
@@ -229,14 +228,14 @@ public class DynamicAnalyzer extends Scanner {
 			if(m_loginType == null || m_loginType.equals("")){
 				m_loginType = upgradeLoginScenario();
 			}
-			if (Objects.equals(m_loginType, RECORDED)) {
+			if (RECORDED.equals(m_loginType)) {
 				properties.put(TRAFFIC_FILE, resolvePath(m_trafficFile, resolver));
 					if (m_trafficFile.equals("")) {
 						throw new hudson.AbortException(Messages.error_login_fields_empty_manual());
 					} else if ((!(new File(m_trafficFile).isFile()))){
 						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
-			} else if (Objects.equals(m_loginType, AUTOMATIC)) {
+			} else if (AUTOMATIC.equals(m_loginType)) {
 				properties.put(LOGIN_USER, Util.replaceMacro(m_loginUser, resolver));
 				properties.put(LOGIN_PASSWORD, Util.replaceMacro(Secret.toString(m_loginPassword), resolver));
 					if (m_loginUser.equals("") || m_loginPassword.equals(Secret.fromString(""))) {
