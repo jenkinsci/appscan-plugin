@@ -55,12 +55,14 @@ import com.hcl.appscan.jenkins.plugin.auth.ASECredentials;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.jenkins.plugin.results.FailureCondition;
 import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
+import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
 import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
 
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
@@ -77,6 +79,7 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
+import hudson.util.VariableResolver;
 import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildStep, Serializable {
@@ -386,30 +389,44 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 
 	private Map<String, String> getScanProperties(Run<?, ?> build, TaskListener listener) {
+            VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+            
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(CoreConstants.SCANNER_TYPE, ASE_DYNAMIC_ANALYZER);
-		properties.put("credentials", m_credentials);
-		properties.put("application", m_application);
-		properties.put("startingURL", m_target);
-		properties.put("folder", m_folder);
-		properties.put("testPolicyId", m_testPolicy);
-		properties.put("templateId", m_template);
-		properties.put("agentServer", m_agent);
-		properties.put("exploreData", m_exploreData);
-		properties.put("loginType", m_loginType);
+                properties.put("credentials", m_credentials);
+                properties.put("testPolicyId", m_testPolicy);
+                properties.put("agentServer", m_agent);
+                properties.put("loginType", m_loginType);
+                properties.put("scanType", m_scanType);
+                properties.put("testOptimization", m_testOptimization);
+                properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
+                
+                if(resolver == null) {
+                    properties.put("application", m_application);
+                    properties.put("startingURL", m_target);
+                    properties.put("folder", m_folder);
+                    properties.put("templateId", m_template);
+                    properties.put("exploreData", m_exploreData);
+                    properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
+                }
+                else {
+                    properties.put("application", Util.replaceMacro(m_application, resolver));
+                    properties.put("startingURL", Util.replaceMacro(m_target, resolver));
+                    properties.put("folder", Util.replaceMacro(m_folder, resolver));
+                    properties.put("templateId", Util.replaceMacro(m_template, resolver));
+                    properties.put("exploreData", m_exploreData.equals("") ? m_exploreData : resolvePath(m_exploreData, resolver));
+                    properties.put(CoreConstants.SCAN_NAME, Util.replaceMacro(m_jobName, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+                }
+
 		if (m_loginType != null) {
-			if (m_loginType.equals("Manual")) {
-				properties.put("trafficFile", m_trafficFile);
-			} else if (m_loginType.equals("Automatic")) {
-				properties.put("userName", m_userName);
-				properties.put("password",Secret.toString(m_password));
-			}
-		}
-		properties.put("scanType", m_scanType);
-		properties.put("testOptimization", m_testOptimization);
-		properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
-		properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));		
-		return properties;
+                    if (m_loginType.equals("Manual")) {
+                        properties.put("trafficFile", (resolver == null || m_trafficFile.equals(""))? m_trafficFile : resolvePath(m_trafficFile, resolver));
+                    } else if (m_loginType.equals("Automatic")) {
+                        properties.put("userName", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
+                        properties.put("password", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
+                    }
+                }
+            return properties;
 	}
 
 	private void shouldFailBuild(IResultsProvider provider, Run<?, ?> build) throws AbortException, IOException {
@@ -491,12 +508,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		provider.setProgress(new StdOutProgress()); // Avoid serialization problem with StreamBuildListener.
 		String aseScanUrl = m_authProvider.getServer();
 		String label = Messages.label_ase_homepage();
-		if (m_application != null && m_application.trim().length() > 0) {
+               
+                VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+                String application = resolver == null ? m_application : Util.replaceMacro(m_application, resolver);
+		if (application != null && application.trim().length() > 0) {
 			String applicationUrl = "/api/pages/applications.html#appProfile/%s/issues";
-			aseScanUrl += String.format(applicationUrl, m_application);
+			aseScanUrl += String.format(applicationUrl, application);
 			label = Messages.label_ase_application();
 		}
-		build.addAction(new ResultsRetriever(build, provider, m_jobName, aseScanUrl, label));
+		build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_jobName : Util.replaceMacro(m_jobName, resolver), aseScanUrl, label));
 
 		if (m_wait)
 			shouldFailBuild(provider, build);
@@ -506,6 +526,21 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		if (SystemUtil.isWindows() && System.getProperty("user.home").toLowerCase().indexOf("system32") >= 0) {
 			System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, JENKINS_INSTALL_DIR.getPath());
 		}
+	}
+        
+        private String resolvePath(String path, VariableResolver<String> resolver) {
+		//First replace any variables in the path
+		path = Util.replaceMacro(path, resolver);
+		
+		//If the path is not absolute, make it relative to the workspace
+		File file = new File(path);
+		if(!file.isAbsolute()) {
+			String targetPath = "${WORKSPACE}" + File.separator + file.getPath();
+			targetPath = Util.replaceMacro(targetPath, resolver);
+			file = new File(targetPath);
+		}
+
+		return file.getAbsolutePath();
 	}
 
 	@Symbol("appscanenterprise") //$NON-NLS-1$
