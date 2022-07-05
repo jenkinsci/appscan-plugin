@@ -204,7 +204,7 @@ public class DynamicAnalyzer extends Scanner {
 			properties.put(TARGET, getTarget());
 			properties.put(SCAN_FILE, m_scanFile);
 			properties.put(EXTRA_FIELD, m_extraField);
-			if(m_loginType == null){
+			if(m_loginType == null || m_loginType.equals("")){
 				m_loginType = upgradeLoginScenario();
 			}
 				if (RECORDED.equals(m_loginType)) {
