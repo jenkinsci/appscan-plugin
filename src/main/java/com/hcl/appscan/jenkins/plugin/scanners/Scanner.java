@@ -6,6 +6,7 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import hudson.AbortException;
 import hudson.Util;
 import hudson.model.AbstractDescribableImpl;
 import hudson.util.VariableResolver;
@@ -35,7 +36,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		return m_target;
 	}
 	
-	public abstract Map<String, String> getProperties(VariableResolver<String> resolver);
+	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 	
 	public abstract String getType();
 	
