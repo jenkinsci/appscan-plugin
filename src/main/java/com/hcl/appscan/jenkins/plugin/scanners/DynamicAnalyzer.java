@@ -98,8 +98,8 @@ public class DynamicAnalyzer extends Scanner {
 		m_loginPassword = Secret.fromString(loginPassword);
 	}
 
-	public Secret getLoginPassword() {
-		return m_loginPassword;
+	public String getLoginPassword() {
+		return Secret.toString(m_loginPassword);
 	}
 
 	@DataBoundSetter
@@ -232,7 +232,7 @@ public class DynamicAnalyzer extends Scanner {
 				properties.put(TRAFFIC_FILE, resolvePath(m_trafficFile, resolver));
 					if (m_trafficFile.equals("")) {
 						throw new hudson.AbortException(Messages.error_login_fields_empty_manual());
-					} else if ((!(new File(m_trafficFile).isFile()))){
+					} else if((!(new File(resolvePath(m_trafficFile, resolver)).isFile()) || (!(resolvePath(m_trafficFile, resolver).endsWith(TEMPLATE_EXTENSION3))))){
 						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
 			} else if (AUTOMATIC.equals(m_loginType)) {
