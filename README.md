@@ -72,15 +72,13 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
 				-   **Application login**: Select a Login method from the available options so 
 											AppScan can scan pages that require authentication. 
 					- **Login not required**: Leave this selected if no login is needed
-					- **Login required: Username and password**: Select this option to allow Login to the application 
-																	using a username and password. Once selected, 
-																	you would be prompted to enter the username and password.
+					- **Login required: Username and password**: Select this option to allow login to the application 
+																	using a username and password.
 						-   **Login User** and **Login Password**: If your app requires login, enter valid user credentials so that 
 																	Application Security on Cloud can log in to the site.
 						-   **Extra Field**: If your app requires a third credential, enter it in this field.
-					- **Login required: Record login**: Select this option to allow login to the application using a recorded login sequence. 
-														Once selected, you would be prompted to enter the path to recorded login sequence. 
-						-   **Login Sequence File**: Provide a path to the login Traffic File data.Supported file type is .CONFIG.
+					- **Login required: Record login**: Select this option to allow login to the application using a recorded login sequence.
+						-   **Login Sequence File**: Provide a path to the login sequence file data. Supported file type is .CONFIG.
         -   **Static Analyzer**
             -   **Target**: Enter the full path to the directory that
                 contains the files that you want to scan or enter the
