@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -209,9 +209,9 @@ public class DynamicAnalyzer extends Scanner {
 			}
 				if (RECORDED.equals(m_loginType)) {
 					properties.put(TRAFFIC_FILE, m_trafficFile);
-					if (m_trafficFile.equals("")) {
+					if (m_trafficFile == null || m_trafficFile.equals("")) {
 						throw new hudson.AbortException(Messages.error_login_fields_empty_manual());
-					} else if ((!(new File(m_trafficFile).isFile()))){
+					} else if ((!((m_trafficFile).toLowerCase().endsWith(TEMPLATE_EXTENSION3)))){
 						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
 				} else if (AUTOMATIC.equals(m_loginType)) {
@@ -230,9 +230,9 @@ public class DynamicAnalyzer extends Scanner {
 			}
 			if (RECORDED.equals(m_loginType)) {
 				properties.put(TRAFFIC_FILE, resolvePath(m_trafficFile, resolver));
-					if (m_trafficFile.equals("")) {
+					if (m_trafficFile == null || m_trafficFile.equals("")) {
 						throw new hudson.AbortException(Messages.error_login_fields_empty_manual());
-					} else if((!(new File(resolvePath(m_trafficFile, resolver)).isFile()) || (!(resolvePath(m_trafficFile, resolver).endsWith(TEMPLATE_EXTENSION3))))){
+					} else if((!((resolvePath(m_trafficFile, resolver)).toLowerCase().endsWith(TEMPLATE_EXTENSION3)))){
 						throw new hudson.AbortException(Messages.error_login_fields_manual());
 					}
 			} else if (AUTOMATIC.equals(m_loginType)) {
@@ -338,7 +338,7 @@ public class DynamicAnalyzer extends Scanner {
 		public FormValidation doCheckTrafficFile(@QueryParameter String trafficFile) {
 			if (trafficFile.trim().equals(EMPTY))
 				return FormValidation.validateRequired(trafficFile);
-			if (!trafficFile.endsWith(TEMPLATE_EXTENSION3) && !trafficFile.startsWith("${"))
+			if (!trafficFile.toLowerCase().endsWith(TEMPLATE_EXTENSION3) && !trafficFile.startsWith("${"))
 				return FormValidation.error(Messages.error_invalid_login_sequence_file());
 			return  FormValidation.ok();
 		}
