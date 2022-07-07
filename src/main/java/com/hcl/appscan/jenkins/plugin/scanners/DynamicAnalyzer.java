@@ -179,7 +179,7 @@ public class DynamicAnalyzer extends Scanner {
 	public String isLoginTypes(String loginTypeName) {
 		if (m_loginType != null) {
 			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
-		} else if((m_loginUser != null || m_loginPassword !=null)){
+		} else if(!(((m_loginUser.equals(""))) && m_loginPassword.equals(Secret.fromString("")))){
 			m_loginType = AUTOMATIC;
 			return "true";
 		} else if (loginTypeName.equals(NONE)) { //Default
@@ -190,7 +190,7 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	public String upgradeLoginScenario(){
-		if(m_loginUser != null && m_loginPassword != null){
+		if(!(((m_loginUser.equals(""))) || m_loginPassword.equals(Secret.fromString("")))){
 			return m_loginType = AUTOMATIC;
 		} else {
 			return m_loginType = NONE;
