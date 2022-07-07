@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+1.0.12 (July, 2022)
+------
+* Support additional login options for HCL AppScan on Cloud dynamic scans.
+* Fix to support Jenkins Environment variables for ASE scan fields.
+* Bug Fixes
+
 1.0.11 (June, 2022)
 ------
 * Bug Fixes
