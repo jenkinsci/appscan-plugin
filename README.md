@@ -35,7 +35,7 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
         step 1 above.
     -   **Application:** Select the application to associate the scan
         with. NOTE: You must create at least 1 application in the
- 	HCL AppScan on Cloud](https://cloud.appscan.com) service or
+ 	HCL AppScan on Cloud(https://cloud.appscan.com) service or
         this field will be empty.
     -   **Test Name:** Specify a name to use for the scan. This value
         will be used to distinguish this scan and its results from
