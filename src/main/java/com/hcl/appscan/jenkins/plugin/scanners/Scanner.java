@@ -43,15 +43,6 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	protected String resolvePath(String path, VariableResolver<String> resolver) {
 		//First replace any variables in the path
 		path = Util.replaceMacro(path, resolver);
-		
-		//If the path is not absolute, make it relative to the workspace
-		File file = new File(path);
-		if(!file.isAbsolute()) {
-			String targetPath = "${WORKSPACE}" + File.separator + file.getPath();
-			targetPath = Util.replaceMacro(targetPath, resolver);
-			file = new File(targetPath);
-		}
-
-		return file.getAbsolutePath();
+		return path;
 	}
 }
