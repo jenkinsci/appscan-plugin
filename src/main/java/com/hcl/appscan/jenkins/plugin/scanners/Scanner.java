@@ -47,7 +47,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		Pattern pattern = Pattern.compile("^(\\\\|/|[a-zA-Z]:\\\\)");
 
 		//If the path is not absolute, make it relative to the workspace
-		if(((!(path.startsWith("/"))) && (!pattern.matcher(path).find()))){
+		if((!path.equals("")) && (!path.startsWith("/")) && (!pattern.matcher(path).find())){
 			String targetPath = "${WORKSPACE}" + "//" + path ;
 			targetPath = Util.replaceMacro(targetPath, resolver);
 			return targetPath;
