@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public abstract class Scanner extends AbstractDescribableImpl<Scanner> implements ScannerConstants, Serializable {
 
@@ -43,10 +44,11 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	protected String resolvePath(String path, VariableResolver<String> resolver) {
 		//First replace any variables in the path
 		path = Util.replaceMacro(path, resolver);
+		Pattern pattern = Pattern.compile("^(\\\\|/|[a-zA-Z]:\\\\)");
 
 		//If the path is not absolute, make it relative to the workspace
-		if(!(path.equals("")) && ((!(path.startsWith("/"))) && (!(path.startsWith("\\"))) && (!(path.startsWith("C:\\"))) && (!(path.startsWith("D:\\"))))){
-			String targetPath = "${WORKSPACE}" + File.separator + path ;
+		if(!(path.equals("")) && ((!(path.startsWith("/"))) && (!(path.startsWith("\\"))) && (!pattern.matcher(path).find()))){
+			String targetPath = "${WORKSPACE}" + "//" + path ;
 			targetPath = Util.replaceMacro(targetPath, resolver);
 			return targetPath;
 		}
