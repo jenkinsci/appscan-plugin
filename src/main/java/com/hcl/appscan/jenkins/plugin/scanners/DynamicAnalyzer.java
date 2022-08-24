@@ -223,7 +223,7 @@ public class DynamicAnalyzer extends Scanner {
 				}
 		} else {
 			properties.put(TARGET, Util.replaceMacro(getTarget(), resolver));
-			properties.put(SCAN_FILE, resolvePath(m_scanFile, resolver));
+			properties.put(SCAN_FILE, m_scanFile.equals("") ? m_scanFile : resolvePath(m_scanFile, resolver));
 			properties.put(EXTRA_FIELD, Util.replaceMacro(m_extraField, resolver));
 			if(m_loginType == null || m_loginType.equals("")){
 				m_loginType = upgradeLoginScenario();
