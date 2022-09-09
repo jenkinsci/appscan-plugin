@@ -72,9 +72,5 @@ public class StaticAnalyzer extends Scanner {
 		public String getDisplayName() {
 			return STATIC_ANALYZER;
 		}
-			
-	    	public FormValidation doCheckTarget(@QueryParameter String target) {
-	    		return FormValidation.validateRequired(target);
-	    	}
 	}
 }
