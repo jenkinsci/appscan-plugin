@@ -24,10 +24,12 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 
 	private static final long serialVersionUID = 1L;
 	private Secret m_token;
+	public String m_url;
 
 	@DataBoundConstructor
-	public ASoCCredentials(String id, String description, String username, String password) {
+	public ASoCCredentials(String id, String description, String username, String password, String url) {
 		this(CredentialsScope.GLOBAL, id, description, username, password);
+		m_url=url;
 	}
 	
 	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password) {
@@ -40,7 +42,11 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	}
 	
 	public String getServer() {
-		return SystemUtil.getServer(getUsername());
+		if(m_url == null || m_url.equals("")){
+			return SystemUtil.getServer(getUsername());
+		} else {
+			return m_url;
+		}
 	}
 	
 	public Secret getToken() {
@@ -49,6 +55,10 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 
 	public void setToken(String connection) {
 		m_token = Secret.fromString(connection);
+	}
+
+	public String getUrl() {
+		return m_url;
 	}
 	
 	@Symbol("asoc-credentials") //$NON-NLS-1$
@@ -62,6 +72,12 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		
 		public String getApiKeyUrl() {
 			return SystemUtil.getDefaultServer() + CoreConstants.API_KEY_PATH;
+		}
+
+		// Check if the Server connection is to an AppScan On-Prem instance.
+		public boolean isASoP(){
+			// need to implement the logic to detect ASoC vs ASoP connection. Can be done based on server URL entered in endPointURL field.
+			return true;
 		}
 
 		public FormValidation doCheckUsername(@QueryParameter String username) {
