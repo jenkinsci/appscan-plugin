@@ -101,8 +101,17 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	private String getToken() {
 		return Secret.toString(m_credentials.getToken());
 	}
+
+	public boolean isASoP(){
+		String URL = m_credentials.getUrl();
+		if(!((URL == null || URL.equals("")))){
+			return (!(URL.endsWith("appscan.com/")));
+		} else {
+			return false;
+		}
+	}
 	
-	private void configureCredentials(String id, ItemGroup<?> context) {
+	public void configureCredentials(String id, ItemGroup<?> context) {
 		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
 		for(ASoCCredentials creds : credentialsList) {

@@ -6,7 +6,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 	
 	<f:entry title="${%label.url}" field="url">
-    	    <f:textbox />
+    	    <f:textbox placeholder="${%label.credentials.placeholder}" />
     	</f:entry>
 
     <f:entry title="${%label.id}" field="username">

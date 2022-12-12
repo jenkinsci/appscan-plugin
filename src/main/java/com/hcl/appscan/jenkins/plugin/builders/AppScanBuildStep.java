@@ -295,7 +295,21 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
     	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
-        
+		JenkinsAuthenticationProvider checkASoPConnection = new JenkinsAuthenticationProvider(m_credentials,build.getParent().getParent());
+        if(m_type.equals("Dynamic Analyzer") && checkASoPConnection.isASoP()){
+			throw new AbortException(Messages.error_dynamic_analyzer_ASoP());
+		}
+
+		if(m_intervention && checkASoPConnection.isASoP()){
+			progress.setStatus(new Message(1,Messages.warning_allow_intervention_ASoP()));
+		}
+
+		if(getScanProperties(build, listener).get("openSourceOnly") !=null){
+			if(getScanProperties(build, listener).get("openSourceOnly").equals("") && checkASoPConnection.isASoP()){
+				throw new AbortException(Messages.error_OSO_ASoP());
+			}
+		}
+
     	
     	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
@@ -454,6 +468,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	public FormValidation doCheckApplication(@QueryParameter String application) {
     		return FormValidation.validateRequired(application);
     	}
+
+		public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+			JenkinsAuthenticationProvider checkASoPConnection = new JenkinsAuthenticationProvider(credentials,context);
+			if((intervention && checkASoPConnection.isASoP())){
+				return FormValidation.error(Messages.error_ASoP());
+			}
+			return FormValidation.ok();
+		}
     }
 }
 
