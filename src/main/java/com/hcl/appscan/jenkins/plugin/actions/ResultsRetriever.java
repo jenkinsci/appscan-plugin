@@ -148,6 +148,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 				m_name,
 				m_provider.getStatus(),
 				m_provider.getFindingsCount(),
+                m_provider.getCriticalCount(),
 				m_provider.getHighCount(),
 				m_provider.getMediumCount(),
 				m_provider.getLowCount(),
