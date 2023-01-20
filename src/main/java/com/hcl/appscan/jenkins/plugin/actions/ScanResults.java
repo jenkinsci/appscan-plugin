@@ -38,7 +38,7 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	private String m_scanServerUrl;
 	private String m_label;
 	private int m_totalFindings;
-    private int m_criticalCount;
+    	private int m_criticalCount;
 	private int m_highCount;
 	private int m_mediumCount;
 	private int m_lowCount;
