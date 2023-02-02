@@ -105,7 +105,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	public boolean isASoP(){
 		String URL = m_credentials.getUrl();
 		if(!((URL == null || URL.equals("")))){
-			return (!(URL.endsWith("appscan.com/")));
+			return (!(URL.contains("appscan.com/")));
 		} else {
 			return false;
 		}
