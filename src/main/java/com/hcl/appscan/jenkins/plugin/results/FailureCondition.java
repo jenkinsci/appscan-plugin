@@ -53,7 +53,7 @@ public class FailureCondition extends AbstractDescribableImpl<FailureCondition> 
 		public ListBoxModel doFillFailureTypeItems() {
 			ListBoxModel model = new ListBoxModel();
 			model.add(Messages.label_total(), "total"); //$NON-NLS-1$
-            model.add(Messages.label_critical(), "critical"); //$NON-NLS-1$
+                        model.add(Messages.label_critical(), "critical"); //$NON-NLS-1$
 			model.add(Messages.label_high(), "high"); //$NON-NLS-1$
 			model.add(Messages.label_medium(), "medium"); //$NON-NLS-1$
 			model.add(Messages.label_low(), "low"); //$NON-NLS-1$
