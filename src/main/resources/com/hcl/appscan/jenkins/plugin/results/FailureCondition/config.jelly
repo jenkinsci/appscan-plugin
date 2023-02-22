@@ -5,7 +5,7 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 	<div style="display:inline-block;border:solid;border-radius:5px;border-width:thin;padding:1px">
-		<div style="display:inline-block;vertical-align:middle">
+		<div style="display:inline-block;width:100px;vertical-align:middle">
 			<f:select field="failureType"/>
 		</div>
 		<div style="display:inline-block;vertical-align:middle;padding-left:1em;padding-right:1em">
