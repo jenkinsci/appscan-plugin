@@ -53,7 +53,7 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		m_name = name;
 		m_status = status;
 		m_totalFindings = totalFindings;
-        m_criticalCount = criticalCount;
+                m_criticalCount = criticalCount;
 		m_highCount = highCount;
 		m_mediumCount = mediumCount;
 		m_lowCount = lowCount;
@@ -106,7 +106,7 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 
 	public int getCriticalCount(){
         return m_criticalCount;
-    }
+        }
 	public int getInfoCount() {
 		return m_infoCount;
 	}
