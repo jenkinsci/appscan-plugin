@@ -105,7 +105,7 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	}
 
 	public int getCriticalCount(){
-        return m_criticalCount;
+                return m_criticalCount;
         }
 	public int getInfoCount() {
 		return m_infoCount;
