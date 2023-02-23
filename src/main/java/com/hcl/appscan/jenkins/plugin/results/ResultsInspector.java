@@ -36,6 +36,8 @@ public class ResultsInspector {
 		switch(type.toLowerCase()) {
 		case "total": //$NON-NLS-1$
 			return m_resultsProvider.getFindingsCount() > threshold;
+                case "critical": //$NON-NLS-1$
+                        return m_resultsProvider.getCriticalCount() > threshold;
 		case "high": //$NON-NLS-1$
 			return m_resultsProvider.getHighCount() > threshold;
 		case "medium": //$NON-NLS-1$
