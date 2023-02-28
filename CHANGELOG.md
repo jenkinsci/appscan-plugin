@@ -1,8 +1,8 @@
 CHANGELOG
 =========
-1.0.14 (March, 2023)
+1.0.14 (February, 2023)
 ------
-* Support critical severity in AppScan on Cloud and AppScan Enterprise.
+* Support for critical severity.
 * Bug Fixes
   
 1.0.13 (November, 2022)
