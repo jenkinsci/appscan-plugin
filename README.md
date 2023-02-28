@@ -96,7 +96,7 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
         finding count(s) exceed the specified thresholds (see below).
     -   **Add Condition:** Allows you to add thresholds for the number
         of findings that will cause a build to fail. You can specify
-        thresholds for total, high, medium, and/or low finding counts.
+        thresholds for total, critical, high, medium, and/or low finding counts.
         If multiple conditions are added, they will be treated as though
         they are separated by a logical OR.
 
@@ -168,11 +168,10 @@ installation and configuration of the plugin for HCL AppScan on Cloud.
         finding count(s) exceed the specified thresholds (see below).
         -   **Add Condition:** Allows you to add thresholds for the number
         of findings that will cause a build to fail. You can specify
-        thresholds for total, high, medium, and/or low finding counts.
+        thresholds for total, critical, high, medium, and/or low finding counts.
         If multiple conditions are added, they will be treated as though
         they are separated by a logical OR.
 
-## Additional Information
 **Known Issues**
 - ASoC is no longer providing Mobile Scan support. Refer to 
 [this page](https://support.hcltechsw.com/community?id=community_blog&sys_id=a537a63adbb6f054a45ad9fcd396191f) for more information. 
@@ -180,4 +179,5 @@ The Mobile Scan functionality
 has been removed from Jenkins since version 1.0.10. The existing jobs that 
 have Mobile Scan configurations must therefore be updated accordingly.
 
-
+## Additional Resources
+- [HCL AppScan Enterprise: Jenkins Integration](https://www.youtube.com/watch?v=XctRBAd0HQc)
