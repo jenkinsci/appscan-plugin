@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+1.0.14 (February, 2023)
+------
+* Support for critical severity.
+* Bug Fixes
+  
 1.0.13 (November, 2022)
 ------
 * Fix generated report to show missing information.
