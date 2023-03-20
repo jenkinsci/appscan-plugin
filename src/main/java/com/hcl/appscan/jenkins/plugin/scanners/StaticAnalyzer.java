@@ -6,12 +6,18 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
+import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.scanners.sast.SASTConstants;
 import java.util.HashMap;
 import java.util.Map;
 
+import hudson.RelativePath;
+import hudson.model.ItemGroup;
 import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -71,6 +77,14 @@ public class StaticAnalyzer extends Scanner {
 		@Override
 		public String getDisplayName() {
 			return STATIC_ANALYZER;
+		}
+
+		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+			JenkinsAuthenticationProvider checkASoPConnection = new JenkinsAuthenticationProvider(credentials,context);
+			if((openSourceOnly && checkASoPConnection.isASoP())){
+				return FormValidation.error("Only supported for AppScan on Cloud");
+			}
+			return FormValidation.ok();
 		}
 	}
 }

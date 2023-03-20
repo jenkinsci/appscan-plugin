@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+1.0.13 (November, 2022)
+------
+* Fix generated report to show missing information.
+
 1.0.12 (July, 2022)
 ------
 * Support additional login options for HCL AppScan on Cloud dynamic scans.

@@ -40,12 +40,16 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	public CredentialsDescriptor getDescriptor() {
 		return (DescriptorImpl)super.getDescriptor();
 	}
+
+	public String getUrl() {
+		return m_url;
+	}
 	
 	public String getServer() {
-		if(m_url == null || m_url.equals("")){
-			return SystemUtil.getServer(getUsername());
-		} else {
+		if(!(m_url == null || m_url.equals(""))){
 			return m_url;
+		} else {
+			return SystemUtil.getServer(getUsername());
 		}
 	}
 	
@@ -56,11 +60,6 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	public void setToken(String connection) {
 		m_token = Secret.fromString(connection);
 	}
-
-	public String getUrl() {
-		return m_url;
-	}
-	
 	@Symbol("asoc-credentials") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends CredentialsDescriptor {
@@ -72,12 +71,6 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		
 		public String getApiKeyUrl() {
 			return SystemUtil.getDefaultServer() + CoreConstants.API_KEY_PATH;
-		}
-
-		// Check if the Server connection is to an AppScan On-Prem instance.
-		public boolean isASoP(){
-			// need to implement the logic to detect ASoC vs ASoP connection. Can be done based on server URL entered in endPointURL field.
-			return true;
 		}
 
 		public FormValidation doCheckUsername(@QueryParameter String username) {
