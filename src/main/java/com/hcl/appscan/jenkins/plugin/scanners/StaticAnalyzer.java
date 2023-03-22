@@ -80,8 +80,8 @@ public class StaticAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-			JenkinsAuthenticationProvider checkASoPConnection = new JenkinsAuthenticationProvider(credentials,context);
-			if((openSourceOnly && checkASoPConnection.isASoP())){
+			JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+			if((openSourceOnly && checkAppScan360Connection.isAppScan360())){
 				return FormValidation.error("Only supported for AppScan on Cloud");
 			}
 			return FormValidation.ok();

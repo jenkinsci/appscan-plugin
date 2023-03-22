@@ -326,9 +326,9 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-			JenkinsAuthenticationProvider checkASoPConnection = new JenkinsAuthenticationProvider(credentials,context);
-			if(checkASoPConnection.isASoP()){
-				return FormValidation.error(Messages.error_dynamic_ASoP());
+			JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+			if(checkAppScan360Connection.isAppScan360()){
+				return FormValidation.error(Messages.error_dynamic_AppScan360());
 			}
 			return FormValidation.validateRequired(target);
 		}
