@@ -102,7 +102,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		return Secret.toString(m_credentials.getToken());
 	}
 
-	public boolean isASoP(){
+	public boolean isAppScan360(){
 		String URL = m_credentials.getUrl();
 		if(!((URL == null || URL.equals("")))){
 			return (!(URL.contains("appscan.com/")));

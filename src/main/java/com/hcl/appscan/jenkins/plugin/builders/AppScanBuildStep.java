@@ -295,18 +295,18 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
     	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
-		JenkinsAuthenticationProvider checkASoPConnection = new JenkinsAuthenticationProvider(m_credentials,build.getParent().getParent());
-        if(m_type.equals("Dynamic Analyzer") && checkASoPConnection.isASoP()){
-			throw new AbortException(Messages.error_dynamic_analyzer_ASoP());
+		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(m_credentials,build.getParent().getParent());
+        if(m_type.equals("Dynamic Analyzer") && checkAppScan360Connection.isAppScan360()){
+			throw new AbortException(Messages.error_dynamic_analyzer_AppScan360());
 		}
 
-		if(m_intervention && checkASoPConnection.isASoP()){
-			progress.setStatus(new Message(1,Messages.warning_allow_intervention_ASoP()));
+		if(m_intervention && checkAppScan360Connection.isAppScan360()){
+			progress.setStatus(new Message(1,Messages.warning_allow_intervention_AppScan360()));
 		}
 
 		if(getScanProperties(build, listener).get("openSourceOnly") !=null){
-			if(getScanProperties(build, listener).get("openSourceOnly").equals("") && checkASoPConnection.isASoP()){
-				throw new AbortException(Messages.error_OSO_ASoP());
+			if(getScanProperties(build, listener).get("openSourceOnly").equals("") && checkAppScan360Connection.isAppScan360()){
+				throw new AbortException(Messages.error_OSO_AppScan360());
 			}
 		}
 
@@ -470,9 +470,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
 
 		public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-			JenkinsAuthenticationProvider checkASoPConnection = new JenkinsAuthenticationProvider(credentials,context);
-			if((intervention && checkASoPConnection.isASoP())){
-				return FormValidation.error(Messages.error_ASoP());
+			JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+			if((intervention && checkAppScan360Connection.isAppScan360())){
+				return FormValidation.error(Messages.error_AppScan360());
 			}
 			return FormValidation.ok();
 		}
