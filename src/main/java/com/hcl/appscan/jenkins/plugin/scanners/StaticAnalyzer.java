@@ -59,7 +59,7 @@ public class StaticAnalyzer extends Scanner {
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
-                if (m_openSourceOnly)
+                if (m_openSourceOnly && getHasOptions())
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
 		return properties;
 	}
