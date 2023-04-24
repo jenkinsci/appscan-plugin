@@ -92,7 +92,7 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 				return;
 			}
 		}
-		m_credentials = new ASoCCredentials("", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		m_credentials = new ASoCCredentials("", "", "", "", "", false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 	
 	private void configureProxy() {
@@ -118,4 +118,18 @@ public final class JenkinsAuthenticationProvider implements IAuthenticationProvi
 			});
 		}
 	}
+
+	public boolean isAppScan360(){
+		String URL = m_credentials.getUrl();
+		if(!((URL == null || URL.equals("")))){
+			return (!(URL.contains("appscan.com")));
+		} else {
+			return false;
+		}
+	}
+
+    @Override
+    public boolean getCertificates(){
+        return m_credentials.getCertificates();
+    }
 }

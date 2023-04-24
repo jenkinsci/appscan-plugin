@@ -76,5 +76,13 @@ public class StaticAnalyzer extends Scanner {
 	    	public FormValidation doCheckTarget(@QueryParameter String target) {
 	    		return FormValidation.validateRequired(target);
 	    	}
+
+		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+			JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+			if((openSourceOnly && checkAppScan360Connection.isAppScan360())){
+				return FormValidation.error(Messages.error_SCA_UI());
+			}
+			return FormValidation.ok();
+		}
 	}
 }
