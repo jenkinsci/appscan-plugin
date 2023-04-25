@@ -107,4 +107,9 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
     public Proxy getProxy() {
         return Proxy.NO_PROXY;
     }
+
+    @Override
+    public boolean getCertificates(){
+        return false;
+    }
 }

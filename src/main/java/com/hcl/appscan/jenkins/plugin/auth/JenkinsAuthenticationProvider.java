@@ -120,6 +120,11 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 				return;
 			}
 		}
-		m_credentials = new ASoCCredentials("", "", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		m_credentials = new ASoCCredentials("", "", "", "", "",false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
+
+    @Override
+    public boolean getCertificates(){
+        return m_credentials.getCertificates();
+    }
 }

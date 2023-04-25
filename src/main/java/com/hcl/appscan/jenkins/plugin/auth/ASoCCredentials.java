@@ -25,14 +25,16 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	private static final long serialVersionUID = 1L;
 	private Secret m_token;
 	public String m_url;
+    public boolean m_certificates;
 
 	@DataBoundConstructor
-	public ASoCCredentials(String id, String description, String username, String password, String url) {
-		this(CredentialsScope.GLOBAL, id, description, username, password);
+	public ASoCCredentials(String id, String description, String username, String password, String url, Boolean certificates) {
+		this(CredentialsScope.GLOBAL, id, description, username, password, certificates);
 		m_url=url;
+        m_certificates=certificates;
 	}
 	
-	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password) {
+	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean certificates) {
 		super(scope, description, description, username, password);
 	}
 	
@@ -44,6 +46,8 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	public String getUrl() {
 		return m_url;
 	}
+
+    public boolean getCertificates() {return m_certificates;}
 	
 	public String getServer() {
 		if(!(m_url == null || m_url.equals(""))){
@@ -82,5 +86,12 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		public FormValidation doCheckPassword(@QueryParameter String password) {
 			return FormValidation.validateRequired(password);
 		}
+
+        public FormValidation doCheckCertificates(@QueryParameter Boolean certificates,@QueryParameter String url){
+            if((!(url == null || url.equals(""))) && url.contains("appscan.com")){
+                return FormValidation.error(Messages.error_asoc_certificates_ui());
+            }
+            return FormValidation.ok();
+        }
     }
 }

@@ -12,7 +12,7 @@ public class ASoCCredentials extends com.hcl.appscan.jenkins.plugin.auth.ASoCCre
 
 	private static final long serialVersionUID = 1L;
 
-	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password) {
-		super(scope, id, description, username, password);
+	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean certificates) {
+		super(scope, id, description, username, password, certificates);
 	}
 }

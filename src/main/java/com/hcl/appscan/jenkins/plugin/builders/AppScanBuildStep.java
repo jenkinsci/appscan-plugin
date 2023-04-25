@@ -264,6 +264,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", JenkinsUtil.getPluginVersion());
 			properties.put("ClientType", JenkinsUtil.getClientType());
+            String fetchServer = m_authProvider.getServer();
+            properties.put("serverURL",fetchServer);
+            if(!(fetchServer == null || fetchServer.equals(""))){
+                if(!fetchServer.contains("appscan.com")){
+                    properties.put("certificates",Boolean.toString(m_authProvider.getCertificates()));
+                }
+            }
 			return properties;
 		}
 	}
@@ -299,6 +306,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         if(m_type.equals("Dynamic Analyzer") && checkAppScan360Connection.isAppScan360()){
 			throw new AbortException(Messages.error_dynamic_analyzer_AppScan360());
 		}
+
+        if(!checkAppScan360Connection.isAppScan360()){
+            if(m_authProvider.getCertificates()){
+                progress.setStatus(new Message(1,Messages.warning_asoc_certificates()));
+            }
+        }
 
 		if(m_intervention && checkAppScan360Connection.isAppScan360()){
 			progress.setStatus(new Message(1,Messages.warning_allow_intervention_AppScan360()));
@@ -370,8 +383,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
       provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
       VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
     	String asocAppUrl = m_authProvider.getServer() + "/serviceui/main/myapps/portfolio";
-		  build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, Messages.label_asoc_homepage()));
-                
+        if(!checkAppScan360Connection.isAppScan360()){
+            build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, Messages.label_asoc_homepage()));
+        }
+        else {
+            build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, Messages.label_appscan360_homepage()));
+        }
+
         if(m_wait)
             shouldFailBuild(provider,build);	
     }
@@ -472,7 +490,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
 			JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
 			if((intervention && checkAppScan360Connection.isAppScan360())){
-				return FormValidation.error(Messages.error_AppScan360());
+				return FormValidation.error(Messages.error_allow_intervention_ui());
 			}
 			return FormValidation.ok();
 		}
