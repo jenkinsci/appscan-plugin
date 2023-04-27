@@ -21,8 +21,8 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 		<f:textbox />
 	</f:entry>
 
-	<f:entry field="certificates">
-	    <f:checkbox title="${%label.certificates}" name="certificates"/>
+	<f:entry field="acceptInvalidCerts">
+	    <f:checkbox title="${%label.acceptInvalidCerts}" name="acceptInvalidCerts"/>
 	</f:entry>
 	
 </j:jelly>

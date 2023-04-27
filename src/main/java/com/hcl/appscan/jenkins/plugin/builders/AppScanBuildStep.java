@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -266,10 +266,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			properties.put("ClientType", JenkinsUtil.getClientType());
             String fetchServer = m_authProvider.getServer();
             properties.put("serverURL",fetchServer);
-            if(!(fetchServer == null || fetchServer.equals(""))){
-                if(!fetchServer.contains("appscan.com")){
-                    properties.put("certificates",Boolean.toString(m_authProvider.getCertificates()));
-                }
+            if(fetchServer != null && !fetchServer.isEmpty() && !fetchServer.contains("appscan.com")){
+                properties.put("acceptInvalidCerts",Boolean.toString(m_authProvider.getacceptInvalidCerts()));
             }
 			return properties;
 		}
@@ -308,7 +306,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		}
 
         if(!checkAppScan360Connection.isAppScan360()){
-            if(m_authProvider.getCertificates()){
+            if(m_authProvider.getacceptInvalidCerts()){
                 progress.setStatus(new Message(1,Messages.warning_asoc_certificates()));
             }
         }

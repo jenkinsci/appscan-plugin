@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019.
+ * @ Copyright HCL Technologies Ltd. 2019, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 package com.hcl.appscan.jenkins.plugin.auth;
@@ -25,16 +25,16 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	private static final long serialVersionUID = 1L;
 	private Secret m_token;
 	public String m_url;
-    public boolean m_certificates;
+    public boolean m_acceptInvalidCerts;
 
 	@DataBoundConstructor
-	public ASoCCredentials(String id, String description, String username, String password, String url, Boolean certificates) {
-		this(CredentialsScope.GLOBAL, id, description, username, password, certificates);
+	public ASoCCredentials(String id, String description, String username, String password, String url, Boolean acceptInvalidCerts) {
+		this(CredentialsScope.GLOBAL, id, description, username, password, acceptInvalidCerts);
 		m_url=url;
-        m_certificates=certificates;
+        m_acceptInvalidCerts=acceptInvalidCerts;
 	}
 	
-	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean certificates) {
+	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean acceptInvalidCerts) {
 		super(scope, description, description, username, password);
 	}
 	
@@ -47,7 +47,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		return m_url;
 	}
 
-    public boolean getCertificates() {return m_certificates;}
+    public boolean getacceptInvalidCerts() {return m_acceptInvalidCerts;}
 	
 	public String getServer() {
 		if(!(m_url == null || m_url.equals(""))){
@@ -87,8 +87,8 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 			return FormValidation.validateRequired(password);
 		}
 
-        public FormValidation doCheckCertificates(@QueryParameter Boolean certificates,@QueryParameter String url){
-            if((!(url == null || url.equals(""))) && url.contains("appscan.com")){
+        public FormValidation doCheckAcceptInvalidCerts(@QueryParameter Boolean acceptInvalidCerts,@QueryParameter String url){
+            if((url.isEmpty() || url.contains("appscan.com")) && acceptInvalidCerts) {
                 return FormValidation.error(Messages.error_asoc_certificates_ui());
             }
             return FormValidation.ok();

@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019, 2022.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019, 2022, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -103,12 +103,8 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	}
 
 	public boolean isAppScan360(){
-		String URL = m_credentials.getUrl();
-		if(!((URL == null || URL.equals("")))){
-			return (!(URL.contains("appscan.com/")));
-		} else {
-			return false;
-		}
+		String url = m_credentials.getUrl();
+        return  url != null && !url.isEmpty() && !url.contains("appscan.com");
 	}
 	
 	public void configureCredentials(String id, ItemGroup<?> context) {
@@ -124,7 +120,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	}
 
     @Override
-    public boolean getCertificates(){
-        return m_credentials.getCertificates();
+    public boolean getacceptInvalidCerts() {
+        return m_credentials.getacceptInvalidCerts();
     }
 }
