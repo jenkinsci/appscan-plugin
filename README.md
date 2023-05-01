@@ -20,9 +20,6 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
 ## Usage
 **Integration with HCL AppScan on Cloud**
 
-[This video](http://ibm.biz/ASoC-Jenkins) demonstrates
-installation and configuration of the plugin for HCL AppScan on Cloud.
-
 1.  Add your AppScan on Cloud credentials on the Jenkins
     **Credentials** page.
     -   From the main Jenkins dashboard, click the **Credentials** link.
