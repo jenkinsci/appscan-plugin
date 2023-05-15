@@ -25,21 +25,24 @@ public class StaticAnalyzer extends Scanner {
 	private static final String STATIC_ANALYZER = "Static Analyzer"; //$NON-NLS-1$
         
         private boolean m_openSourceOnly;
+        private boolean m_sourceCodeOnly;
         
         @Deprecated
         public StaticAnalyzer(String target){
             this(target,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly){
             super(target, hasOptions);
             m_openSourceOnly=openSourceOnly;
+            m_sourceCodeOnly=sourceCodeOnly;
         }
         
 	@DataBoundConstructor
 	public StaticAnalyzer(String target,boolean hasOptions) {
 		super(target, hasOptions);
                 m_openSourceOnly=false;
+                m_sourceCodeOnly=false;
 	}
 
 	@Override
@@ -55,12 +58,25 @@ public class StaticAnalyzer extends Scanner {
         public void setOpenSourceOnly(boolean openSourceOnly) {
             m_openSourceOnly = openSourceOnly;
         }
+
+        public boolean isSourceCodeOnly() {
+            return m_sourceCodeOnly;
+        }
+
+        @DataBoundSetter
+        public void setSourceCodeOnly(boolean sourceCodeOnly) {
+            m_sourceCodeOnly = sourceCodeOnly;
+        }
 	
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
-                if (m_openSourceOnly && getHasOptions())
+                if (m_openSourceOnly && getHasOptions()) {
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
+                }
+        if(m_sourceCodeOnly && getHasOptions()){
+            properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
+        }
 		return properties;
 	}
 	
