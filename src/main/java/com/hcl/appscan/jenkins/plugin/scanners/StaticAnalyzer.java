@@ -74,9 +74,9 @@ public class StaticAnalyzer extends Scanner {
                 if (m_openSourceOnly && getHasOptions()) {
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
                 }
-        if(m_sourceCodeOnly && getHasOptions()){
-            properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
-        }
+                if (m_sourceCodeOnly && getHasOptions()) {
+                    properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
+                }
 		return properties;
 	}
 	
