@@ -104,7 +104,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 
 	public boolean isAppScan360(){
 		String url = m_credentials.getUrl();
-        return  url != null && !url.isEmpty() && !url.contains("appscan.com");
+        	return  url != null && !url.isEmpty() && !url.contains("appscan.com");
 	}
 	
 	public void configureCredentials(String id, ItemGroup<?> context) {
@@ -119,8 +119,8 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		m_credentials = new ASoCCredentials("", "", "", "", "",false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
-    @Override
-    public boolean getacceptInvalidCerts() {
-        return m_credentials.getacceptInvalidCerts();
-    }
+    	@Override
+    	public boolean getacceptInvalidCerts() {
+        	return m_credentials.getacceptInvalidCerts();
+    	}
 }
