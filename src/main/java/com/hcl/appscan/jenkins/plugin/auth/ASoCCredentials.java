@@ -31,7 +31,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	public ASoCCredentials(String id, String description, String username, String password, String url, Boolean acceptInvalidCerts) {
 		this(CredentialsScope.GLOBAL, id, description, username, password, acceptInvalidCerts);
 		m_url=url;
-        m_acceptInvalidCerts=acceptInvalidCerts;
+                m_acceptInvalidCerts=acceptInvalidCerts;
 	}
 	
 	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean acceptInvalidCerts) {
@@ -64,6 +64,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	public void setToken(String connection) {
 		m_token = Secret.fromString(connection);
 	}
+	
 	@Symbol("asoc-credentials") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends CredentialsDescriptor {
