@@ -28,13 +28,13 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
     public boolean m_acceptInvalidCerts;
 
 	@DataBoundConstructor
-	public ASoCCredentials(String id, String description, String username, String password, String url, Boolean acceptInvalidCerts) {
+	public ASoCCredentials(String id, String description, String username, String password, String url, boolean acceptInvalidCerts) {
 		this(CredentialsScope.GLOBAL, id, description, username, password, acceptInvalidCerts);
 		m_url=url;
         m_acceptInvalidCerts=acceptInvalidCerts;
 	}
 	
-	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean acceptInvalidCerts) {
+	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, boolean acceptInvalidCerts) {
 		super(scope, description, description, username, password);
 	}
 	

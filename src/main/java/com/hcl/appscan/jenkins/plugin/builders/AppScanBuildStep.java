@@ -60,7 +60,6 @@ import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Plugin;
 import hudson.Util;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
@@ -264,11 +263,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", JenkinsUtil.getPluginVersion());
 			properties.put("ClientType", JenkinsUtil.getClientType());
-            String fetchServer = m_authProvider.getServer();
-            properties.put("serverURL",fetchServer);
-            if(fetchServer != null && !fetchServer.isEmpty() && !fetchServer.contains("appscan.com")){
-                properties.put("acceptInvalidCerts",Boolean.toString(m_authProvider.getacceptInvalidCerts()));
-            }
+            properties.put(CoreConstants.SERVER_URL,m_authProvider.getServer());
+            properties.put(CoreConstants.ACCEPT_INVALID_CERTS,Boolean.toString(m_authProvider.getacceptInvalidCerts()));
 			return properties;
 		}
 	}
@@ -299,27 +295,23 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
-    	final IScan scan = ScanFactory.createScan(getScanProperties(build, listener), progress, m_authProvider);
+        Map<String, String> properties = getScanProperties(build,listener);
+    	final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
 		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(m_credentials,build.getParent().getParent());
-        if(m_type.equals("Dynamic Analyzer") && checkAppScan360Connection.isAppScan360()){
-			throw new AbortException(Messages.error_dynamic_analyzer_AppScan360());
-		}
-
-        if(!checkAppScan360Connection.isAppScan360()){
-            if(m_authProvider.getacceptInvalidCerts()){
-                progress.setStatus(new Message(1,Messages.warning_asoc_certificates()));
+        boolean checkAppScan360 = checkAppScan360Connection.isAppScan360();
+        if(checkAppScan360) {
+            if (m_type.equals("Dynamic Analyzer")) {
+                throw new AbortException(Messages.error_dynamic_analyzer_AppScan360());
+            } else if (m_intervention) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
+            } else if (properties.get("openSourceOnly") != null) {
+                throw new AbortException(Messages.error_OSO_AppScan360());
             }
         }
 
-		if(m_intervention && checkAppScan360Connection.isAppScan360()){
-			progress.setStatus(new Message(1,Messages.warning_allow_intervention_AppScan360()));
-		}
-
-		if(getScanProperties(build, listener).get("openSourceOnly") !=null){
-			if(getScanProperties(build, listener).get("openSourceOnly").equals("") && checkAppScan360Connection.isAppScan360()){
-				throw new AbortException(Messages.error_OSO_AppScan360());
-			}
-		}
+        if(!checkAppScan360 && m_authProvider.getacceptInvalidCerts()){
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
+        }
 
     	
     	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
@@ -381,12 +373,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
       provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
       VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
     	String asocAppUrl = m_authProvider.getServer() + "/ui/main/myapps/" + m_application + "/scans/" + scan.getScanId();
-        if(!checkAppScan360Connection.isAppScan360()){
-            build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, Messages.label_asoc_homepage()));
+        String label;
+        if(checkAppScan360){
+            label = Messages.label_appscan360_homepage();
+        } else {
+            label = Messages.label_asoc_homepage();
         }
-        else {
-            build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, Messages.label_appscan360_homepage()));
-        }
+
+        build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
 
         if(m_wait)
             shouldFailBuild(provider,build);	
