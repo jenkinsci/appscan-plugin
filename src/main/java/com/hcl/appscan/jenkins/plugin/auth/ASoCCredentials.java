@@ -25,13 +25,13 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	private static final long serialVersionUID = 1L;
 	private Secret m_token;
 	public String m_url;
-    public boolean m_acceptInvalidCerts;
+        public boolean m_acceptInvalidCerts;
 
 	@DataBoundConstructor
 	public ASoCCredentials(String id, String description, String username, String password, String url, boolean acceptInvalidCerts) {
 		this(CredentialsScope.GLOBAL, id, description, username, password, acceptInvalidCerts);
 		m_url=url;
-        m_acceptInvalidCerts=acceptInvalidCerts;
+                m_acceptInvalidCerts=acceptInvalidCerts;
 	}
 	
 	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, boolean acceptInvalidCerts) {
@@ -47,7 +47,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		return m_url;
 	}
 
-    public boolean getacceptInvalidCerts() {return m_acceptInvalidCerts;}
+        public boolean getacceptInvalidCerts() {return m_acceptInvalidCerts;}
 	
 	public String getServer() {
 		if(!(m_url == null || m_url.equals(""))){
@@ -64,6 +64,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	public void setToken(String connection) {
 		m_token = Secret.fromString(connection);
 	}
+	
 	@Symbol("asoc-credentials") //$NON-NLS-1$
     @Extension
     public static class DescriptorImpl extends CredentialsDescriptor {
@@ -87,11 +88,11 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 			return FormValidation.validateRequired(password);
 		}
 
-        public FormValidation doCheckAcceptInvalidCerts(@QueryParameter Boolean acceptInvalidCerts,@QueryParameter String url){
-            if((url.isEmpty() || url.contains("appscan.com")) && acceptInvalidCerts) {
-                return FormValidation.error(Messages.error_asoc_certificates_ui());
-            }
-            return FormValidation.ok();
-        }
+                public FormValidation doCheckAcceptInvalidCerts(@QueryParameter Boolean acceptInvalidCerts,@QueryParameter String url){
+            		if((url.isEmpty() || url.contains("appscan.com")) && acceptInvalidCerts) {
+                		return FormValidation.error(Messages.error_asoc_certificates_ui());
+            		}
+            		return FormValidation.ok();
+        	}
     }
 }
