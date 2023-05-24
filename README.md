@@ -21,7 +21,7 @@ on the service to associate your scans with.
 
 **HCL AppScan 360°**
 
-To execute scans in HCL AppScan 360°, you must have access to an instance of AppScan 360°. To learn more about AppScan 360° features and installation, click [here](https://help.hcltechsw.com/appscan/180/1.0/appseccloud_plugins_integrations.html).
+To execute scans in HCL AppScan 360°, you must have access to an instance of AppScan 360°. To learn more about AppScan 360° features and installation, click [here](https://help.hcltechsw.com/appscan/360/1.0/appseccloud_plugins_integrations.html).
 
 **HCL AppScan Enterprise prerequisites**
 
