@@ -99,7 +99,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
 	private String m_scanStatus;
-	private JenkinsAuthenticationProvider m_authProvider;
+	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
@@ -297,7 +297,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final boolean suspend = m_wait;
         Map<String, String> properties = getScanProperties(build,listener);
     	final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
-        if(m_authProvider.isAppScan360()) {
+        JenkinsAuthenticationProvider checkAppScan360 = (JenkinsAuthenticationProvider) m_authProvider;
+        if(checkAppScan360.isAppScan360()) {
             if (m_type.equals("Dynamic Analyzer")) {
                 throw new AbortException(Messages.error_dynamic_analyzer_AppScan360());
             } else if (m_intervention) {
@@ -307,7 +308,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             }
         }
 
-        if(!m_authProvider.isAppScan360() && m_authProvider.getacceptInvalidCerts()){
+        if(!checkAppScan360.isAppScan360() && m_authProvider.getacceptInvalidCerts()){
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
@@ -372,7 +373,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
       VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
     	String asocAppUrl = m_authProvider.getServer() + "/ui/main/myapps/" + m_application + "/scans/" + scan.getScanId();
         String label;
-        if(m_authProvider.isAppScan360()){
+        if(checkAppScan360.isAppScan360()){
             label = Messages.label_appscan360_homepage();
         } else {
             label = Messages.label_asoc_homepage();
