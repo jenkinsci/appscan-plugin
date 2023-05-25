@@ -96,7 +96,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_emailNotification;
         private boolean m_intervention;
 	private boolean m_wait;
-    private boolean m_failBuildNonCompliance;
+    	private boolean m_failBuildNonCompliance;
 	private boolean m_failBuild;
 	private String m_scanStatus;
 	private JenkinsAuthenticationProvider m_authProvider;
@@ -114,7 +114,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_emailNotification = email;
                 m_intervention = intervention;
 		m_wait = wait;
-        m_failBuildNonCompliance=failBuildNonCompliance;
+        	m_failBuildNonCompliance=failBuildNonCompliance;
 		m_failBuild = failBuild;
 	}
 	
@@ -129,7 +129,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_emailNotification = false;
                 m_intervention = true;
 		m_wait = false;
-        m_failBuildNonCompliance=false;
+       		m_failBuildNonCompliance=false;
 		m_failBuild = false;
 	}
 	
@@ -477,13 +477,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		return FormValidation.validateRequired(application);
     	}
 
-		public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-			JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
-			if((intervention && checkAppScan360Connection.isAppScan360())){
-				return FormValidation.error(Messages.error_allow_intervention_ui());
-			}
-			return FormValidation.ok();
+	public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+		if((intervention && checkAppScan360Connection.isAppScan360())){
+			return FormValidation.error(Messages.error_allow_intervention_ui());
 		}
+		return FormValidation.ok();
+	}
     }
 }
 
