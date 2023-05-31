@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019.
+ * @ Copyright HCL Technologies Ltd. 2019, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 package com.hcl.appscan.jenkins.plugin.auth;
@@ -24,13 +24,17 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 
 	private static final long serialVersionUID = 1L;
 	private Secret m_token;
+	public String m_url;
+        public boolean m_acceptInvalidCerts;
 
 	@DataBoundConstructor
-	public ASoCCredentials(String id, String description, String username, String password) {
-		this(CredentialsScope.GLOBAL, id, description, username, password);
+	public ASoCCredentials(String id, String description, String username, String password, String url, boolean acceptInvalidCerts) {
+		this(CredentialsScope.GLOBAL, id, description, username, password, acceptInvalidCerts);
+		m_url=url;
+                m_acceptInvalidCerts=acceptInvalidCerts;
 	}
 	
-	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password) {
+	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, boolean acceptInvalidCerts) {
 		super(scope, description, description, username, password);
 	}
 	
@@ -38,9 +42,19 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	public CredentialsDescriptor getDescriptor() {
 		return (DescriptorImpl)super.getDescriptor();
 	}
+
+	public String getUrl() {
+		return m_url;
+	}
+
+        public boolean getacceptInvalidCerts() {return m_acceptInvalidCerts;}
 	
 	public String getServer() {
-		return SystemUtil.getServer(getUsername());
+		if(!(m_url == null || m_url.equals(""))){
+			return m_url;
+		} else {
+			return SystemUtil.getServer(getUsername());
+		}
 	}
 	
 	public Secret getToken() {
@@ -73,5 +87,12 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		public FormValidation doCheckPassword(@QueryParameter String password) {
 			return FormValidation.validateRequired(password);
 		}
+
+                public FormValidation doCheckAcceptInvalidCerts(@QueryParameter Boolean acceptInvalidCerts,@QueryParameter String url){
+            		if((url.isEmpty() || url.contains("appscan.com")) && acceptInvalidCerts) {
+                		return FormValidation.error(Messages.error_asoc_certificates_ui());
+            		}
+            		return FormValidation.ok();
+        	}
     }
 }

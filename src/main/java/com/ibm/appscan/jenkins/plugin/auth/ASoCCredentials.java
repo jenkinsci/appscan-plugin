@@ -1,5 +1,5 @@
 /* 
- * @ Copyright HCL Technologies Ltd. 2019.
+ * @ Copyright HCL Technologies Ltd. 2019, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
  
@@ -12,7 +12,7 @@ public class ASoCCredentials extends com.hcl.appscan.jenkins.plugin.auth.ASoCCre
 
 	private static final long serialVersionUID = 1L;
 
-	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password) {
-		super(scope, id, description, username, password);
+	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean acceptInvalidCerts) {
+		super(scope, id, description, username, password, acceptInvalidCerts);
 	}
 }

@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2022.
+ * @ Copyright HCL Technologies Ltd. 2017, 2022, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials;
+import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -323,7 +325,11 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.ok();
 		}
 
-		public FormValidation doCheckTarget(@QueryParameter String target) {
+		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+			JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+			if(checkAppScan360Connection.isAppScan360()){
+				return FormValidation.error(Messages.error_dynamic_AppScan360());
+			}
 			return FormValidation.validateRequired(target);
 		}
 

@@ -1,17 +1,23 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
+import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.scanners.sast.SASTConstants;
 import java.util.HashMap;
 import java.util.Map;
 
+import hudson.RelativePath;
+import hudson.model.ItemGroup;
 import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -87,6 +93,15 @@ public class StaticAnalyzer extends Scanner {
 		@Override
 		public String getDisplayName() {
 			return STATIC_ANALYZER;
+		}
+
+		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+
+            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+			if((openSourceOnly && checkAppScan360Connection.isAppScan360())){
+				return FormValidation.error(Messages.error_sca_ui());
+			}
+			return FormValidation.ok();
 		}
 	}
 }

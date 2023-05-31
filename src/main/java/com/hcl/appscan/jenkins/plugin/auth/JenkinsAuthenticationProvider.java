@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019, 2022.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019, 2022, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -101,8 +101,13 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	private String getToken() {
 		return Secret.toString(m_credentials.getToken());
 	}
+
+	public boolean isAppScan360(){
+		String url = m_credentials.getUrl();
+        	return  url != null && !url.isEmpty() && !url.contains("appscan.com");
+	}
 	
-	private void configureCredentials(String id, ItemGroup<?> context) {
+	public void configureCredentials(String id, ItemGroup<?> context) {
 		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
 		for(ASoCCredentials creds : credentialsList) {
@@ -111,6 +116,11 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 				return;
 			}
 		}
-		m_credentials = new ASoCCredentials("", "", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		m_credentials = new ASoCCredentials("", "", "", "", "",false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
+
+    	@Override
+    	public boolean getacceptInvalidCerts() {
+        	return m_credentials.getacceptInvalidCerts();
+    	}
 }

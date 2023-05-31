@@ -1,5 +1,5 @@
 /**
- * @ Copyright HCL Technologies Ltd. 2019,2020.
+ * @ Copyright HCL Technologies Ltd. 2019,2020, 2023.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -106,5 +106,10 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
     @Override
     public Proxy getProxy() {
         return Proxy.NO_PROXY;
+    }
+
+    @Override
+    public boolean getacceptInvalidCerts(){
+        return false;
     }
 }

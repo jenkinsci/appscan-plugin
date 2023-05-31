@@ -2,11 +2,14 @@
 
 [![AppScan](img/AppScan.svg)](https://cloud.appscan.com)
 
-Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scan using HCL AppScan on Cloud and DAST (Dynamic Application Security Testing) scans using both HCL AppScan on Cloud and HCL AppScan Enterprise.
+Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scan using HCL AppScan on Cloud and HCL AppScan 360°, and DAST (Dynamic Application Security Testing) scans using both HCL AppScan on Cloud and HCL AppScan Enterprise.
 
 ## Prerequisites
 
-The plugin supports scanning through HCL AppScan on Cloud and HCL AppScan Enterprise.
+The plugin supports scanning through following HCL AppScan products:
+ - HCL AppScan on Cloud
+ - HCL AppScan 360°
+ - HCL AppScan Enterprise
 
 **HCL AppScan on Cloud prerequisites**
 
@@ -16,33 +19,39 @@ service. You'll need to [create an
 application](http://help.hcltechsw.com/appscan/ASoC/ent_create_application.html?query=create)
 on the service to associate your scans with.
 
+**HCL AppScan 360°**
+
+To execute scans in HCL AppScan 360°, you must have access to an instance of AppScan 360°. To learn more about AppScan 360° features and installation, click [here](https://help.hcltechsw.com/appscan/360/1.0/appseccloud_plugins_integrations.html).
+
 **HCL AppScan Enterprise prerequisites**
 
 HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for creation and execution of ADAC jobs. To use this integration, you must have access to a running instance of AppScan Enterprise Server  version 9.0.3.14 or later. Please note that Content Scan jobs are not supported through this integration.
 
 ## Usage
-**Integration with HCL AppScan on Cloud**
+**Integration with HCL AppScan on Cloud/HCL AppScan 360°**
+**Note:** Support for SAST scanning using HCL AppScan 360° was added for version 1.1.0 of the Jenkins extension. The existing HCL AppScan on Cloud connection endpoint and build step have been enhanced to allow users to connect to HCL AppScan 360°.
 
-1.  Add your AppScan on Cloud credentials on the Jenkins
+1.  Add your AppScan on Cloud/AppScan 360° credentials on the Jenkins
     **Credentials** page.
     -   From the main Jenkins dashboard, click the **Credentials** link.
     -   Add new global credentials.
-    -   In the **Kind** drop-down list, select **HCL AppScan on Cloud Credentials**.
+    -   In the **Kind** drop-down list, select **HCL AppScan on Cloud Credentials/HCL AppScan 360°**.
     -   Enter your API key details.
-2.  Add a **Run AppScan on Cloud Security Test** build step to your Jenkins project
+    -   Check **Allows Untrusted Connections** to enable untrusted connection to AppScan 360° service.
+2.  Add a **Run AppScan on Cloud Security Test/AppScan 360°** build step to your Jenkins project
     configuration and enter the following information:
     -   **Credentials:** Select the credentials you added to Jenkins in
         step 1 above.
     -   **Application:** Select the application to associate the scan
         with. NOTE: You must create at least 1 application in the
- 	HCL AppScan on Cloud(https://cloud.appscan.com) service or
+ 	HCL AppScan on Cloud(https://cloud.appscan.com) or HCl AppScan 360° service or
         this field will be empty.
     -   **Test Name:** Specify a name to use for the scan. This value
         will be used to distinguish this scan and its results from
         others.
     -   **Test Type:** Select the type of scan to run from the available
         options.
-        -   **Dynamic Analyzer**
+        -   **Dynamic Analyzer:** Available for AppScan on Cloud only
             -   **Starting URL**: Enter the URL from where you want the
                 scan to start exploring the site.
             -   **Additional Options**: If selected, the following
@@ -83,8 +92,12 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
             -   **Target**: Enter the full path to the directory that
                 contains the files that you want to scan or enter the
                 full path to an existing .irx file.
-    -   **Allow intervention by scan enablement team:** When selected (default),
-        our scan enablement team will step in if the scan fails, or if 
+            -   **Additional Options**: If selected, the following options are available.
+                -   Open Source Only: Available for AppScan on Cloud only.
+                    -   When checked, open source and third-party packages used by your code are analyzed. Use of this option requires a specific ASoC Software Composition Analysis (SCA) subscription.
+                -   Source Code Only: When checked, static analysis is executed with source code only option.
+    -   **Allow intervention by scan enablement team:** Available for AppScan on Cloud only 
+        -   When selected (default), our scan enablement team will step in if the scan fails, or if 
         no issues are found, and try to fix the configuration. This may delay 
         the scan result.            
     -   **Suspend job until security analysis completes:** If selected,
@@ -181,3 +194,4 @@ have Mobile Scan configurations must therefore be updated accordingly.
 
 ## Additional Resources
 - [HCL AppScan Enterprise: Jenkins Integration](https://www.youtube.com/watch?v=XctRBAd0HQc)
+- [Blog: HCL AppScan Integrates Security Scanning Easily into the Jenkins Pipeline](https://blog.hcltechsw.com/appscan/hcl-appscan-integrates-security-scanning-easily-into-the-jenkins-pipeline/) 
