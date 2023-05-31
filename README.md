@@ -19,7 +19,7 @@ service. You'll need to [create an
 application](http://help.hcltechsw.com/appscan/ASoC/ent_create_application.html?query=create)
 on the service to associate your scans with.
 
-**HCL AppScan 360°**
+**HCL AppScan 360° prerequisites**
 
 To execute scans in HCL AppScan 360°, you must have access to an instance of AppScan 360°. To learn more about AppScan 360° features and installation, click [here](https://help.hcltechsw.com/appscan/360/1.0/appseccloud_plugins_integrations.html).
 
