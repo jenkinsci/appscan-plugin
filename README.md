@@ -2,7 +2,7 @@
 
 [![AppScan](img/AppScan.svg)](https://cloud.appscan.com)
 
-Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scan using HCL AppScan on Cloud and HCL AppScan 360°, and DAST (Dynamic Application Security Testing) scans using both HCL AppScan on Cloud and HCL AppScan Enterprise.
+Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins Plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scan using HCL AppScan on Cloud and HCL AppScan 360° and DAST (Dynamic Application Security Testing) scans using both HCL AppScan on Cloud and HCL AppScan Enterprise.
 
 ## Prerequisites
 
@@ -28,17 +28,16 @@ To execute scans in HCL AppScan 360°, you must have access to an instance of Ap
 HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for creation and execution of ADAC jobs. To use this integration, you must have access to a running instance of AppScan Enterprise Server  version 9.0.3.14 or later. Please note that Content Scan jobs are not supported through this integration.
 
 ## Usage
-**Integration with HCL AppScan on Cloud/HCL AppScan 360°**
-**Note:** Support for SAST scanning using HCL AppScan 360° was added for version 1.1.0 of the Jenkins extension. The existing HCL AppScan on Cloud connection endpoint and build step have been enhanced to allow users to connect to HCL AppScan 360°.
+**Integration with HCL AppScan on Cloud/HCL AppScan 360°**                                                                                                 **Note:** Support for SAST scanning using HCL AppScan 360° was added for version 1.1.0 of the Jenkins extension. The existing HCL AppScan on Cloud connection endpoint and build step have been enhanced to allow users to connect to HCL AppScan 360°.
 
 1.  Add your AppScan on Cloud/AppScan 360° credentials on the Jenkins
     **Credentials** page.
     -   From the main Jenkins dashboard, click the **Credentials** link.
     -   Add new global credentials.
-    -   In the **Kind** drop-down list, select **HCL AppScan on Cloud Credentials/HCL AppScan 360°**.
+    -   In the **Kind** drop-down list, select **HCL AppScan on Cloud/HCL AppScan 360° Credentials**.
     -   Enter your API key details.
-    -   Check **Allows Untrusted Connections** to enable untrusted connection to AppScan 360° service.
-2.  Add a **Run AppScan on Cloud Security Test/AppScan 360°** build step to your Jenkins project
+    -   Check **Allow Untrusted Connections** to enable untrusted connection to AppScan 360° service.
+2.  Add a **Run AppScan on Cloud/AppScan 360° Security Test** build step to your Jenkins project
     configuration and enter the following information:
     -   **Credentials:** Select the credentials you added to Jenkins in
         step 1 above.
