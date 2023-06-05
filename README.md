@@ -44,14 +44,14 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
         step 1 above.
     -   **Application:** Select the application to associate the scan
         with. NOTE: You must create at least 1 application in the
- 	HCL AppScan on Cloud(https://cloud.appscan.com) or HCl AppScan 360° service or
+ 	HCL AppScan on Cloud(https://cloud.appscan.com) or HCL AppScan 360° service or
         this field will be empty.
     -   **Test Name:** Specify a name to use for the scan. This value
         will be used to distinguish this scan and its results from
         others.
     -   **Test Type:** Select the type of scan to run from the available
         options.
-        -   **Dynamic Analyzer:** Available for AppScan on Cloud only
+        -   **Dynamic Analyzer:** Available for AppScan on Cloud only.
             -   **Starting URL**: Enter the URL from where you want the
                 scan to start exploring the site.
             -   **Additional Options**: If selected, the following
@@ -80,7 +80,7 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
                     topic](https://help.hcltechsw.com/appscan/ASoC/asd_AppScanStandard.html).
 				-   **Application login**: Select a Login method from the available options so 
 											AppScan can scan pages that require authentication. 
-					- **Login not required**: Leave this selected if no login is needed
+					- **Login not required**: Leave this selected if no login is needed.
 					- **Login required: Username and password**: Select this option to allow login to the application 
 																	using a username and password.
 						-   **Login User** and **Login Password**: If your app requires login, enter valid user credentials so that 
@@ -96,7 +96,7 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
                 -   Open Source Only: Available for AppScan on Cloud only.
                     -   When checked, open source and third-party packages used by your code are analyzed. Use of this option requires a specific ASoC Software Composition Analysis (SCA) subscription.
                 -   Source Code Only: When checked, static analysis is executed with source code only option.
-    -   **Allow intervention by scan enablement team:** Available for AppScan on Cloud only 
+    -   **Allow intervention by scan enablement team:** Available for AppScan on Cloud only. 
         -   When selected (default), our scan enablement team will step in if the scan fails, or if 
         no issues are found, and try to fix the configuration. This may delay 
         the scan result.            
