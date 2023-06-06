@@ -33,21 +33,21 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
 
 1.  Add your AppScan on Cloud/AppScan 360° credentials on the Jenkins
     **Credentials** page.
-    -   From the main Jenkins dashboard, click the **Credentials** link.
-    -   Add new global credentials.
-    -   In the **Kind** drop-down list, select **HCL AppScan on Cloud/HCL AppScan 360° Credentials**.
-    -   Enter your API key details.
-    -   Check **Allow Untrusted Connections** to enable untrusted connection to AppScan 360° service.
+    a.  From the main Jenkins dashboard, click **Credentials**.
+    b.  Add new global credentials.
+    c.  In the **Kind** drop-down list, select **HCL AppScan on Cloud/HCL AppScan 360° Credentials**.
+    d.  Enter your API key details.
+    e.  Check **Allow Untrusted Connections** to enable untrusted connection to AppScan 360° service.
 2.  Add a **Run AppScan on Cloud/AppScan 360° Security Test** build step to your Jenkins project
     configuration and enter the following information:
     -   **Credentials:** Select the credentials you added to Jenkins in
         step 1 above.
-    -   **Application:** Select the application to associate the scan
-        with. NOTE: You must create at least 1 application in the
+    -   **Application:** Select the application to associate with the scan.
+        NOTE: You must create at least one application in the
  	HCL AppScan on Cloud(https://cloud.appscan.com) or HCL AppScan 360° service or
-        this field will be empty.
+        this field is empty.
     -   **Test Name:** Specify a name to use for the scan. This value
-        will be used to distinguish this scan and its results from
+        is used to distinguish this scan and its results from
         others.
     -   **Test Type:** Select the type of scan to run from the available
         options.
@@ -119,11 +119,11 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
 
 1.  Add your AppScan Enterprise credentials on the Jenkins
     **Credentials** page.
-    -   From the main Jenkins dashboard, click the **Credentials** link.
-    -   Add new global credentials.
-    -   In the **Kind** drop-down list, select **HCL AppScan Enterprise Credentials**.
-    -   Enter your AppScan Enterprise server URL. For e.g. https:// ASE Server hostname:9443/ase
-    -   Enter your API key details.
+    a.  From the main Jenkins dashboard, click the **Credentials** link.
+    b.  Add new global credentials.
+    c.  In the **Kind** drop-down list, select **HCL AppScan Enterprise Credentials**.
+    d.  Enter your AppScan Enterprise server URL. For example https:// ASE Server hostname:9443/ase
+    e.  Enter your API key details.
     
 2.  Add a **Run AppScan Enterprise Security Test** build step to your Jenkins project
     configuration and enter the following information:    
@@ -195,3 +195,4 @@ have Mobile Scan configurations must therefore be updated accordingly.
 ## Additional Resources
 - [HCL AppScan Enterprise: Jenkins Integration](https://www.youtube.com/watch?v=XctRBAd0HQc)
 - [Blog: HCL AppScan Integrates Security Scanning Easily into the Jenkins Pipeline](https://blog.hcltechsw.com/appscan/hcl-appscan-integrates-security-scanning-easily-into-the-jenkins-pipeline/) 
+- [Blog: Leveraging HCL AppScan on Cloud for More Secure Coding in Jenkins](https://blog.hcltechsw.com/appscan/leveraging-hcl-appscan-on-cloud-for-more-secure-coding-in-jenkins/)
