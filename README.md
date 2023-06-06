@@ -33,11 +33,11 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
 
 1.  Add your AppScan on Cloud/AppScan 360° credentials on the Jenkins
     **Credentials** page.
-    a.  From the main Jenkins dashboard, click **Credentials**.
-    b.  Add new global credentials.
-    c.  In the **Kind** drop-down list, select **HCL AppScan on Cloud/HCL AppScan 360° Credentials**.
-    d.  Enter your API key details.
-    e.  Check **Allow Untrusted Connections** to enable untrusted connection to AppScan 360° service.
+    -   From the main Jenkins dashboard, click **Credentials**.
+    -   Add new global credentials.
+    -   In the **Kind** drop-down list, select **HCL AppScan on Cloud/HCL AppScan 360° Credentials**.
+    -   Enter your API key details.
+    -   Check **Allow Untrusted Connections** to enable untrusted connection to AppScan 360° service.
 2.  Add a **Run AppScan on Cloud/AppScan 360° Security Test** build step to your Jenkins project
     configuration and enter the following information:
     -   **Credentials:** Select the credentials you added to Jenkins in
@@ -119,11 +119,11 @@ HCL AppScan Jenkins Plug-in supports integration with HCL AppScan Enterprise for
 
 1.  Add your AppScan Enterprise credentials on the Jenkins
     **Credentials** page.
-    a.  From the main Jenkins dashboard, click the **Credentials** link.
-    b.  Add new global credentials.
-    c.  In the **Kind** drop-down list, select **HCL AppScan Enterprise Credentials**.
-    d.  Enter your AppScan Enterprise server URL. For example https:// ASE Server hostname:9443/ase
-    e.  Enter your API key details.
+    -   From the main Jenkins dashboard, click the **Credentials** link.
+    -   Add new global credentials.
+    -   In the **Kind** drop-down list, select **HCL AppScan Enterprise Credentials**.
+    -   Enter your AppScan Enterprise server URL. For example https:// ASE Server hostname:9443/ase.
+    -   Enter your API key details.
     
 2.  Add a **Run AppScan Enterprise Security Test** build step to your Jenkins project
     configuration and enter the following information:    
