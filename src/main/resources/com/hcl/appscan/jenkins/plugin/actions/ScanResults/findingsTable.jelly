@@ -7,12 +7,12 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	<table>
     	<h3><a href="${it.urlName}">${it.displayName}</a></h3>
 		<tr>
-			<td style="width: 16.66%">${%Total Issues}</td>
-			<td style="width: 16.66%">${%Critical}</td>
-			<td style="width: 16.66%">${%High}</td>
-			<td style="width: 16.66%">${%Med}</td>
-			<td style="width: 16.66%">${%Low}</td>
-			<td style="width: 16.66%">${%Info}</td>
+			<td style="width: 70px">${%Total Issues}</td>
+			<td style="width: 60px">${%Critical}</td>
+			<td style="width: 60px">${%High}</td>
+			<td style="width: 60px">${%Medium}</td>
+			<td style="width: 60px">${%Low}</td>
+			<td style="width: 60px">${%Info}</td>
 		</tr>
 		<tr>
 			<td style="font-size: 200%">${it.totalFindings}</td>
