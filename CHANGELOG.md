@@ -1,6 +1,6 @@
 CHANGELOG
 =========
-2.1.0 (June, 2023)
+1.1.0 (June, 2023)
 ------
 - Support for executing SAST Scans via AppScan 360°.
 - Support source code only scans in Static Analysis.
