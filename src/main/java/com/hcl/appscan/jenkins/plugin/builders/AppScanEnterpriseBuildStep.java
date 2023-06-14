@@ -444,6 +444,19 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 	}
 
+    private String getUpdatedApplicationId(Map<String, String> application){
+        String appId = null;
+        if(application != null) {
+            for(Map.Entry<String, String> entry : application.entrySet()){
+                String appName = StringEscapeUtils.unescapeHtml(entry.getValue());
+                if(appName != null && appName.equals(m_application)) {
+                    appId = entry.getKey();
+                }
+            }
+        }
+        return appId;
+    }
+
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
 		Map<String, String> properties = getScanProperties(build, listener);
@@ -451,6 +464,14 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				build.getParent().getParent());
 		final IProgress progress = new ScanProgress(listener);
 		final boolean suspend = m_wait;
+        if(m_application.equals(getApplication())){
+            IASEAuthenticationProvider authProvider = (IASEAuthenticationProvider) m_authProvider;
+            Map<String, String> appList = new ASEApplicationProvider(authProvider).getApplications();
+            m_application = getUpdatedApplicationId(appList);
+            properties.remove("application");
+            properties.put("application", m_application);
+            getDescriptor().applicationMap = appList;
+        }
 		final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider); // Call ASEScanFactory directly
 
 		IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
