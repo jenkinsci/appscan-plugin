@@ -32,16 +32,18 @@ public class StaticAnalyzer extends Scanner {
         
         private boolean m_openSourceOnly;
         private boolean m_sourceCodeOnly;
+        private String m_scanSpeed;
         
         @Deprecated
         public StaticAnalyzer(String target){
             this(target,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanSpeed){
             super(target, hasOptions);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
+            m_scanSpeed=scanSpeed;
         }
         
 	@DataBoundConstructor
@@ -49,12 +51,29 @@ public class StaticAnalyzer extends Scanner {
 		super(target, hasOptions);
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
+                m_scanSpeed="";
 	}
 
 	@Override
 	public String getType() {
 		return STATIC_ANALYZER;
 	}
+
+    @DataBoundSetter
+    public void setScanSpeed(String scanSpeed) {
+            m_scanSpeed = scanSpeed;
+    }
+
+    public String getScanSpeed() {
+        return m_scanSpeed;
+    }
+
+    public String isScanSpeed(String scanspeed) {
+        if (m_scanSpeed != null) {
+            return m_scanSpeed.equalsIgnoreCase(scanspeed) ? "true" : "false";
+        }
+        return "";
+    }
         
         public boolean isOpenSourceOnly() {
             return m_openSourceOnly;
@@ -82,6 +101,9 @@ public class StaticAnalyzer extends Scanner {
                 }
                 if (m_sourceCodeOnly && getHasOptions()) {
                     properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
+                }
+                if(m_scanSpeed!=null && !m_scanSpeed.equals("") && getHasOptions()){
+                    properties.put(SCAN_SPEED, m_scanSpeed);
                 }
 		return properties;
 	}

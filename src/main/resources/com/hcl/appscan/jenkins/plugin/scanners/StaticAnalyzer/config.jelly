@@ -18,6 +18,47 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
             <f:entry field="sourceCodeOnly">
         <f:checkbox title="${%label.sourcecode.only}" onclick="sourceCodeOnlyClicked(this);" name="sourceCodeOnly"/>
 			</f:entry>
+
+			<f:entry title="${%label.scan.speed.option}" help="/plugin/appscan/help/scanSpeed.html">
+			</f:entry>
+			<f:entry>
+            			<f:radioBlock name="scanSpeed" title="${%label.simple}" checked="${instance.isScanSpeed('simple')}" value="simple" inline="true">
+                                    <f:entry>
+                                        <div style="border-style:solid;border-color:lightgrey">
+                                            <ul>
+                                                A simple scan performs a surface-level analysis of your files to identify the most pressing issues for remediation. It takes the least amount of time to complete.
+                                            </ul>
+                                        </div>
+                                    </f:entry>
+                        </f:radioBlock>
+                        <f:radioBlock name="scanSpeed" title="${%label.balanced}" checked="${instance.isScanSpeed('balanced')}" value="balanced" inline="true">
+                                                            <f:entry>
+                                                                <div style="border-style:solid;border-color:lightgrey">
+                                                                    <ul>
+                                                                        A balanced scan provides a medium level of detail on the analysis and identification of security issues, and takes a bit more time to complete than the 'simple' scan.
+                                                                    </ul>
+                                                                </div>
+                                                            </f:entry>
+                        </f:radioBlock>
+                        <f:radioBlock name="scanSpeed" title="${%label.deep}" checked="${(instance.isScanSpeed('deep')== null) ? 'true' : (instance.isScanSpeed('deep'))}" value="deep" inline="true">
+                                                            <f:entry>
+                                                                <div style="border-style:solid;border-color:lightgrey">
+                                                                    <ul>
+                                                                        A deep scan performs a more complete analysis of your files to identify vulnerabilities, and usually takes longer to complete.
+                                                                    </ul>
+                                                                </div>
+                                                            </f:entry>
+                        </f:radioBlock>
+                        <f:radioBlock name="scanSpeed" title="${%label.thorough}" checked="${instance.isScanSpeed('thorough')}" value="thorough" inline="true">
+                                                            <f:entry>
+                                                                <div style="border-style:solid;border-color:lightgrey">
+                                                                    <ul>
+                                                                        A thorough scan performs a comprehensive analysis to identify the most comprehensive list of vulnerabilities and will take the longest time to complete.
+                                                                    </ul>
+                                                                </div>
+                                                            </f:entry>
+                        </f:radioBlock>
+            </f:entry>
 	</f:optionalBlock>
 
 </j:jelly>
