@@ -445,16 +445,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 
     private String getUpdatedApplicationId(Map<String, String> application){
-        String appId = null;
         if(application != null) {
             for(Map.Entry<String, String> entry : application.entrySet()){
                 String appName = StringEscapeUtils.unescapeHtml(entry.getValue());
                 if(appName != null && appName.equals(m_application)) {
-                    appId = entry.getKey();
+                    return entry.getKey();
                 }
             }
         }
-        return appId;
+        return null;
     }
 
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
