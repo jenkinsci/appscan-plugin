@@ -72,7 +72,7 @@ public class StaticAnalyzer extends Scanner {
         if (m_scanSpeed != null) {
             return m_scanSpeed.equalsIgnoreCase(scanspeed) ? "true" : "false";
         }
-        return "";
+        return null;
     }
         
         public boolean isOpenSourceOnly() {
