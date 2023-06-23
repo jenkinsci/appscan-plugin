@@ -467,7 +467,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
             		IASEAuthenticationProvider authProvider = (IASEAuthenticationProvider) m_authProvider;
             		Map<String, String> appList = new ASEApplicationProvider(authProvider).getApplications();
             		m_application = getUpdatedApplicationId(appList);
-            		properties.remove("application");
             		properties.put("application", m_application);
             		getDescriptor().applicationMap = appList;
         	}
