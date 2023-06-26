@@ -464,6 +464,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		final IProgress progress = new ScanProgress(listener);
 		final boolean suspend = m_wait;
         	if(m_application.equals(getApplication())){
+		// indicating that we have an application name, not an id, so we need to fetch the id
             		IASEAuthenticationProvider authProvider = (IASEAuthenticationProvider) m_authProvider;
             		Map<String, String> appList = new ASEApplicationProvider(authProvider).getApplications();
             		m_application = getUpdatedApplicationId(appList);
