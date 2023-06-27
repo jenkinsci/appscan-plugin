@@ -22,7 +22,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 			<f:entry title="${%label.scan.speed.option}" help="/plugin/appscan/help/scanSpeed.html">
 			</f:entry>
 			<f:entry>
-            			<f:radioBlock name="scanSpeed" title="${%label.simple}" checked="${instance.isScanSpeed('simple')}" value="simple" inline="true">
+            			<f:radioBlock name="scanSpeed" title="${%label.simple}" checked="${instance.checkScanSpeed('simple')}" value="simple" inline="true">
                                     <f:entry>
                                         <div style="border-style:solid;border-color:lightgrey">
                                             <ul>
@@ -31,7 +31,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
                                         </div>
                                     </f:entry>
                         </f:radioBlock>
-                        <f:radioBlock name="scanSpeed" title="${%label.balanced}" checked="${instance.isScanSpeed('balanced')}" value="balanced" inline="true">
+                        <f:radioBlock name="scanSpeed" title="${%label.balanced}" checked="${instance.checkScanSpeed('balanced')}" value="balanced" inline="true">
                                                             <f:entry>
                                                                 <div style="border-style:solid;border-color:lightgrey">
                                                                     <ul>
@@ -40,7 +40,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
                                                                 </div>
                                                             </f:entry>
                         </f:radioBlock>
-                        <f:radioBlock name="scanSpeed" title="${%label.deep}" checked="${(instance.isScanSpeed('deep') == null) ? 'true' : (instance.isScanSpeed('deep'))}" value="deep" inline="true">
+                        <f:radioBlock name="scanSpeed" title="${%label.deep}" checked="${(instance.checkScanSpeed('deep') == null) ? 'true' : (instance.checkScanSpeed('deep'))}" value="deep" inline="true">
                                                             <f:entry>
                                                                 <div style="border-style:solid;border-color:lightgrey">
                                                                     <ul>
@@ -49,7 +49,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
                                                                 </div>
                                                             </f:entry>
                         </f:radioBlock>
-                        <f:radioBlock name="scanSpeed" title="${%label.thorough}" checked="${instance.isScanSpeed('thorough')}" value="thorough" inline="true">
+                        <f:radioBlock name="scanSpeed" title="${%label.thorough}" checked="${instance.checkScanSpeed('thorough')}" value="thorough" inline="true">
                                                             <f:entry>
                                                                 <div style="border-style:solid;border-color:lightgrey">
                                                                     <ul>

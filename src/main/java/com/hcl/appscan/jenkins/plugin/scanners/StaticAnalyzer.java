@@ -51,7 +51,7 @@ public class StaticAnalyzer extends Scanner {
 		super(target, hasOptions);
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
-                m_scanSpeed="";
+                m_scanSpeed=DEEP;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class StaticAnalyzer extends Scanner {
         return m_scanSpeed;
     }
 
-    public String isScanSpeed(String scanspeed) {
+    public String checkScanSpeed(String scanspeed) {
         if (m_scanSpeed != null) {
             return m_scanSpeed.equalsIgnoreCase(scanspeed) ? "true" : "false";
         }
