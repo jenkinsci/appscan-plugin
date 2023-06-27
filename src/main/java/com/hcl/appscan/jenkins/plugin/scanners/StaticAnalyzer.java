@@ -59,21 +59,21 @@ public class StaticAnalyzer extends Scanner {
 		return STATIC_ANALYZER;
 	}
 
-    @DataBoundSetter
-    public void setScanSpeed(String scanSpeed) {
-            m_scanSpeed = scanSpeed;
-    }
+    	@DataBoundSetter
+   	public void setScanSpeed(String scanSpeed) {
+            	m_scanSpeed = scanSpeed;
+    	}
 
-    public String getScanSpeed() {
-        return m_scanSpeed;
-    }
+    	public String getScanSpeed() {
+        	return m_scanSpeed;
+    	}
 
-    public String checkScanSpeed(String scanspeed) {
-        if (m_scanSpeed != null) {
-            return m_scanSpeed.equalsIgnoreCase(scanspeed) ? "true" : "false";
-        }
-        return null;
-    }
+    	public String checkScanSpeed(String scanSpeed) {
+        	if (m_scanSpeed != null) {
+            	return m_scanSpeed.equalsIgnoreCase(scanSpeed) ? "true" : "false";
+        		}
+        	return null;
+    	}
         
         public boolean isOpenSourceOnly() {
             return m_openSourceOnly;
