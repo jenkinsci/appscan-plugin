@@ -8,8 +8,12 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	<f:entry title="${%label.target.directory}" field="target">
 		<f:textbox />
 	</f:entry>
+
+	<f:entry field="irxLess">
+    		<f:checkbox title="${%label.irx.less}" onclick="irxLessClicked(this);" name="irxLess"/>
+    </f:entry>
         
-        <f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
+        <f:optionalBlock title="${%label.additional.options}" field="hasOptions" onclick="additionalOptionsClicked(this);" inline="true" name="additionalOptions">
 
             <f:entry field="openSourceOnly">
 		<f:checkbox title="${%label.opensource.only}" onclick="openSourceOnlyClicked(this);" name="openSourceOnly"/>

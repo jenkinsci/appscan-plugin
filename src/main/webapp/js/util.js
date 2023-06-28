@@ -70,6 +70,24 @@ function waitClicked(e) {
 	}
 }
 
+function additionalOptionsClicked(e){
+	if (e.checked) {
+		var irxLessCheckbox = getComponent(e, 'irxLess');
+		if (irxLessCheckbox != null) {
+			irxLessCheckbox.checked = false;
+		}
+	}
+}
+
+function irxLessClicked(e){
+	if (e.checked) {
+		var additionalOptionsCheckbox = getComponent(e, 'additionalOptions');
+		if (additionalOptionsCheckbox != null) {
+			additionalOptionsCheckbox.checked = false;
+		}
+	}
+}
+
 function sourceCodeOnlyClicked(e){
 	if (e.checked) {
 		var osoCheckbox = getComponent(e, 'openSourceOnly');
