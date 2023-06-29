@@ -51,7 +51,7 @@ public class StaticAnalyzer extends Scanner {
 		super(target, hasOptions);
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
-                m_scanSpeed=DEEP;
+                m_scanSpeed="";
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class StaticAnalyzer extends Scanner {
                 if (m_sourceCodeOnly && getHasOptions()) {
                     properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
                 }
-                if(m_scanSpeed!=null && !m_scanSpeed.equals("") && getHasOptions()){
+                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
                     properties.put(SCAN_SPEED, m_scanSpeed);
                 }
 		return properties;

@@ -39,5 +39,4 @@ public interface ScannerConstants {
 	String NO_OPTIMIZATION          = "NoOptimization";         //$NON-NLS-1$
 	String TEST_OPTIMIZATION_LEVEL  = "TestOptimizationLevel";  //$NON-NLS-1$
     	String SCAN_SPEED               = "scanSpeed";              //$NON-NLS-1$
-    	String DEEP                     = "deep";                   //$NON-NLS-1$
 }
