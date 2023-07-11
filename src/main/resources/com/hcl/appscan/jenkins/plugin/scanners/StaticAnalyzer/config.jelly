@@ -5,15 +5,19 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 
-	<f:entry title="${%label.target.directory}" field="target">
+	    <f:entry title="${%label.target.directory}" field="target">
 		<f:textbox />
 	</f:entry>
 
-	<f:entry field="irxLess">
-    		<f:checkbox title="${%label.irx.less}" onclick="irxLessClicked(this);" name="irxLess"/>
-    </f:entry>
-        
-        <f:optionalBlock title="${%label.additional.options}" field="hasOptions" onclick="additionalOptionsClicked(this);" inline="true" name="additionalOptions">
+	<f:entry title="${%label.static.scan.options}">
+               <f:radioBlock name="scanMethod" title="${%label.create.irx}" checked="true" value="createIRX" inline="true" help="/plugin/appscan/help/createIRX.html" >
+               </f:radioBlock>
+
+                    <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" help="/plugin/appscan/help/uploadDirect.html" >
+            		</f:radioBlock>
+        </f:entry>
+
+        <f:optionalBlock title="${%label.additional.options}" field="hasOptions" checked="${instance.scanMethod == 'createIRX'}" inline="true" name="additionalOptions">
 
             <f:entry field="openSourceOnly">
 		<f:checkbox title="${%label.opensource.only}" onclick="openSourceOnlyClicked(this);" name="openSourceOnly"/>

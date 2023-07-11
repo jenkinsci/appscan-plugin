@@ -72,15 +72,15 @@ function waitClicked(e) {
 
 function additionalOptionsClicked(e){
 	if (e.checked) {
-		var irxLessCheckbox = getComponent(e, 'irxLess');
-		if (irxLessCheckbox != null) {
-			irxLessCheckbox.checked = false;
+		var uploadDirectButton = getComponent(e, 'uploadDirect');
+		if (uploadDirectButton != null) {
+			uploadDirectButton.checked = "create IRX";
 		}
 	}
 }
 
-function irxLessClicked(e){
-	if (e.checked) {
+function uploadDirectClicked(e){
+	if (e.) {
 		var additionalOptionsCheckbox = getComponent(e, 'additionalOptions');
 		if (additionalOptionsCheckbox != null) {
 			additionalOptionsCheckbox.checked = false;
