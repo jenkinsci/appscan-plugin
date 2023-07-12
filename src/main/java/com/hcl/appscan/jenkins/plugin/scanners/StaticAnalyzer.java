@@ -51,7 +51,7 @@ public class StaticAnalyzer extends Scanner {
 		super(target, hasOptions);
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
-                m_scanMethod="createIRX";
+                m_scanMethod=CoreConstants.CREATE_IRX;
 	}
 
 	@Override
