@@ -151,7 +151,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// Post autocomplete feature, to handle backward compatibiliy 
 		// we have to initialize autocomplete lists explicitly 
 		// for already existing jobs.
-		if (m_credentials != null && m_credentials != ""
+		if (m_credentials != null && !m_credentials.isEmpty()
 				&& getDescriptor().folderMap == null
 				&& getDescriptor().applicationMap == null
 				&& getDescriptor().templateMap == null) {

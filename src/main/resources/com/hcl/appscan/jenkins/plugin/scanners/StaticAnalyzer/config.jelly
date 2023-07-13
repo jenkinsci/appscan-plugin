@@ -26,6 +26,47 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
             <f:entry field="sourceCodeOnly">
         <f:checkbox title="${%label.sourcecode.only}" onclick="sourceCodeOnlyClicked(this);" name="sourceCodeOnly"/>
 			</f:entry>
+
+			<f:entry title="${%label.scan.speed.option}" help="/plugin/appscan/help/scanSpeed.html">
+			</f:entry>
+			<f:entry>
+            			 <f:radioBlock name="scanSpeed" title="${%label.normal}" checked="${instance.checkScanSpeed('normal')}" value="normal" inline="true">
+                                                                                    <f:entry>
+                                                                                        <div style="border-style:solid;border-color:lightgrey">
+                                                                                            <ul>
+                                                                                                Performs a complete analysis of the code, identifying vulnerabilities in detail and differentiating issues that could be reported as false positives. This scan takes the longest to complete.
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </f:entry>
+                                                  </f:radioBlock>
+                         <f:radioBlock name="scanSpeed" title="${%label.fast}" checked="${(instance.checkScanSpeed('fast') == null) ? 'true' : (instance.checkScanSpeed('fast'))}" value="fast" inline="true">
+                                                                                     <f:entry>
+                                                                                         <div style="border-style:solid;border-color:lightgrey">
+                                                                                             <ul>
+                                                                                                Performs a comprehensive analysis of your files to identify vulnerabilities, taking longer to complete than “Faster” or “Fastest” scans.
+                                                                                             </ul>
+                                                                                         </div>
+                                                                                     </f:entry>
+                                                 </f:radioBlock>
+                         <f:radioBlock name="scanSpeed" title="${%label.faster}" checked="${instance.checkScanSpeed('faster')}" value="faster" inline="true">
+                                                                                     <f:entry>
+                                                                                         <div style="border-style:solid;border-color:lightgrey">
+                                                                                             <ul>
+                                                                                                 Provides a medium level of detail of analysis and identification of security issues.  This scan takes more time to complete than the “Fastest” option.
+                                                                                             </ul>
+                                                                                         </div>
+                                                                                     </f:entry>
+                                                 </f:radioBlock>
+            			<f:radioBlock name="scanSpeed" title="${%label.fastest}" checked="${instance.checkScanSpeed('fastest')}" value="fastest" inline="true">
+                                    <f:entry>
+                                        <div style="border-style:solid;border-color:lightgrey">
+                                            <ul>
+                                                Performs a surface-level analysis of your files to identify the most pressing issues for remediation, taking the least amount of time to complete.
+                                            </ul>
+                                        </div>
+                                    </f:entry>
+                        </f:radioBlock>
+            </f:entry>
 	</f:optionalBlock>
 
 </j:jelly>
