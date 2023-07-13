@@ -133,11 +133,7 @@ public class DynamicAnalyzer extends Scanner {
 
 	@DataBoundSetter
 	public void setOptimization(String optimization) {
-		if(optimization != null) {
-			m_optimization = mapOldtoNewOptLevels(optimization);
-		} else {
-			m_optimization = optimization;
-		}
+        m_optimization = (optimization != null) ? mapOldtoNewOptLevels(optimization) : null;
 	}
 
 	public String getOptimization() {

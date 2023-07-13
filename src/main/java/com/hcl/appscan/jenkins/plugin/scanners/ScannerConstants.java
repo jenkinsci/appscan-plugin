@@ -38,4 +38,5 @@ public interface ScannerConstants {
 	String FASTEST                  = "Fastest";                //$NON-NLS-1$
 	String NO_OPTIMIZATION          = "NoOptimization";         //$NON-NLS-1$
 	String TEST_OPTIMIZATION_LEVEL  = "TestOptimizationLevel";  //$NON-NLS-1$
+    	String SCAN_SPEED               = "scanSpeed";              //$NON-NLS-1$
 }
