@@ -70,24 +70,6 @@ function waitClicked(e) {
 	}
 }
 
-function additionalOptionsClicked(e){
-	if (e.checked) {
-		var uploadDirectButton = getComponent(e, 'uploadDirect');
-		if (uploadDirectButton != null) {
-			uploadDirectButton.checked = "create IRX";
-		}
-	}
-}
-
-function uploadDirectClicked(e){
-	if (e.) {
-		var additionalOptionsCheckbox = getComponent(e, 'additionalOptions');
-		if (additionalOptionsCheckbox != null) {
-			additionalOptionsCheckbox.checked = false;
-		}
-	}
-}
-
 function sourceCodeOnlyClicked(e){
 	if (e.checked) {
 		var osoCheckbox = getComponent(e, 'openSourceOnly');

@@ -33,19 +33,17 @@ public class StaticAnalyzer extends Scanner {
         private boolean m_openSourceOnly;
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
-        private String m_scanSpeed;
         
         @Deprecated
         public StaticAnalyzer(String target){
             this(target,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod){
             super(target, hasOptions);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
-            m_scanSpeed=scanSpeed;
         }
         
 	@DataBoundConstructor
@@ -54,29 +52,12 @@ public class StaticAnalyzer extends Scanner {
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
-                m_scanSpeed="";
 	}
 
 	@Override
 	public String getType() {
 		return STATIC_ANALYZER;
 	}
-
-    	@DataBoundSetter
-   	public void setScanSpeed(String scanSpeed) {
-            	m_scanSpeed = scanSpeed;
-    	}
-
-    	public String getScanSpeed() {
-        	return m_scanSpeed;
-    	}
-
-    	public String checkScanSpeed(String scanSpeed) {
-        	if (m_scanSpeed != null) {
-            	return m_scanSpeed.equalsIgnoreCase(scanSpeed) ? "true" : "false";
-        		}
-        	return null;
-    	}
         
         public boolean isOpenSourceOnly() {
             return m_openSourceOnly;
@@ -120,8 +101,6 @@ public class StaticAnalyzer extends Scanner {
                 }
                 if (m_scanMethod!=null) {
                     properties.put(CoreConstants.SCAN_METHOD, m_scanMethod);
-                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
-                    properties.put(SCAN_SPEED, m_scanSpeed);
                 }
 		return properties;
 	}
@@ -137,12 +116,10 @@ public class StaticAnalyzer extends Scanner {
 
 		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanMethod) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
-			if((openSourceOnly && checkAppScan360Connection.isAppScan360())){
-				return FormValidation.error(Messages.error_sca_ui());
-			} else if (openSourceOnly && scanMethod.equals("uploadDirect")) {
-                return FormValidation.error("OSO is not applicable for this scan method");
+			if((openSourceOnly && checkAppScan360Connection.isAppScan360())) {
+                return FormValidation.error(Messages.error_sca_ui());
             }
-			return FormValidation.ok();
+            return FormValidation.ok();
 		}
 	}
 }
