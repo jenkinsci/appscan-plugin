@@ -121,5 +121,19 @@ public class StaticAnalyzer extends Scanner {
             }
             return FormValidation.ok();
 		}
+
+        public FormValidation doCheckSourceCodeOnly(@QueryParameter String scanMethod,@QueryParameter Boolean additionalOptions, @QueryParameter Boolean sourceCodeOnly){
+            if(scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && sourceCodeOnly){
+                return FormValidation.error("options are not meant for this scan method");
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckAdditionalOptions(@QueryParameter String scanMethod,@QueryParameter Boolean additionalOptions, @QueryParameter Boolean sourceCodeOnly){
+            if(scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && additionalOptions){
+                return FormValidation.error("options are not meant for this scan method");
+            }
+            return FormValidation.ok();
+        }
 	}
 }

@@ -310,6 +310,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
+        if(properties.get(CoreConstants.SCAN_METHOD).equals(CoreConstants.UPLOAD_DIRECT)){
+            if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY) || properties.containsKey(CoreConstants.SOURCE_CODE_ONLY)){
+                progress.setStatus(new Message(Message.WARNING, "Additional Options are not meant for this scan method"));
+            }
+        }
+
     	
     	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;

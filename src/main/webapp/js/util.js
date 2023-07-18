@@ -88,6 +88,15 @@ function openSourceOnlyClicked(e){
 	}
 }
 
+function uploadDirectClicked(e){
+     if(e.checked) {
+        var additionalOptionsCheckbox = getComponent(e,'additionalOptions');
+        if( additionalOptionsCheckbox != null){
+             additionalOptionsCheckbox.checked = false;
+        }
+     }
+}
+
 function aseFailBuildClicked(e) {
 	if(e.checked) {
 		var waitCheckbox = getComponent(e, 'wait');
