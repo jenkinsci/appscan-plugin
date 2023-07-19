@@ -311,7 +311,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
 
         if(properties.get(CoreConstants.SCAN_METHOD).equals(CoreConstants.UPLOAD_DIRECT)){
-            if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY) || properties.containsKey(CoreConstants.SOURCE_CODE_ONLY)){
+            if(getScanner().getHasOptions()){
                 progress.setStatus(new Message(Message.WARNING, "Additional Options are not meant for this scan method"));
             }
         }
