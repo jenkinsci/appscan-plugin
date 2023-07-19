@@ -8,9 +8,8 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 import com.hcl.appscan.sdk.CoreConstants;
-import com.hcl.appscan.sdk.scanners.sast.SASTConstants;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,10 +113,10 @@ public class StaticAnalyzer extends Scanner {
 			return STATIC_ANALYZER;
 		}
 
-		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanMethod) {
+		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
 			if((openSourceOnly && checkAppScan360Connection.isAppScan360())) {
-                return FormValidation.error(Messages.error_sca_ui());
+                    return FormValidation.error(Messages.error_sca_ui());
             }
             return FormValidation.ok();
 		}
