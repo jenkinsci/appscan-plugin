@@ -57,7 +57,10 @@ public class StaticAnalyzer extends Scanner {
 	public String getType() {
 		return STATIC_ANALYZER;
 	}
-        
+
+        public boolean isAdditionalOptions(){
+            return getHasOptions();
+        }
         public boolean isOpenSourceOnly() {
             return m_openSourceOnly;
         }
