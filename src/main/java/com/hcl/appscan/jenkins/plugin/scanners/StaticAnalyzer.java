@@ -9,10 +9,8 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
 import org.jenkinsci.Symbol;
@@ -81,12 +79,12 @@ public class StaticAnalyzer extends Scanner {
 
         @DataBoundSetter
         public void setScanMethod(String scanMethod) {
-        m_scanMethod =scanMethod;
+         	m_scanMethod =scanMethod;
         }
 
         public String getScanMethod() {
-        return m_scanMethod;
-    }
+        	return m_scanMethod;
+    	}
 
         public boolean isScanMethod(String scanMethod) {
             return m_scanMethod.equals(scanMethod);
@@ -117,10 +115,10 @@ public class StaticAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+            		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
 			if((openSourceOnly && checkAppScan360Connection.isAppScan360())) {
                             return FormValidation.error(Messages.error_sca_ui());
-                }
+                	}
                 return FormValidation.ok();
 		}
 	}
