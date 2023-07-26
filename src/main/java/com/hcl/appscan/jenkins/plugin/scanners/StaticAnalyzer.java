@@ -8,12 +8,9 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 import com.hcl.appscan.sdk.CoreConstants;
-import com.hcl.appscan.sdk.scanners.sast.SASTConstants;
 import java.util.HashMap;
 import java.util.Map;
-
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
 import org.jenkinsci.Symbol;
@@ -32,16 +29,18 @@ public class StaticAnalyzer extends Scanner {
         
         private boolean m_openSourceOnly;
         private boolean m_sourceCodeOnly;
+        private String m_scanMethod;
         
         @Deprecated
         public StaticAnalyzer(String target){
             this(target,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod){
             super(target, hasOptions);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
+            m_scanMethod= scanMethod;
         }
         
 	@DataBoundConstructor
@@ -49,13 +48,17 @@ public class StaticAnalyzer extends Scanner {
 		super(target, hasOptions);
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
+                m_scanMethod=CoreConstants.CREATE_IRX;
 	}
 
 	@Override
 	public String getType() {
 		return STATIC_ANALYZER;
 	}
-        
+
+        public boolean isAdditionalOptions(){
+            return getHasOptions();
+        }
         public boolean isOpenSourceOnly() {
             return m_openSourceOnly;
         }
@@ -73,6 +76,19 @@ public class StaticAnalyzer extends Scanner {
         public void setSourceCodeOnly(boolean sourceCodeOnly) {
             m_sourceCodeOnly = sourceCodeOnly;
         }
+
+        @DataBoundSetter
+        public void setScanMethod(String scanMethod) {
+         	m_scanMethod =scanMethod;
+        }
+
+        public String getScanMethod() {
+        	return m_scanMethod;
+    	}
+
+        public boolean isScanMethod(String scanMethod) {
+            return m_scanMethod.equals(scanMethod);
+        }
 	
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
@@ -82,6 +98,9 @@ public class StaticAnalyzer extends Scanner {
                 }
                 if (m_sourceCodeOnly && getHasOptions()) {
                     properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
+                }
+                if (m_scanMethod!=null) {
+                    properties.put(CoreConstants.SCAN_METHOD, m_scanMethod);
                 }
 		return properties;
 	}
@@ -96,12 +115,11 @@ public class StaticAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-
-            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
-			if((openSourceOnly && checkAppScan360Connection.isAppScan360())){
-				return FormValidation.error(Messages.error_sca_ui());
-			}
-			return FormValidation.ok();
+            		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
+			if((openSourceOnly && checkAppScan360Connection.isAppScan360())) {
+                            return FormValidation.error(Messages.error_sca_ui());
+                	}
+                return FormValidation.ok();
 		}
 	}
 }
