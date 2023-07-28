@@ -475,7 +475,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	public FormValidation doCheckApplication(@QueryParameter String application, @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
             Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
-            if(applications.isEmpty() && !credentials.equals("")){
+            if((applications==null || applications.isEmpty()) && !credentials.equals("")){
                 return FormValidation.error(Messages.error_application_empty_ui());
             } else {
                 return FormValidation.validateRequired(application);
