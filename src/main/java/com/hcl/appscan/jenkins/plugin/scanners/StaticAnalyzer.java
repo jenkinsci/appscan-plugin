@@ -99,10 +99,10 @@ public class StaticAnalyzer extends Scanner {
                 if (m_sourceCodeOnly && getHasOptions()) {
                     properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
                 }
-                if (m_scanMethod!=null) {
-                    properties.put(CoreConstants.SCAN_METHOD, m_scanMethod);
+                if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
+                    properties.put(CoreConstants.UPLOAD_DIRECT, "");
                 }
-		return properties;
+        return properties;
 	}
 	
 	@Symbol("static_analyzer") //$NON-NLS-1$
