@@ -30,17 +30,19 @@ public class StaticAnalyzer extends Scanner {
         private boolean m_openSourceOnly;
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
+        private String m_scanSpeed;
         
         @Deprecated
         public StaticAnalyzer(String target){
             this(target,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
             super(target, hasOptions);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
+            m_scanSpeed=scanSpeed;
         }
         
 	@DataBoundConstructor
@@ -49,6 +51,7 @@ public class StaticAnalyzer extends Scanner {
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
+                m_scanSpeed="";
 	}
 
 	@Override
@@ -59,6 +62,23 @@ public class StaticAnalyzer extends Scanner {
         public boolean isAdditionalOptions(){
             return getHasOptions();
         }
+  
+    	@DataBoundSetter
+   	  public void setScanSpeed(String scanSpeed) {
+            	m_scanSpeed = scanSpeed;
+    	}
+
+    	public String getScanSpeed() {
+        	return m_scanSpeed;
+    	}
+
+    	public String checkScanSpeed(String scanSpeed) {
+        	if (m_scanSpeed != null) {
+            	return m_scanSpeed.equalsIgnoreCase(scanSpeed) ? "true" : "false";
+        		}
+        	return null;
+    	}
+       
         public boolean isOpenSourceOnly() {
             return m_openSourceOnly;
         }
@@ -102,7 +122,10 @@ public class StaticAnalyzer extends Scanner {
                 if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
                     properties.put(CoreConstants.UPLOAD_DIRECT, "");
                 }
-        return properties;
+                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
+                    properties.put(SCAN_SPEED, m_scanSpeed);
+                }
+		return properties;
 	}
 	
 	@Symbol("static_analyzer") //$NON-NLS-1$
