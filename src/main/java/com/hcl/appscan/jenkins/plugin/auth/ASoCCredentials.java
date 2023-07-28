@@ -50,12 +50,13 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
         public boolean getacceptInvalidCerts() {return m_acceptInvalidCerts;}
 	
 	public String getServer() {
-		if(!(m_url == null || m_url.equals(""))){
-			return m_url;
-		} else {
-			return SystemUtil.getServer(getUsername());
-		}
-	}
+            if ((m_url != null && !m_url.equals(""))) {
+                if(System.getenv(CoreConstants.APPSCAN_OPTS) == null || !System.getenv(CoreConstants.APPSCAN_OPTS).contains(CoreConstants.BLUEMIX_SERVER)){
+                    return m_url;
+            }
+        }
+        return SystemUtil.getServer(getUsername());
+    }
 	
 	public Secret getToken() {
 		return m_token;
