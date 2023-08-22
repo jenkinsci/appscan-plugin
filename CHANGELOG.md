@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+1.2.0 (August, 2023)
+------
+- Added support for uploading files and folders in AppScan on Cloud/AppScan 360° for static analysis scans.
+- Support static analysis scan speeds.
+- Bug fixes.
+
 1.1.0 (June, 2023)
 ------
 - Support for executing SAST Scans via AppScan 360°.
