@@ -89,13 +89,18 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
 					- **Login required: Record login**: Select this option to allow login to the application using a recorded login sequence.
 						-   **Login Sequence File**: Provide a path to the login sequence file data. Supported file type is .CONFIG.
         -   **Static Analyzer**
-            -   **Target**: Enter the full path to the directory that
-                contains the files that you want to scan or enter the
-                full path to an existing .irx file.
-            -   **Additional Options**: If selected, the following options are available:
-                -   Open Source Only: Available for AppScan on Cloud only.
-                    -   When checked, open source and third-party packages used by your code are analyzed. Use of this option requires a specific ASoC Software Composition Analysis (SCA) subscription.
-                -   Source Code Only: When checked, static analysis is executed with source code only option.
+            -   **Target**: Enter the complete path to the directory containing the files to scan, or provide the full path to an existing .irx .war, .ear, .jar or .zip file. Leave this field empty to scan all supported files within the workspace directory.
+            -   **Scan Method**
+                -   **Generate IRX**: Generate an IRX archive locally from the specified files and folders.
+                    -   **Additional Options**: If selected, the following options are available:
+                        -   Open Source Only: AppScan on Cloud only. Analyze open source and third-party packages used by your code. Aa specific ASoC Software Composition Analysis (SCA) subscription is required.
+                        -   Source Code Only: Analyze source code only.
+                        -   Select Scan Speed: Optimize scan speed and results according to development stage. Choose faster scans early in the development lifecycle to identify basic security issues; choose thorough scans later in the cycle to ensure complete coverage for your application.
+                            -   Normal: Performs a complete analysis of the code, identifying vulnerabilities in detail and differentiating issues that could be reported as false positives. This scan takes the longest to complete.
+                            -   Fast: Performs a comprehensive analysis of your files to identify vulnerabilities, taking longer to complete than “Faster” or “Fastest” scans.
+                            -   Faster: Provides a medium level of detail of analysis and identification of security issues. This scan takes more time to complete than the “Fastest” option.
+                            -   Fastest: Performs a surface-level analysis of your files to identify the most pressing issues for remediation, taking the least amount of time to complete.
+                -   **Upload files and folders**: Upload files and folders directly to AppScan for immediate scanning preparation, resulting in faster processing.
     -   **Allow intervention by scan enablement team:** Available for AppScan on Cloud only. 
         -   When selected (default), our scan enablement team will step in if the scan fails, or if 
         no issues are found, and try to fix the configuration. This may delay 
@@ -191,6 +196,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
 The Mobile Scan functionality
 has been removed from Jenkins since version 1.0.10. The existing jobs that 
 have Mobile Scan configurations must therefore be updated accordingly.
+- If you are unable to view the scan report on the Jenkins, first verify that the "Test Name" field. Test Name can't contain any of the following characters: \/:*?"<>|
 
 ## Additional Resources
 - [HCL AppScan Enterprise: Jenkins Integration](https://www.youtube.com/watch?v=XctRBAd0HQc)
