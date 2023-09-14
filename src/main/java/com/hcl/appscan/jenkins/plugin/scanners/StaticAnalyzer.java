@@ -113,14 +113,14 @@ public class StaticAnalyzer extends Scanner {
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
-                if (m_openSourceOnly && getHasOptions()) {
+                if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
+            properties.put(CoreConstants.UPLOAD_DIRECT, "");
+        }
+        if (m_openSourceOnly && getHasOptions()) {
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
                 }
                 if (m_sourceCodeOnly && getHasOptions()) {
                     properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
-                }
-                if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
-                    properties.put(CoreConstants.UPLOAD_DIRECT, "");
                 }
                 if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
                     properties.put(SCAN_SPEED, m_scanSpeed);

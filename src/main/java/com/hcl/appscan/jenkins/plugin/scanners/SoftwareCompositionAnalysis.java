@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SoftwareCompositionAnalysis extends Scanner {
-    private static final String SOFTWARE_COMPOSITION_ANALYSIS = "Software Composition Analysis"; //$NON-NLS-1$
+    private static final String SOFTWARE_COMPOSITION_ANALYSIS = "Sca"; //$NON-NLS-1$
 
     public SoftwareCompositionAnalysis(String target){
         super(target, false);
@@ -43,7 +43,7 @@ public class SoftwareCompositionAnalysis extends Scanner {
 
         @Override
         public String getDisplayName() {
-            return SOFTWARE_COMPOSITION_ANALYSIS;
+            return "Software Composition Analysis";
         }
     }
 }
