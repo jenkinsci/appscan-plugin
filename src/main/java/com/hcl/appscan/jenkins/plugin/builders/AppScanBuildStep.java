@@ -106,7 +106,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	@Deprecated
 	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email, boolean intervention) {
 		m_scanner = scanner;
-		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : FileUtil.getValidFilename(name); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
 		m_target = target;
 		m_application = application;
@@ -122,7 +122,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	@DataBoundConstructor
 	public AppScanBuildStep(Scanner scanner, String name, String type, String application, String credentials) {
 		m_scanner = scanner;
-		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : FileUtil.getValidFilename(name); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
 		m_target = "";
 		m_application = application;
