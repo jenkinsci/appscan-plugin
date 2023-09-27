@@ -43,7 +43,7 @@ public class SoftwareCompositionAnalysis extends Scanner {
 
         @Override
         public String getDisplayName() {
-            return "Software Composition Analysis";
+            return "Software Composition Analysis (SCA)";
         }
     }
 }

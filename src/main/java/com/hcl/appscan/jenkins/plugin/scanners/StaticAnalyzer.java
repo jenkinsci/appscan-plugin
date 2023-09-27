@@ -134,7 +134,7 @@ public class StaticAnalyzer extends Scanner {
 		
 		@Override
 		public String getDisplayName() {
-			return STATIC_ANALYZER;
+			return "Static Analysis (SAST)";
 		}
 
 		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
