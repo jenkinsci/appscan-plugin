@@ -107,6 +107,7 @@ public class StaticAnalyzer extends Scanner {
          	m_scanMethod =scanMethod;
         }
 
+        @Override
         public String getScanMethod() {
         	return m_scanMethod;
     	}
