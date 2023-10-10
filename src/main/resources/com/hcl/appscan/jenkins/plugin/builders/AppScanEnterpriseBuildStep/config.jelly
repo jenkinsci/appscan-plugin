@@ -44,6 +44,14 @@
 	    <f:entry title="${%label.test.policy}" field="testPolicy">
 	        <f:select />
 	    </f:entry>
+
+	    <f:entry title="${%label.description}" field="description">
+        	        <f:textbox />
+        </f:entry>
+
+        <f:entry title="${%label.contact}" field="contact">
+                	<f:textbox />
+        </f:entry>
 	    
 	    <f:entry title="${%label.starting.url}" field="target">
 	        <f:textbox />

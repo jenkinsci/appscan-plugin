@@ -112,6 +112,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	private String m_testOptimization;
 	private String m_scanStatus;
+    private String m_description;
+    private String m_contact;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -145,6 +147,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		
 		m_scanType = "";
 		m_testOptimization = "";
+        m_description = "";
+        m_contact = "";
 	}
 	
 	public String getCredentials() {
@@ -327,6 +331,24 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_failBuild;
 	}
 
+    @DataBoundSetter
+    public void setDescription(String description) {
+        m_description = description;
+    }
+
+    public String getDescription() {
+        return m_description;
+    }
+
+    @DataBoundSetter
+    public void setContact(String contact) {
+        m_contact = contact;
+    }
+
+    public String getContact() {
+        return m_contact;
+    }
+
 	@DataBoundSetter
 	public void setFailureConditions(List<FailureCondition> failureConditions) {
 		m_failureConditions = failureConditions;
@@ -408,6 +430,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("templateId", m_template);
                     properties.put("exploreData", m_exploreData);
                     properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
+                    properties.put("description", m_description);
+                    properties.put("contact", m_contact);
                 }
                 else {
                     properties.put("application", Util.replaceMacro(m_application, resolver));
@@ -416,6 +440,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("templateId", Util.replaceMacro(m_template, resolver));
                     properties.put("exploreData", m_exploreData.equals("") ? m_exploreData : resolvePath(m_exploreData, resolver));
                     properties.put(CoreConstants.SCAN_NAME, Util.replaceMacro(m_jobName, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+                    properties.put("description", Util.replaceMacro(m_description, resolver));
+                    properties.put("contact", Util.replaceMacro(m_contact, resolver));
                 }
 
 		if (m_loginType != null) {
