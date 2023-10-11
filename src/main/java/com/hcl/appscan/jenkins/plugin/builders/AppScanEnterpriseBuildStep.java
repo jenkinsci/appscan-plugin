@@ -112,8 +112,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	private String m_testOptimization;
 	private String m_scanStatus;
-    private String m_description;
-    private String m_contact;
+    	private String m_description;
+    	private String m_contact;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -147,8 +147,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		
 		m_scanType = "";
 		m_testOptimization = "";
-        m_description = "";
-        m_contact = "";
+        	m_description = "";
+        	m_contact = "";
 	}
 	
 	public String getCredentials() {
@@ -331,23 +331,23 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_failBuild;
 	}
 
-    @DataBoundSetter
-    public void setDescription(String description) {
-        m_description = description;
-    }
+    	@DataBoundSetter
+    	public void setDescription(String description) {
+        	m_description = description;
+    	}
 
-    public String getDescription() {
-        return m_description;
-    }
+    	public String getDescription() {
+        	return m_description;
+    	}
 
-    @DataBoundSetter
-    public void setContact(String contact) {
-        m_contact = contact;
-    }
+    	@DataBoundSetter
+    	public void setContact(String contact) {
+        	m_contact = contact;
+    	}
 
-    public String getContact() {
-        return m_contact;
-    }
+    	public String getContact() {
+        	return m_contact;
+    	}
 
 	@DataBoundSetter
 	public void setFailureConditions(List<FailureCondition> failureConditions) {
