@@ -20,6 +20,7 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 
@@ -326,6 +327,9 @@ public class DynamicAnalyzer extends Scanner {
 			if(checkAppScan360Connection.isAppScan360()){
 				return FormValidation.error(Messages.error_dynamic_AppScan360());
 			}
+            if(!target.equals("") && !ServiceUtil.isValidUrl(target, checkAppScan360Connection)){
+                return FormValidation.error("Please enter valid URL");
+            }
 			return FormValidation.validateRequired(target);
 		}
 
