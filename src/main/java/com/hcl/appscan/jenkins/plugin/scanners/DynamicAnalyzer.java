@@ -328,7 +328,7 @@ public class DynamicAnalyzer extends Scanner {
 				return FormValidation.error(Messages.error_dynamic_AppScan360());
 			}
             if(!target.equals("") && !ServiceUtil.isValidUrl(target, checkAppScan360Connection)){
-                return FormValidation.error("Please enter valid URL");
+                return FormValidation.error("Unless this is a private network, Please verify your domain");
             }
 			return FormValidation.validateRequired(target);
 		}
