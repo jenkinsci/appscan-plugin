@@ -312,7 +312,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
 
         if(!ServiceUtil.isValidUrl(properties.get(CoreConstants.TARGET), m_authProvider)){
-            throw new AbortException("");
+            throw new AbortException(Messages.error_url_validation());
         }
 
     	
