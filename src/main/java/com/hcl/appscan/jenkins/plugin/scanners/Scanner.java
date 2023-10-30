@@ -30,10 +30,10 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		m_hasOptions = hasOptions;
 	}
 
-    public boolean getHasOptions() {
-        if(getScanMethod().equals(CoreConstants.UPLOAD_DIRECT)){
-            return false;
-        }
+    	public boolean getHasOptions() {
+        	if(getScanMethod().equals(CoreConstants.UPLOAD_DIRECT)){
+            	return false;
+        	}
 		return m_hasOptions;
 	}
 	
@@ -41,9 +41,9 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		return m_target;
 	}
 
-    public abstract String getScanMethod();
+    	public abstract String getScanMethod();
 
-    public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
+    	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 	
 	public abstract String getType();
 	
