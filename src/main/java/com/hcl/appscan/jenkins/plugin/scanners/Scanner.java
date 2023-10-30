@@ -6,6 +6,7 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import com.hcl.appscan.sdk.CoreConstants;
 import hudson.AbortException;
 import hudson.Util;
 import hudson.model.AbstractDescribableImpl;
@@ -28,16 +29,21 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		m_target = target;
 		m_hasOptions = hasOptions;
 	}
-	
-	public boolean getHasOptions() {
+
+    	public boolean getHasOptions() {
+        	if(getScanMethod().equals(CoreConstants.UPLOAD_DIRECT)){
+            	return false;
+        	}
 		return m_hasOptions;
 	}
 	
 	public String getTarget() {
 		return m_target;
 	}
-	
-	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
+
+    	public abstract String getScanMethod();
+
+    	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 	
 	public abstract String getType();
 	

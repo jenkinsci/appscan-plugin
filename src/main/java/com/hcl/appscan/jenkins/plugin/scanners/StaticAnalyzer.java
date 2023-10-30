@@ -58,10 +58,6 @@ public class StaticAnalyzer extends Scanner {
 	public String getType() {
 		return STATIC_ANALYZER;
 	}
-
-        public boolean isAdditionalOptions(){
-            return getHasOptions();
-        }
   
     	@DataBoundSetter
    	  public void setScanSpeed(String scanSpeed) {
@@ -69,7 +65,10 @@ public class StaticAnalyzer extends Scanner {
     	}
 
     	public String getScanSpeed() {
-        	return m_scanSpeed;
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_scanSpeed;
+            }
+        	return "";
     	}
 
     	public String checkScanSpeed(String scanSpeed) {
@@ -80,7 +79,10 @@ public class StaticAnalyzer extends Scanner {
     	}
        
         public boolean isOpenSourceOnly() {
-            return m_openSourceOnly;
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_openSourceOnly;
+            }
+            return false;
         }
         
         @DataBoundSetter
@@ -89,7 +91,10 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public boolean isSourceCodeOnly() {
-            return m_sourceCodeOnly;
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_sourceCodeOnly;
+            }
+            return false;
         }
 
         @DataBoundSetter
@@ -102,6 +107,7 @@ public class StaticAnalyzer extends Scanner {
          	m_scanMethod =scanMethod;
         }
 
+        @Override
         public String getScanMethod() {
         	return m_scanMethod;
     	}
@@ -113,18 +119,20 @@ public class StaticAnalyzer extends Scanner {
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
-                if (m_openSourceOnly && getHasOptions()) {
-                    properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
-                }
-                if (m_sourceCodeOnly && getHasOptions()) {
-                    properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
-                }
-                if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
-                    properties.put(CoreConstants.UPLOAD_DIRECT, "");
-                }
-                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
-                    properties.put(SCAN_SPEED, m_scanSpeed);
-                }
+        if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
+            properties.put(CoreConstants.UPLOAD_DIRECT, "");
+        }
+        if(!properties.containsKey(CoreConstants.UPLOAD_DIRECT)){
+            if (m_openSourceOnly && getHasOptions()) {
+                properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
+            }
+            if (m_sourceCodeOnly && getHasOptions()) {
+                properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
+            }
+            if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
+                properties.put(SCAN_SPEED, m_scanSpeed);
+            }
+        }
 		return properties;
 	}
 	
