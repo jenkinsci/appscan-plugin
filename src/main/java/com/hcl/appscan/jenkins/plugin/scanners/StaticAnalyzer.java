@@ -39,10 +39,10 @@ public class StaticAnalyzer extends Scanner {
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
             super(target, hasOptions);
-            m_openSourceOnly=openSourceOnly;
-            m_sourceCodeOnly=sourceCodeOnly;
+            m_openSourceOnly=openSourceOnly && !scanMethod.equals(CoreConstants.UPLOAD_DIRECT);
+            m_sourceCodeOnly=sourceCodeOnly && !scanMethod.equals(CoreConstants.UPLOAD_DIRECT);
             m_scanMethod= scanMethod;
-            m_scanSpeed=scanSpeed;
+            m_scanSpeed=scanMethod.equals(CoreConstants.UPLOAD_DIRECT) ? "" : scanSpeed;
         }
         
 	@DataBoundConstructor
@@ -107,7 +107,6 @@ public class StaticAnalyzer extends Scanner {
          	m_scanMethod =scanMethod;
         }
 
-        @Override
         public String getScanMethod() {
         	return m_scanMethod;
     	}

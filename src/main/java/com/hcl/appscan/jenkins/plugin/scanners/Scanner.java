@@ -31,17 +31,12 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	}
 
     	public boolean getHasOptions() {
-        	if(getScanMethod().equals(CoreConstants.UPLOAD_DIRECT)){
-            	return false;
-        	}
-		return m_hasOptions;
-	}
+                return m_hasOptions;
+	    }
 	
 	public String getTarget() {
 		return m_target;
 	}
-
-    	public abstract String getScanMethod();
 
     	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 	

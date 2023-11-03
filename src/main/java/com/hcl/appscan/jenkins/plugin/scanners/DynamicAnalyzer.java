@@ -174,11 +174,6 @@ public class DynamicAnalyzer extends Scanner {
 		return DYNAMIC_ANALYZER;
 	}
 
-    	@Override
-    	public String getScanMethod() {
-        	return "";
-    	}
-
 	public String isLoginTypes(String loginTypeName) {
 		if (m_loginType != null) {
 			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
