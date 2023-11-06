@@ -39,10 +39,10 @@ public class StaticAnalyzer extends Scanner {
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
             super(target, hasOptions);
-            m_openSourceOnly=openSourceOnly && !scanMethod.equals(CoreConstants.UPLOAD_DIRECT);
-            m_sourceCodeOnly=sourceCodeOnly && !scanMethod.equals(CoreConstants.UPLOAD_DIRECT);
+            m_openSourceOnly=openSourceOnly;
+            m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
-            m_scanSpeed=scanMethod.equals(CoreConstants.UPLOAD_DIRECT) ? "" : scanSpeed;
+            m_scanSpeed=scanSpeed;
         }
         
 	@DataBoundConstructor
@@ -118,20 +118,18 @@ public class StaticAnalyzer extends Scanner {
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
-        if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
-            properties.put(CoreConstants.UPLOAD_DIRECT, "");
-        }
-        if(!properties.containsKey(CoreConstants.UPLOAD_DIRECT)){
-            if (m_openSourceOnly && getHasOptions()) {
-                properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
-            }
-            if (m_sourceCodeOnly && getHasOptions()) {
-                properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
-            }
-            if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
-                properties.put(SCAN_SPEED, m_scanSpeed);
-            }
-        }
+                if (m_openSourceOnly && getHasOptions()) {
+                    properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
+                }
+                if (m_sourceCodeOnly && getHasOptions()) {
+                    properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
+                }
+                if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
+                    properties.put(CoreConstants.UPLOAD_DIRECT, "");
+                }
+                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
+                    properties.put(SCAN_SPEED, m_scanSpeed);
+                }
 		return properties;
 	}
 	
