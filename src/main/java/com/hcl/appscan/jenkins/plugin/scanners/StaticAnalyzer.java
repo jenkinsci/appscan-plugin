@@ -58,10 +58,6 @@ public class StaticAnalyzer extends Scanner {
 	public String getType() {
 		return STATIC_ANALYZER;
 	}
-
-        public boolean isAdditionalOptions(){
-            return getHasOptions();
-        }
   
     	@DataBoundSetter
    	  public void setScanSpeed(String scanSpeed) {
@@ -69,7 +65,10 @@ public class StaticAnalyzer extends Scanner {
     	}
 
     	public String getScanSpeed() {
-        	return m_scanSpeed;
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_scanSpeed;
+            }
+        	return "";
     	}
 
     	public String checkScanSpeed(String scanSpeed) {
@@ -80,7 +79,10 @@ public class StaticAnalyzer extends Scanner {
     	}
        
         public boolean isOpenSourceOnly() {
-            return m_openSourceOnly;
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_openSourceOnly;
+            }
+            return false;
         }
         
         @DataBoundSetter
@@ -89,7 +91,10 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public boolean isSourceCodeOnly() {
-            return m_sourceCodeOnly;
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_sourceCodeOnly;
+            }
+            return false;
         }
 
         @DataBoundSetter
