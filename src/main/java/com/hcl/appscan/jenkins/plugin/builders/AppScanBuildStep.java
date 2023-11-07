@@ -21,6 +21,7 @@ import java.util.Comparator;
 import javax.annotation.Nonnull;
 
 import com.hcl.appscan.sdk.scanners.ScanConstants;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -308,6 +309,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             }
         } else if (m_authProvider.getacceptInvalidCerts()) {
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
+        }
+
+        if(m_type.equals("Dynamic Analyzer") && !ServiceUtil.isValidUrl(properties.get(CoreConstants.TARGET), m_authProvider)){
+            throw new AbortException(Messages.error_url_validation());
         }
 
     	
