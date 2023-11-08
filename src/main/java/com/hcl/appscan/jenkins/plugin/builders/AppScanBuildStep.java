@@ -21,7 +21,6 @@ import java.util.Comparator;
 import javax.annotation.Nonnull;
 
 import com.hcl.appscan.sdk.scanners.ScanConstants;
-import com.hcl.appscan.sdk.utils.ServiceUtil;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
