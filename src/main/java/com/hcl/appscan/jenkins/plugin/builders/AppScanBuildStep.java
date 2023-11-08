@@ -311,10 +311,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
-        if(m_type.equals("Dynamic Analyzer") && !ServiceUtil.isValidUrl(properties.get(CoreConstants.TARGET), m_authProvider)){
-            throw new AbortException(Messages.error_url_validation());
-        }
-
     	
     	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
