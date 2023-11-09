@@ -270,7 +270,7 @@ public class DynamicAnalyzer extends Scanner {
 
 		@Override
 		public String getDisplayName() {
-			return DYNAMIC_ANALYZER;
+			return "Dynamic Analysis (DAST)";
 		}
 
 		public ListBoxModel doFillScanTypeItems() {

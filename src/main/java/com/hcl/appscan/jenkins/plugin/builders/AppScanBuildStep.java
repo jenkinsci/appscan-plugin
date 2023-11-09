@@ -301,10 +301,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         if(isAppScan360) {
             if (m_type.equals("Dynamic Analyzer")) {
                 throw new AbortException(Messages.error_dynamic_analyzer_AppScan360());
+            } if (m_type.equals("Sca")) {
+                throw new AbortException(Messages.error_sca_AppScan360());
             } if (m_intervention) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
             } if (properties.get("openSourceOnly") != null) {
-                throw new AbortException(Messages.error_OSO_AppScan360());
+                throw new AbortException(Messages.error_sca_AppScan360());
             }
         } else if (m_authProvider.getacceptInvalidCerts()) {
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
@@ -400,6 +402,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.builders.AppScanBuildStep", com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.StaticAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.StaticAnalyzer.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.ibm.appscan.jenkins.plugin.scanners.DynamicAnalyzer", com.hcl.appscan.jenkins.plugin.scanners.DynamicAnalyzer.class);
+            Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.jenkins.plugin.scanners.SoftwareCompositionAnalysis", com.hcl.appscan.jenkins.plugin.scanners.SoftwareCompositionAnalysis.class);
     		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.results.CloudResultsProvider", com.hcl.appscan.sdk.results.CloudResultsProvider.class);
 		Items.XSTREAM2.addCompatibilityAlias("com.hcl.appscan.plugin.core.scan.CloudScanServiceProvider", com.hcl.appscan.sdk.scan.CloudScanServiceProvider.class);
     	}
