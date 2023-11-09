@@ -8,6 +8,7 @@ package com.hcl.appscan.jenkins.plugin.builders;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -470,6 +471,25 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 	}
 
+    private boolean checkURLValidity(String URL) {
+        try {
+            new URL(URL).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean checkURLAccessibility(String URL) throws IOException {
+        try {
+            URL url = new URL(URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            return conn.getResponseCode() == 200;
+        } catch (Exception e){
+            throw new AbortException("Error accessing the URL");
+        }
+    }
+
     	private String getUpdatedApplicationId(Map<String, String> application){
         	if(application != null) {
             	for(Map.Entry<String, String> entry : application.entrySet()){
@@ -485,7 +505,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
 		Map<String, String> properties = getScanProperties(build, listener);
-		m_authProvider = new ASEJenkinsAuthenticationProvider(properties.get("credentials"),
+        if(!checkURLValidity(properties.get("startingURL"))){
+            throw new AbortException("URL is inavlid");
+        } else if (!checkURLAccessibility(properties.get("startingURL"))) {
+            throw new AbortException("URL is not accessible");
+        }
+
+        m_authProvider = new ASEJenkinsAuthenticationProvider(properties.get("credentials"),
 				build.getParent().getParent());
 		final IProgress progress = new ScanProgress(listener);
 		final boolean suspend = m_wait;
