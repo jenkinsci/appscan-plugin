@@ -20,6 +20,7 @@ import org.kohsuke.stapler.QueryParameter;
 
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.presence.CloudPresenceProvider;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 
@@ -322,10 +323,13 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-			JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
-			if(checkAppScan360Connection.isAppScan360()){
+			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+			if(authProvider.isAppScan360()){
 				return FormValidation.error(Messages.error_dynamic_AppScan360());
 			}
+            if(!target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider)) {
+                return FormValidation.error(Messages.error_url_validation_ui());
+            }
 			return FormValidation.validateRequired(target);
 		}
 
