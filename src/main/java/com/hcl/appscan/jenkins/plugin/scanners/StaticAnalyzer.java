@@ -119,9 +119,9 @@ public class StaticAnalyzer extends Scanner {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
                 if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
-            properties.put(CoreConstants.UPLOAD_DIRECT, "");
-        }
-        if (m_openSourceOnly && getHasOptions()) {
+            		properties.put(CoreConstants.UPLOAD_DIRECT, "");
+        	}
+        	if (m_openSourceOnly && getHasOptions()) {
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
                 }
                 if (m_sourceCodeOnly && getHasOptions()) {
@@ -145,13 +145,13 @@ public class StaticAnalyzer extends Scanner {
 		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
 			if(openSourceOnly) {
-                if(checkAppScan360Connection.isAppScan360()) {
-                    return FormValidation.error(Messages.error_sca_ui());
-                } else {
-                    return FormValidation.warning(Messages.warning_sca_ui());
-                }
-            }
-                return FormValidation.ok();
+                		if(checkAppScan360Connection.isAppScan360()) {
+                    			return FormValidation.error(Messages.error_sca_ui());
+                	} else {
+                    		return FormValidation.warning(Messages.warning_sca_ui());
+                		}
+            		}
+                	return FormValidation.ok();
 		}
 	}
 }
