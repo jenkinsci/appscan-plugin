@@ -23,9 +23,9 @@ public class ScannerFactory implements ScannerConstants {
 		case STATIC_ANALYZER:
 			ret = new StaticAnalyzer(target);
 			break;
-            case SOFTWARE_COMPOSITION_ANALYZER:
-                	ret = new SoftwareCompositionAnalyzer(target);
-                	break;
+     case SOFTWARE_COMPOSITION_ANALYZER:
+       ret = new SoftwareCompositionAnalyzer(target);
+       break;
 		default:
 				break;
 		}

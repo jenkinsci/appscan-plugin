@@ -26,7 +26,7 @@ public interface ScannerConstants {
 	
 	String DYNAMIC_ANALYZER				= "Dynamic Analyzer";			//$NON-NLS-1$
 	String STATIC_ANALYZER				= "Static Analyzer";			//$NON-NLS-1$
-    	String SOFTWARE_COMPOSITION_ANALYZER		= "Software Composition Analyzer";	//$NON-NLS-1$
+  String SOFTWARE_COMPOSITION_ANALYZER		= "Software Composition Analyzer";	//$NON-NLS-1$
 
 	String CUSTOM					= "Custom";				//$NON-NLS-1$
 	String PRODUCTION				= "Production";				//$NON-NLS-1$
