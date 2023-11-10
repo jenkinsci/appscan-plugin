@@ -19,22 +19,21 @@ import org.kohsuke.stapler.QueryParameter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SoftwareCompositionAnalysis extends Scanner {
-    private static final String SOFTWARE_COMPOSITION_ANALYSIS = "Sca"; //$NON-NLS-1$
+public class SoftwareCompositionAnalyzer extends Scanner {
 
-    public SoftwareCompositionAnalysis(String target){
+    public SoftwareCompositionAnalyzer(String target){
         super(target, false);
     }
 
     @DataBoundConstructor
-    public SoftwareCompositionAnalysis(String target, boolean hasOptions){
+    public SoftwareCompositionAnalyzer(String target, boolean hasOptions){
         super(target, false);
     }
 
 
     @Override
     public String getType() {
-        return SOFTWARE_COMPOSITION_ANALYSIS;
+        return SOFTWARE_COMPOSITION_ANALYZER;
     }
 
     public Map<String, String> getProperties(VariableResolver<String> resolver) {
