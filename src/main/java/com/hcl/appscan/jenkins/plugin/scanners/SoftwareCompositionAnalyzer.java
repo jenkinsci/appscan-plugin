@@ -5,6 +5,7 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import hudson.Extension;
 import hudson.RelativePath;
@@ -54,7 +55,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         public FormValidation doCheckTarget(@QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(authProvider.isAppScan360()){
-                return FormValidation.error("Software Composition Analysis is available for AppScan on Cloud only.");
+                return FormValidation.error(Messages.error_sca_AppScan360_ui());
             }
             return FormValidation.ok();
         }
