@@ -5,6 +5,7 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import hudson.Extension;
 import hudson.RelativePath;
@@ -19,22 +20,21 @@ import org.kohsuke.stapler.QueryParameter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SoftwareCompositionAnalysis extends Scanner {
-    private static final String SOFTWARE_COMPOSITION_ANALYSIS = "Sca"; //$NON-NLS-1$
+public class SoftwareCompositionAnalyzer extends Scanner {
 
-    public SoftwareCompositionAnalysis(String target){
+    public SoftwareCompositionAnalyzer(String target){
         super(target, false);
     }
 
     @DataBoundConstructor
-    public SoftwareCompositionAnalysis(String target, boolean hasOptions){
+    public SoftwareCompositionAnalyzer(String target, boolean hasOptions){
         super(target, false);
     }
 
 
     @Override
     public String getType() {
-        return SOFTWARE_COMPOSITION_ANALYSIS;
+        return SOFTWARE_COMPOSITION_ANALYZER;
     }
 
     public Map<String, String> getProperties(VariableResolver<String> resolver) {
@@ -55,7 +55,7 @@ public class SoftwareCompositionAnalysis extends Scanner {
         public FormValidation doCheckTarget(@QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(authProvider.isAppScan360()){
-                return FormValidation.error("Software Composition Analysis is available for AppScan on Cloud only.");
+                return FormValidation.error(Messages.error_sca_AppScan360_ui());
             }
             return FormValidation.ok();
         }
