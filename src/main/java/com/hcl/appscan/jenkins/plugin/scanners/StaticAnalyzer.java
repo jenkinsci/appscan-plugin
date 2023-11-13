@@ -147,7 +147,7 @@ public class StaticAnalyzer extends Scanner {
 			if(openSourceOnly) {
                 		if(checkAppScan360Connection.isAppScan360()) {
                     			return FormValidation.error(Messages.error_sca_ui());
-                	  } else {
+                	  	} else {
                     		return FormValidation.warning(Messages.warning_sca_ui());
                 		}
             		}
