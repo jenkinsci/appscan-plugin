@@ -327,9 +327,9 @@ public class DynamicAnalyzer extends Scanner {
 			if(authProvider.isAppScan360()){
 				return FormValidation.error(Messages.error_dynamic_AppScan360());
 			}
-            if(presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
-                return FormValidation.error(Messages.error_url_validation_ui());
-            }
+            		if(presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+                		return FormValidation.error(Messages.error_url_validation_ui());
+            		}
 			return FormValidation.validateRequired(target);
 		}
 
