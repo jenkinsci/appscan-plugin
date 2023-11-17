@@ -471,15 +471,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 	}
 
-    private boolean checkURLAccessibility(String URL) throws IOException {
-        try {
-            URL url = new URL(URL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            return conn.getResponseCode() == HttpURLConnection.HTTP_OK;
-        } catch (Exception e){
-            throw new AbortException(Messages.error_url_validation());
-        }
-    }
+    	private boolean checkURLAccessibility(String URL) throws IOException {
+        	try {
+            		URL url = new URL(URL);
+            		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            		return conn.getResponseCode() == HttpURLConnection.HTTP_OK;
+        	} catch (Exception e){
+            		throw new AbortException(Messages.error_url_validation());
+        	}
+    	}
 
     	private String getUpdatedApplicationId(Map<String, String> application){
         	if(application != null) {
@@ -497,11 +497,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			throws InterruptedException, IOException {
 		Map<String, String> properties = getScanProperties(build, listener);
 
-        if (!checkURLAccessibility(properties.get("startingURL"))) {
-            throw new AbortException(Messages.error_url_validation());
-        }
+        	if (!checkURLAccessibility(properties.get("startingURL"))) {
+            		throw new AbortException(Messages.error_url_validation());
+        	}
 
-        m_authProvider = new ASEJenkinsAuthenticationProvider(properties.get("credentials"),
+        	m_authProvider = new ASEJenkinsAuthenticationProvider(properties.get("credentials"),
 				build.getParent().getParent());
 		final IProgress progress = new ScanProgress(listener);
 		final boolean suspend = m_wait;
