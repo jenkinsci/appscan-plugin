@@ -471,15 +471,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 	}
 
-    /*private boolean checkURLValidity(String URL) {
-        try {
-            new URL(URL).toURI();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }*/
-
     private boolean checkURLAccessibility(String URL) throws IOException {
         try {
             URL url = new URL(URL);
@@ -505,9 +496,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
 		Map<String, String> properties = getScanProperties(build, listener);
-        /*if(!checkURLValidity(properties.get("startingURL"))){
-            throw new AbortException("URL is inavlid");
-        } else */if (!checkURLAccessibility(properties.get("startingURL"))) {
+
+        if (!checkURLAccessibility(properties.get("startingURL"))) {
             throw new AbortException(Messages.error_url_validation());
         }
 
