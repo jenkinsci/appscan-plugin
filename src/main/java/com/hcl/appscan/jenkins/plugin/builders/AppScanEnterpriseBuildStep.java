@@ -475,7 +475,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
         	try {
             		URL url = new URL(URL);
             		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            		return conn.getResponseCode() == HttpURLConnection.HTTP_OK;
+            		int responseCode = conn.getResponseCode();
+                    return responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE;
         	} catch (Exception e){
             		throw new AbortException(Messages.error_url_validation());
         	}
