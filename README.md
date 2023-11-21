@@ -29,7 +29,9 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
 
 ## Usage
 **Integration with HCL AppScan on Cloud/HCL AppScan 360°** \
-**Note:** Support for SAST scanning using HCL AppScan 360° was added for version 1.1.0 of the Jenkins extension. The existing HCL AppScan on Cloud connection endpoint and build step have been enhanced to allow users to connect to HCL AppScan 360°.
+**Notes:** 
+- Support for SAST scanning using HCL AppScan 360° was added for version 1.1.0 of the Jenkins extension. The existing HCL AppScan on Cloud connection endpoint and build step have been enhanced to allow users to connect to HCL AppScan 360°.
+- AppScan on Cloud (ASoC) now performs SAST and SCA analysis as separate scans. To execute an open-source only scan, use the Software Composition Analysis (SCA) scan type. The open-source only option will be removed from SAST scans in a future release.
 
 1.  Add your AppScan on Cloud/AppScan 360° credentials on the Jenkins
     **Credentials** page.
@@ -51,7 +53,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
         others.
     -   **Test Type:** Select the type of scan to run from the available
         options.
-        -   **Dynamic Analyzer:** Available for AppScan on Cloud only.
+        -   **Dynamic Analysis (DAST):** Available for AppScan on Cloud only.
             -   **Starting URL**: Enter the URL from where you want the
                 scan to start exploring the site.
             -   **Additional Options**: If selected, the following
@@ -88,7 +90,9 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
 						-   **Extra Field**: If your app requires a third credential, enter it in this field.
 					- **Login required: Record login**: Select this option to allow login to the application using a recorded login sequence.
 						-   **Login Sequence File**: Provide a path to the login sequence file data. Supported file type is .CONFIG.
-        -   **Static Analyzer**
+        -   **Software Composition Analysis (SCA)**
+            -   **Target**: Enter the complete path to the directory containing the files to scan, or provide the full path to an existing .irx file. Leave this field empty to scan all supported files within the workspace directory.
+        -   **Static Analysis (SAST)**
             -   **Target**: Enter the complete path to the directory containing the files to scan, or provide the full path to an existing .irx .war, .ear, .jar or .zip file. Leave this field empty to scan all supported files within the workspace directory.
             -   **Scan Method**
                 -   **Generate IRX**: Generate an IRX archive locally from the specified files and folders.
@@ -144,6 +148,8 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
                 Please note this is not a required parameter for an AppScan Enterprise 
                 ADAC job.
             -   **Test policy**: Select the test policy for your scan.
+            -   **Description**: Description of the job.
+            -   **Contact**: Contact user of the job.
             -   **Starting URL**: Enter the URL from where you want the
                 scan to start exploring the site.                
        - **Which Login method you want to use**       
