@@ -3,7 +3,7 @@ CHANGELOG
 1.3.0 (November, 2023)
 ------
 - Support for new scan type : Software Composition Analysis (SCA) in AppScan on Cloud.
-- Support for adding Contact and description for AppScan Enterprise jobs.
+- Support for adding Contact and Description for AppScan Enterprise jobs.
 - Bug fixes.
 
 1.2.0 (August, 2023)

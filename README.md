@@ -28,10 +28,7 @@ To execute scans in HCL AppScan 360°, you must have access to an instance of Ap
 HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for creation and execution of ADAC jobs. To use this integration, you must have access to a running instance of AppScan Enterprise Server  version 9.0.3.14 or later. Please note that Content Scan jobs are not supported through this integration.
 
 ## Usage
-**Integration with HCL AppScan on Cloud/HCL AppScan 360°** \
-**Notes:** 
-- Support for SAST scanning using HCL AppScan 360° was added for version 1.1.0 of the Jenkins extension. The existing HCL AppScan on Cloud connection endpoint and build step have been enhanced to allow users to connect to HCL AppScan 360°.
-- AppScan on Cloud (ASoC) now performs SAST and SCA analysis as separate scans. To execute an open-source only scan, use the Software Composition Analysis (SCA) scan type. The open-source only option will be removed from SAST scans in a future release.
+**Integration with HCL AppScan on Cloud/HCL AppScan 360°**
 
 1.  Add your AppScan on Cloud/AppScan 360° credentials on the Jenkins
     **Credentials** page.
@@ -121,6 +118,10 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
         thresholds for total, critical, high, medium, and/or low finding counts.
         If multiple conditions are added, they will be treated as though
         they are separated by a logical OR.
+
+**Notes:**
+- Support for SAST scanning using HCL AppScan 360° was added for version 1.1.0 of the Jenkins extension. The existing HCL AppScan on Cloud connection endpoint and build step have been enhanced to allow users to connect to HCL AppScan 360°.
+- AppScan on Cloud (ASoC) now performs SAST and SCA analysis as separate scans. To execute an open-source only scan, use the Software Composition Analysis (SCA) scan type. The open-source only option will be removed from SAST scans in a future release.
 
  For more information on adding security analysis to Jenkins automation server, please visit this [link](http://help.hcltechsw.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins).
 
