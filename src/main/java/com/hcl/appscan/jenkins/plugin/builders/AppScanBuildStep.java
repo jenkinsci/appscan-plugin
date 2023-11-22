@@ -301,7 +301,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         if(isAppScan360) {
             if (m_type.equals("Dynamic Analyzer")) {
                 throw new AbortException(Messages.error_dynamic_analyzer_AppScan360());
-            } if (m_type.equals("Sca")) {
+            } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
                 throw new AbortException(Messages.error_sca_AppScan360());
             } if (m_intervention) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
