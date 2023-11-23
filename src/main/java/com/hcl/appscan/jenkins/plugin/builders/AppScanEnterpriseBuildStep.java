@@ -478,7 +478,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
             		int responseCode = conn.getResponseCode();
                     	return responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE;
         	} catch (Exception e){
-            		throw new AbortException(Messages.error_url_validation());
+            		throw new AbortException(Messages.error_url_validation(m_target));
         	}
     	}
 
@@ -499,7 +499,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		Map<String, String> properties = getScanProperties(build, listener);
 
         	if (!checkURLAccessibility(properties.get("startingURL"))) {
-            		throw new AbortException(Messages.error_url_validation());
+            		throw new AbortException(Messages.error_url_validation(m_target));
         	}
 
         	m_authProvider = new ASEJenkinsAuthenticationProvider(properties.get("credentials"),
