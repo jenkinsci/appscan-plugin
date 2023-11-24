@@ -498,7 +498,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			throws InterruptedException, IOException {
 		Map<String, String> properties = getScanProperties(build, listener);
 
-        if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
+        	if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
             		throw new AbortException(Messages.error_url_validation(m_target));
         	}
 
