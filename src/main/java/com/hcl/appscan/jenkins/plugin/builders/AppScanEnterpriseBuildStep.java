@@ -23,6 +23,7 @@ import java.util.HashMap;
 
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.wink.json4j.JSONException;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -551,7 +552,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 						}
 					}
 					return provider;
-				} catch (ScannerException | InvalidTargetException | InterruptedException e) {
+				} catch (ScannerException | InvalidTargetException | InterruptedException |JSONException e) {
 					progress.setStatus(new Message(Message.INFO, Messages.label_ase_homepage() + ": " + m_authProvider.getServer()));
 					throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
 				}
