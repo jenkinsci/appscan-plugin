@@ -552,7 +552,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 						}
 					}
 					return provider;
-				} catch (ScannerException | InvalidTargetException | InterruptedException |JSONException e) {
+				} catch (ScannerException | InvalidTargetException | InterruptedException e) {
 					progress.setStatus(new Message(Message.INFO, Messages.label_ase_homepage() + ": " + m_authProvider.getServer()));
 					throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
 				}

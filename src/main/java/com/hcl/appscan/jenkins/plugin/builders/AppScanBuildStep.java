@@ -350,7 +350,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    		
 		    		return provider;
 		    	}
-		    	catch(ScannerException | InvalidTargetException | InterruptedException | JSONException e) {
+		    	catch(ScannerException | InvalidTargetException | InterruptedException e) {
 		    		throw new AbortException(Messages.error_running_scan(e.getLocalizedMessage()));
 		    	}
 			}
