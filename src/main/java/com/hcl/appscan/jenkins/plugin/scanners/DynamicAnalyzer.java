@@ -202,7 +202,9 @@ public class DynamicAnalyzer extends Scanner {
 		if (resolver == null) {
 			properties.put(TARGET, getTarget());
 			properties.put(SCAN_FILE, m_scanFile);
-			properties.put(EXTRA_FIELD, m_extraField);
+			if(!m_extraField.equals(EMPTY)) {
+				properties.put(EXTRA_FIELD, m_extraField);
+			}
 			if(m_loginType == null || m_loginType.equals("")){
 				m_loginType = upgradeLoginScenario();
 			}
@@ -245,7 +247,9 @@ public class DynamicAnalyzer extends Scanner {
 		properties.put(LOGIN_TYPE,m_loginType);
 		properties.put(SCAN_TYPE, m_scanType);
 		properties.put(TEST_OPTIMIZATION_LEVEL, m_optimization);
-		properties.put(PRESENCE_ID, m_presenceId);
+		if (!m_presenceId.equals(EMPTY)) {
+				properties.put(PRESENCE_ID, m_presenceId);
+		}
 
 		return properties;
 	}
