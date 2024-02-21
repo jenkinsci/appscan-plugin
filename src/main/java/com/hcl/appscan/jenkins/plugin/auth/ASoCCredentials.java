@@ -51,9 +51,10 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 	
 	public String getServer() {
 		if(!(m_url == null || m_url.equals(""))){
-			return m_url;
+			return m_url.endsWith("/") ? m_url.substring(0, m_url.length()-1) : m_url;
 		} else {
-			return SystemUtil.getServer(getUsername());
+			String URL = SystemUtil.getServer(getUsername());
+			return URL.endsWith("/") ? URL.substring(0, URL.length()-1) : URL;
 		}
 	}
 	
