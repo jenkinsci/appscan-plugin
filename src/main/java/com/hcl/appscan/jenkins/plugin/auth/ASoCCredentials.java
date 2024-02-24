@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019, 2023.
+ * @ Copyright HCL Technologies Ltd. 2019, 2024.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 package com.hcl.appscan.jenkins.plugin.auth;
@@ -50,11 +50,11 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
         public boolean getacceptInvalidCerts() {return m_acceptInvalidCerts;}
 	
 	public String getServer() {
-		if(!(m_url == null || m_url.equals(""))){
-			return m_url;
-		} else {
-			return SystemUtil.getServer(getUsername());
+		String url = m_url;
+		if(url == null || url.equals("")){
+			url = SystemUtil.getServer(getUsername());
 		}
+		return url.endsWith("/") ? url.substring(0, url.length()-1) : url;
 	}
 	
 	public Secret getToken() {
