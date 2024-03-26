@@ -71,7 +71,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
                     select your AppScan Presence from the list.
                     Information about creating an AppScan Presence is
                     available
-                    [here](https://help.hcltechsw.com/appscan/ASoC/asp_scanning.html).
+                    [here](https://help.hcltechsw.com/appscan/ASoC/Presence_scanning.html).
                 -   **Scan File**: If you have an AppScan Standard scan
                     file, enter its full path and file name in this
                     field. To learn more about AppScan Standard scan
