@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+1.3.1 (March, 2024)
+------
+- Migration to version 4 of ASoC REST APIs.
+- Bug fixes.
+
 1.3.0 (November, 2023)
 ------
 - Support for new scan type : Software Composition Analysis (SCA) in AppScan on Cloud.
