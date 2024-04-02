@@ -104,7 +104,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
-	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email, boolean peronalScan, boolean intervention) {
+	public AppScanBuildStep(Scanner scanner, String name, String type, String target, String application, String credentials, List<FailureCondition> failureConditions, boolean failBuildNonCompliance, boolean failBuild, boolean wait, boolean email, boolean personalScan, boolean intervention) {
 		m_scanner = scanner;
 		m_name = (name == null || name.trim().equals("")) ? application.replaceAll(" ", "") + ThreadLocalRandom.current().nextInt(0, 10000) : name; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_type = scanner.getType();
@@ -113,7 +113,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		m_credentials = credentials;
 		m_failureConditions = failureConditions;
 		m_emailNotification = email;
-		m_personalScan = peronalScan;
+		m_personalScan = personalScan;
                 m_intervention = intervention;
 		m_wait = wait;
         	m_failBuildNonCompliance=failBuildNonCompliance;
