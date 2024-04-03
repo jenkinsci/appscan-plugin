@@ -23,6 +23,10 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	<f:entry field="email">
 		<f:checkbox title="${%label.email}"/>
 	</f:entry>
+
+	<f:entry field="personalScan">
+		<f:checkbox title="${%label.personalScan}"/>
+	</f:entry>
         
         <f:entry field="intervention">
 		<f:checkbox title="${%label.intervention}" default="true" />
