@@ -11,10 +11,6 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	</f:entry>
 
 	<f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
-
-		<f:entry title="${%label.scan.type}" field="scanType">
-			<f:select />
-		</f:entry>
 		
 		<f:entry title="${%label.scan.optimization}" field="optimization"> 
 			<f:select />
