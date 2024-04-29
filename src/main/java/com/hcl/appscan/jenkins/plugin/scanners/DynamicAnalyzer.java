@@ -328,13 +328,18 @@ public class DynamicAnalyzer extends Scanner {
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
-			if(authProvider.isAppScan360()){
-				return FormValidation.error(Messages.error_dynamic_AppScan360());
-			}
             		if(presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
                 		return FormValidation.error(Messages.error_url_validation_ui());
             		}
 			return FormValidation.validateRequired(target);
+		}
+
+		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
+			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+			if(authProvider.isAppScan360()){
+				return FormValidation.error(Messages.warning_presence_AppScan360());
+			}
+			return FormValidation.ok();
 		}
 
 		public FormValidation doCheckLoginUser(@QueryParameter String loginUser) {
