@@ -9,6 +9,7 @@ package com.hcl.appscan.jenkins.plugin.builders;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,8 +20,15 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.Comparator;
 
 import javax.annotation.Nonnull;
+import javax.net.ssl.HttpsURLConnection;
 
+import com.hcl.appscan.sdk.http.HttpClient;
+import com.hcl.appscan.sdk.http.HttpResponse;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
+import org.apache.wink.json4j.JSONArtifact;
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -312,8 +320,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
         if(isAppScan360) {
-            if (m_type.equals("Dynamic Analyzer") && properties.containsKey(Scanner.PRESENCE_ID)) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_presence_AppScan360()));
+            String buildVersion = ServiceUtil.getA360Version(m_authProvider);
+            if (m_type.equals("Dynamic Analyzer")) {
+                if (buildVersion != null && buildVersion.startsWith("1.2")) {
+                    throw new AbortException("HCL AppScan task failed: Dynamic analysis (DAST) is available in AppScan on Cloud only");
+                } if(properties.containsKey(Scanner.PRESENCE_ID)) {
+                    progress.setStatus(new Message(Message.WARNING, Messages.warning_presence_AppScan360()));
+                }
             } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
                 throw new AbortException(Messages.error_sca_AppScan360());
             } if (m_intervention) {
