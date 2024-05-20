@@ -23,12 +23,12 @@ import java.util.Map;
 public class SoftwareCompositionAnalyzer extends Scanner {
 
     public SoftwareCompositionAnalyzer(String target){
-        super(target, false);
+        super(target, false, false);
     }
 
     @DataBoundConstructor
     public SoftwareCompositionAnalyzer(String target, boolean hasOptions){
-        super(target, false);
+        super(target, false, false);
     }
 
 

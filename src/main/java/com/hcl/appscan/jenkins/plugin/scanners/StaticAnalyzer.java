@@ -27,28 +27,31 @@ public class StaticAnalyzer extends Scanner {
 
 	private static final String STATIC_ANALYZER = "Static Analyzer"; //$NON-NLS-1$
         
-        private boolean m_openSourceOnly;
+        private boolean m_includeSCA1;
+        private boolean m_includeSCA2;
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
         private String m_scanSpeed;
         
         @Deprecated
         public StaticAnalyzer(String target){
-            this(target,false);
+            this(target,false,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
-            super(target, hasOptions);
-            m_openSourceOnly=openSourceOnly;
+        public StaticAnalyzer(String target, boolean hasOptions1, boolean hasOptions2, boolean includeSCA1, boolean includeSCA2, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
+            super(target, hasOptions1, hasOptions2);
+            m_includeSCA1=includeSCA1;
+            m_includeSCA2=includeSCA2;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions) {
-		super(target, hasOptions);
-                m_openSourceOnly=false;
+	public StaticAnalyzer(String target,boolean hasOptions1, boolean hasOptions2) {
+		super(target, hasOptions1, hasOptions2);
+                m_includeSCA1=false;
+                m_includeSCA2=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
                 m_scanSpeed="";
@@ -78,17 +81,22 @@ public class StaticAnalyzer extends Scanner {
         	return null;
     	}
        
-        public boolean isOpenSourceOnly() {
+        /*public boolean isOpenSourceOnly() {
             if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
                 return m_openSourceOnly;
             }
             return false;
-        }
+        }*/
         
         @DataBoundSetter
-        public void setOpenSourceOnly(boolean openSourceOnly) {
-            m_openSourceOnly = openSourceOnly;
+        public void setIncludeSCA1(boolean includeSCA1) {
+            m_includeSCA1 = includeSCA1;
         }
+
+    @DataBoundSetter
+    public void setIncludeSCA2(boolean includeSCA2) {
+        m_includeSCA2 = includeSCA2;
+    }
 
         public boolean isSourceCodeOnly() {
             if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
@@ -121,13 +129,13 @@ public class StaticAnalyzer extends Scanner {
                 if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
             		properties.put(CoreConstants.UPLOAD_DIRECT, "");
         	}
-        	if (m_openSourceOnly && getHasOptions()) {
-                    properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
+        	if ((m_includeSCA1 || m_includeSCA2) && (getHasOptions1() || getHasOptions2())) {
+                    properties.put(CoreConstants.INCLUDE_SCA, "");
                 }
-                if (m_sourceCodeOnly && getHasOptions()) {
+                if (m_sourceCodeOnly && getHasOptions1()) {
                     properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
                 }
-                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
+                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions1()) {
                     properties.put(SCAN_SPEED, m_scanSpeed);
                 }
 		return properties;

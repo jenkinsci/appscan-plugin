@@ -72,14 +72,14 @@ function waitClicked(e) {
 
 function sourceCodeOnlyClicked(e){
 	if (e.checked) {
-		var osoCheckbox = getComponent(e, 'openSourceOnly');
-		if (osoCheckbox != null) {
-			osoCheckbox.checked = false;
+		var scaCheckbox = getComponent(e, 'includeSCA');
+		if (scaCheckbox != null) {
+			scaCheckbox.checked = false;
 		}
 	}
 }
 
-function openSourceOnlyClicked(e){
+function includeSCAClicked(e){
 	if (e.checked) {
 		var scoCheckbox = getComponent(e, 'sourceCodeOnly');
 		if (scoCheckbox != null) {

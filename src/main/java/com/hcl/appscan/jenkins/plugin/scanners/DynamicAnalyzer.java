@@ -60,7 +60,7 @@ public class DynamicAnalyzer extends Scanner {
 
 	@Deprecated
 	public DynamicAnalyzer(String target, boolean hasOptions, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
-		super(target, hasOptions);
+		super(target, hasOptions, false);
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
@@ -75,7 +75,7 @@ public class DynamicAnalyzer extends Scanner {
 	@DataBoundConstructor
 
 	public DynamicAnalyzer(String target, boolean hasOptions) {
-		super(target, hasOptions);
+		super(target, hasOptions, false);
 		m_presenceId = EMPTY;
 		m_scanFile = EMPTY;
 		m_scanType = EMPTY;
