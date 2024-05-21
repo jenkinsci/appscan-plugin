@@ -329,9 +329,6 @@ public class DynamicAnalyzer extends Scanner {
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) throws IOException {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
-            if(authProvider.isAppScan360() && ServiceUtil.getA360Version(authProvider).startsWith("1.2")) {
-                return FormValidation.error("Dynamic Analysis is not supported in yours A360 instance");
-            }
             		if(presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
                 		return FormValidation.error(Messages.error_url_validation_ui());
             		}
