@@ -246,7 +246,6 @@ public class DynamicAnalyzer extends Scanner {
 			}
 		}
 		properties.put(LOGIN_TYPE,m_loginType);
-		properties.put(SCAN_TYPE, m_scanType);
 		properties.put(TEST_OPTIMIZATION_LEVEL, m_optimization);
 		if (!m_presenceId.equals(EMPTY)) {
 				properties.put(PRESENCE_ID, m_presenceId);
