@@ -238,7 +238,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-	perform((Run<?,?>)build, launcher, listener);
+        perform((Run<?,?>)build, launcher, listener);
+        m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
+        Map<String,String> properties= getScanProperties(build, listener);
+        if(properties.containsKey("includeSCA")) {
+            m_scanner = ScannerFactory.getScanner("Software Composition Analyzer", m_target);
+          perform((Run<?,?>)build, launcher, listener);
+        }
 	        return true;
     }
     
@@ -269,7 +275,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			Map<String, String> properties = m_scanner.getProperties(resolver);
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
-			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_scanner.getType()+m_name : m_scanner.getType()+ Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 			properties.put(CoreConstants.PERSONAL_SCAN, Boolean.toString(m_personalScan));
 			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
