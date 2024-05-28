@@ -314,7 +314,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
         if(isAppScan360) {
             if (m_type.equals("Dynamic Analyzer") && properties.containsKey(Scanner.PRESENCE_ID)) {
-                    progress.setStatus(new Message(Message.WARNING, Messages.warning_presence_AppScan360()));
+                    throw new AbortException(Messages.error_presence_AppScan360());
             } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
                 throw new AbortException(Messages.error_sca_AppScan360());
             } if (m_intervention) {

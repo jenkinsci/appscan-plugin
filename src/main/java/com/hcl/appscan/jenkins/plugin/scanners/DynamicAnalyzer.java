@@ -337,7 +337,7 @@ public class DynamicAnalyzer extends Scanner {
 		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
 			if(authProvider.isAppScan360()){
-				return FormValidation.error(Messages.warning_presence_AppScan360());
+				return FormValidation.error(Messages.error_presence_AppScan360());
 			}
 			return FormValidation.ok();
 		}
