@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019, 2022, 2023.
+ * @ Copyright HCL Technologies Ltd. 2017, 2024.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -102,9 +102,9 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		return Secret.toString(m_credentials.getToken());
 	}
 
-    public boolean isAppScan360(){
+	public boolean isAppScan360(){
 		String keyId = m_credentials.getUsername();
-        	return  keyId.trim().startsWith("local");
+		return  keyId.trim().startsWith("local");
 	}
 	
 	public void configureCredentials(String id, ItemGroup<?> context) {
