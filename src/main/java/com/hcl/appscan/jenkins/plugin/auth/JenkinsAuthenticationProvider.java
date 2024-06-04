@@ -102,7 +102,6 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		return Secret.toString(m_credentials.getToken());
 	}
 
-	@Override
     public boolean isAppScan360(){
 		String keyId = m_credentials.getUsername();
         	return  keyId.trim().startsWith("local");

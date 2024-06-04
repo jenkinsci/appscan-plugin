@@ -112,9 +112,4 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
     public boolean getacceptInvalidCerts(){
         return false;
     }
-
-    @Override
-    public boolean isAppScan360() {
-        return false;
-    }
 }

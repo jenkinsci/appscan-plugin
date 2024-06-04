@@ -9,7 +9,6 @@ package com.hcl.appscan.jenkins.plugin.builders;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +21,7 @@ import java.util.Comparator;
 import javax.annotation.Nonnull;
 
 import com.hcl.appscan.sdk.scanners.ScanConstants;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -313,8 +313,15 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
         if(isAppScan360) {
-            if (m_type.equals("Dynamic Analyzer") && properties.containsKey(Scanner.PRESENCE_ID)) {
+            if(m_type.equals("Dynamic Analyzer")) {
+                if (properties.containsKey(Scanner.PRESENCE_ID)) {
                     throw new AbortException(Messages.error_presence_AppScan360());
+                } else if (!ServiceUtil.isValidUrl(properties.get(CoreConstants.TARGET), m_authProvider, m_authProvider.getProxy())) {
+                    throw new AbortException(Messages.error_url_dynamic_unsupported(properties.get(CoreConstants.TARGET)));
+                }
+            }
+            if (m_type.equals("Dynamic Analyzer") && properties.containsKey(Scanner.PRESENCE_ID)) {
+                throw new AbortException(Messages.error_presence_AppScan360());
             } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
                 throw new AbortException(Messages.error_sca_AppScan360());
             } if (m_intervention) {
