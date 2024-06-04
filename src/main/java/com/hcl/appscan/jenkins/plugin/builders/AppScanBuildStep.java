@@ -320,9 +320,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                     throw new AbortException(Messages.error_url_dynamic_unsupported(properties.get(CoreConstants.TARGET)));
                 }
             }
-            if (m_type.equals("Dynamic Analyzer") && properties.containsKey(Scanner.PRESENCE_ID)) {
-                throw new AbortException(Messages.error_presence_AppScan360());
-            } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
+            if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
                 throw new AbortException(Messages.error_sca_AppScan360());
             } if (m_intervention) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
