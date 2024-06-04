@@ -12,6 +12,9 @@ import hudson.model.Job;
 public abstract class AppScanAction implements Action {
 
 	protected static final String ICON = "/plugin/appscan/images/ASoC.ico"; //$NON-NLS-1$
+    protected static final String SAST = "/plugin/appscan/images/SAST.svg"; //$NON-NLS-1$
+    protected static final String SCA = "/plugin/appscan/images/SCA.svg"; //$NON-NLS-1$
+    protected static final String DAST = "/plugin/appscan/images/DAST.svg"; //$NON-NLS-1$
 	protected static final String URL = "https://cloud.appscan.com"; //$NON-NLS-1$
 	protected final Job<?,?> m_project;
 	

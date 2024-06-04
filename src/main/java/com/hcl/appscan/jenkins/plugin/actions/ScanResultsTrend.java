@@ -38,6 +38,15 @@ public class ScanResultsTrend extends AppScanAction {
 	public String getIconFileName() {
 		if(getBuildCount() == 0 || getLatestResults() == null)
 			return null;
+        if (m_type.equals("Sast")) {
+            return SAST;
+        }
+        if (m_type.equals("Software Composition Analyzer")) {
+            return SCA;
+        }
+        if (m_type.equals("Dast")) {
+            return DAST;
+        }
 		return super.getIconFileName();
 	}
 	

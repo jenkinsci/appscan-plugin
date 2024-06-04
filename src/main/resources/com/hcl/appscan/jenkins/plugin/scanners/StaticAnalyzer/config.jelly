@@ -12,14 +12,14 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	<f:entry title="${%label.static.scan.options}">
                <f:radioBlock name="scanMethod" title="${%label.create.irx}" checked="true" value="createIRX" inline="true" help="/plugin/appscan/help/createIRX.html" >
                <f:nested>
-               <f:optionalBlock title="${%label.additional.options}" field="hasOptions1" checked="${instance.isAdditionalOptions()}" inline="true">
-                           <f:entry field="includeSCA">
-               		<f:checkbox title="${%label.include.sca}" onclick="includeSCAClicked(this);" name="includeSCA1"/>
-                           </f:entry>
+               <f:optionalBlock title="${%label.additional.options}" checked="${instance.isAdditionalOptions()}" field="hasOptions" inline="true">
+                   <f:entry field="sourceCodeOnly">
+                       <f:checkbox title="${%label.sourcecode.only}" name="sourceCodeOnly"/>
+                   </f:entry>
 
-                           <f:entry field="sourceCodeOnly">
-                       <f:checkbox title="${%label.sourcecode.only}" onclick="sourceCodeOnlyClicked(this);" name="sourceCodeOnly"/>
-               			   </f:entry>
+                   <f:entry field="includeSCA1">
+               		<f:checkbox title="${%label.include.sca}" name="includeSCA1"/>
+                           </f:entry>
                  
                  <f:entry title="${%label.scan.speed.option}" help="/plugin/appscan/help/scanSpeed.html">
 			           </f:entry>
@@ -67,9 +67,9 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 
                <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" help="/plugin/appscan/help/uploadDirect.html" >
                    <f:nested>
-                   <f:optionalBlock title="${%label.additional.options}" field="hasOptions2" checked="${instance.isAdditionalOptions()}" inline="true">
-                   <f:entry field="includeSCA">
-                       <f:checkbox title="${%label.include.sca}" onclick="includeSCAClicked(this);" name="includeSCA2"/>
+                   <f:optionalBlock title="${%label.additional.options}" checked="${instance.isAdditionalOptions()}" field="hasOptions1" inline="true">
+                   <f:entry field="includeSCA2">
+                       <f:checkbox title="${%label.include.sca}" name="includeSCA2"/>
                    </f:entry>
                    </f:optionalBlock>
                    </f:nested>

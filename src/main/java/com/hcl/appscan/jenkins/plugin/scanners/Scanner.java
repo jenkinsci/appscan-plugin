@@ -10,6 +10,7 @@ import hudson.AbortException;
 import hudson.Util;
 import hudson.model.AbstractDescribableImpl;
 import hudson.util.VariableResolver;
+import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 
 import java.io.File;
 import java.io.Serializable;
@@ -22,21 +23,21 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	private static final long serialVersionUID = 1L;
 	
 	private String m_target;
-	private boolean m_hasOptions1;
-    private boolean m_hasOptions2;
+	private boolean m_hasOptions;
+    private boolean m_hasOptions1;
 	
-	public Scanner(String target, boolean hasOptions1, boolean hasOptions2) {
+	public Scanner(String target, boolean hasOptions, boolean hasOptions1) {
 		m_target = target;
-		m_hasOptions1 = hasOptions1;
-        m_hasOptions2 = hasOptions2;
+		m_hasOptions = hasOptions;
+        m_hasOptions1 = hasOptions1;
 	}
 	
-	public boolean getHasOptions1() {
-		return m_hasOptions1;
+	public boolean getHasOptions() {
+		return m_hasOptions;
 	}
 
-    public boolean getHasOptions2() {
-        return m_hasOptions2;
+    public boolean getHasOptions1() {
+        return m_hasOptions1;
     }
 	
 	public String getTarget() {

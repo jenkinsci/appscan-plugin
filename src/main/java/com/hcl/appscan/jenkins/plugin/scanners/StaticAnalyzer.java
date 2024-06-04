@@ -8,6 +8,7 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 import com.hcl.appscan.sdk.CoreConstants;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,8 +39,8 @@ public class StaticAnalyzer extends Scanner {
             this(target,false,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions1, boolean hasOptions2, boolean includeSCA1, boolean includeSCA2, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
-            super(target, hasOptions1, hasOptions2);
+        public StaticAnalyzer(String target, boolean hasOptions, boolean hasOptions1, boolean includeSCA1, boolean includeSCA2, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
+            super(target, hasOptions, hasOptions1);
             m_includeSCA1=includeSCA1;
             m_includeSCA2=includeSCA2;
             m_sourceCodeOnly=sourceCodeOnly;
@@ -48,8 +49,8 @@ public class StaticAnalyzer extends Scanner {
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions1, boolean hasOptions2) {
-		super(target, hasOptions1, hasOptions2);
+	public StaticAnalyzer(String target,boolean hasOptions, boolean hasOptions1) {
+		super(target, hasOptions, hasOptions1);
                 m_includeSCA1=false;
                 m_includeSCA2=false;
                 m_sourceCodeOnly=false;
@@ -105,6 +106,20 @@ public class StaticAnalyzer extends Scanner {
             return false;
         }
 
+    public boolean isIncludeSCA1() {
+        if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+            return m_includeSCA1;
+        }
+        return false;
+    }
+
+    public boolean isIncludeSCA2() {
+            if(m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
+                return m_includeSCA2;
+            }
+            return false;
+    }
+
         @DataBoundSetter
         public void setSourceCodeOnly(boolean sourceCodeOnly) {
             m_sourceCodeOnly = sourceCodeOnly;
@@ -126,16 +141,22 @@ public class StaticAnalyzer extends Scanner {
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
+                if(getHasOptions()) {
+                    properties.put("hasOptions","");
+                }
+                if(getHasOptions1()) {
+                    properties.put("hasOptions1","");
+                }
                 if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
             		properties.put(CoreConstants.UPLOAD_DIRECT, "");
         	}
-        	if ((m_includeSCA1 || m_includeSCA2) && (getHasOptions1() || getHasOptions2())) {
+        	if ((m_includeSCA1 || m_includeSCA2) && (getHasOptions() || getHasOptions1())) {
                     properties.put(CoreConstants.INCLUDE_SCA, "");
                 }
                 if (m_sourceCodeOnly && getHasOptions1()) {
                     properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
                 }
-                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions1()) {
+                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
                     properties.put(SCAN_SPEED, m_scanSpeed);
                 }
 		return properties;
