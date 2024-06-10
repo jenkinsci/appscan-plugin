@@ -141,16 +141,10 @@ public class StaticAnalyzer extends Scanner {
 	public Map<String, String> getProperties(VariableResolver<String> resolver) {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
-                if(getHasOptions()) {
-                    properties.put("hasOptions","");
-                }
-                if(getHasOptions1()) {
-                    properties.put("hasOptions1","");
-                }
                 if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
             		properties.put(CoreConstants.UPLOAD_DIRECT, "");
-        	}
-        	if ((m_includeSCA1 || m_includeSCA2) && (getHasOptions() || getHasOptions1())) {
+                }
+                if ((m_includeSCA1 || m_includeSCA2) && (getHasOptions() || getHasOptions1())) {
                     properties.put(CoreConstants.INCLUDE_SCA, "");
                 }
                 if (m_sourceCodeOnly && getHasOptions1()) {
@@ -171,16 +165,20 @@ public class StaticAnalyzer extends Scanner {
 			return "Static Analysis (SAST)";
 		}
 
-		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
-			if(openSourceOnly) {
-                		if(checkAppScan360Connection.isAppScan360()) {
-                    			return FormValidation.error(Messages.error_sca_ui());
-                	  	} else {
-                    			return FormValidation.warning(Messages.warning_sca_ui());
-                		}
-            		}
-                	return FormValidation.ok();
-		}
+        public FormValidation doCheckIncludeSCA1(@QueryParameter Boolean includeSCA1, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
+            if (includeSCA1 && checkAppScan360Connection.isAppScan360()) {
+                    return FormValidation.error(Messages.error_include_sca_ui());
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckIncludeSCA2(@QueryParameter Boolean includeSCA2, @QueryParameter String scanMethod, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
+            if (includeSCA2 && checkAppScan360Connection.isAppScan360()) {
+                    return FormValidation.error(Messages.error_include_sca_ui());
+            }
+            return FormValidation.ok();
+        }
 	}
 }
