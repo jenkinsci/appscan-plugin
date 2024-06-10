@@ -332,9 +332,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
 
         if(m_type.equals("Dynamic Analyzer") && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(target, m_authProvider, m_authProvider.getProxy())) {
-            if(isAppScan360) {
-                throw new AbortException(Messages.error_url_dynamic_unsupported(target));
-            }
             throw new AbortException(Messages.error_url_validation(target));
         }
 
