@@ -17,8 +17,8 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
                        <f:checkbox title="${%label.sourcecode.only}" name="sourceCodeOnly"/>
                    </f:entry>
 
-                   <f:entry field="includeSCA1">
-               		<f:checkbox title="${%label.include.sca1}" value="includeSCA1" />
+                   <f:entry field="includeSCAGenerateIRX">
+               		<f:checkbox title="${%label.include.sca.generate.irx}" value="includeSCAGenerateIRX" />
                            </f:entry>
                  
                  <f:entry title="${%label.scan.speed.option}">
@@ -66,9 +66,9 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 
                <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" >
                    <f:nested>
-                   <f:optionalBlock title="${%label.additional.options}" checked="${instance.isAdditionalOptions()}" field="hasOptions1" inline="true">
-                   <f:entry field="includeSCA2">
-                       <f:checkbox title="${%label.include.sca2}" value="includeSCA2"/>
+                   <f:optionalBlock title="${%label.additional.options}" checked="${instance.isAdditionalOptions()}" field="hasOptionsUploadDirect" inline="true">
+                   <f:entry field="includeSCAUploadDirect">
+                       <f:checkbox title="${%label.include.sca.upload.direct}" value="includeSCAUploadDirect"/>
                    </f:entry>
                    </f:optionalBlock>
                    </f:nested>

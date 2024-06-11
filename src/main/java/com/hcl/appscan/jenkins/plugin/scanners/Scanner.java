@@ -10,7 +10,6 @@ import hudson.AbortException;
 import hudson.Util;
 import hudson.model.AbstractDescribableImpl;
 import hudson.util.VariableResolver;
-import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 
 import java.io.File;
 import java.io.Serializable;
@@ -24,21 +23,21 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	private String m_target;
 	private boolean m_hasOptions;
-    private boolean m_hasOptions1;
+	private boolean m_hasOptionsUploadDirect;
 	
-	public Scanner(String target, boolean hasOptions, boolean hasOptions1) {
+	public Scanner(String target, boolean hasOptions, boolean hasOptionsUploadDirect) {
 		m_target = target;
 		m_hasOptions = hasOptions;
-        m_hasOptions1 = hasOptions1;
+		m_hasOptionsUploadDirect = hasOptionsUploadDirect;
 	}
 	
 	public boolean getHasOptions() {
 		return m_hasOptions;
 	}
 
-    public boolean getHasOptions1() {
-        return m_hasOptions1;
-    }
+	public boolean getHasOptionsUploadDirect() {
+		return m_hasOptionsUploadDirect;
+	}
 	
 	public String getTarget() {
 		return m_target;
