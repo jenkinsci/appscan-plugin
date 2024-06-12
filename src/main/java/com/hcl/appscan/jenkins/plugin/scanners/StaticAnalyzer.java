@@ -80,22 +80,15 @@ public class StaticAnalyzer extends Scanner {
         		}
         	return null;
     	}
-       
-        /*public boolean isOpenSourceOnly() {
-            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
-                return m_openSourceOnly;
-            }
-            return false;
-        }*/
         
         @DataBoundSetter
-        public void setIncludeSCAGenerateIRX(boolean includeSCA1) {
-            m_includeSCAGenerateIRX = includeSCA1;
+        public void setIncludeSCAGenerateIRX(boolean includeSCAGenerateIRX) {
+            m_includeSCAGenerateIRX = includeSCAGenerateIRX;
         }
 
         @DataBoundSetter
-        public void setIncludeSCAUploadDirect(boolean includeSCA2) {
-            m_includeSCAUploadDirect = includeSCA2;
+        public void setIncludeSCAUploadDirect(boolean includeSCAUploadDirect) {
+            m_includeSCAUploadDirect = includeSCAUploadDirect;
         }
 
         public boolean isSourceCodeOnly() {
