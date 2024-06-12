@@ -48,8 +48,8 @@ public class StaticAnalyzer extends Scanner {
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions, boolean hasOptions1) {
-		super(target, hasOptions, hasOptions1);
+	public StaticAnalyzer(String target,boolean hasOptions, boolean hasOptionsUploadDirect) {
+		super(target, hasOptions, hasOptionsUploadDirect);
                 m_includeSCAGenerateIRX=false;
                 m_includeSCAUploadDirect=false;
                 m_sourceCodeOnly=false;
