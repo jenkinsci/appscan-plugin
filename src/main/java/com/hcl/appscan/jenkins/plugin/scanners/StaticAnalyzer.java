@@ -27,6 +27,7 @@ public class StaticAnalyzer extends Scanner {
 
 	private static final String STATIC_ANALYZER = "Static Analyzer"; //$NON-NLS-1$
         
+        private boolean m_openSourceOnly;
         private boolean m_includeSCAGenerateIRX;
         private boolean m_includeSCAUploadDirect;
         private boolean m_sourceCodeOnly;
@@ -80,6 +81,11 @@ public class StaticAnalyzer extends Scanner {
         		}
         	return null;
     	}
+
+        @DataBoundSetter
+        public void setOpenSourceOnly(boolean openSourceOnly) {
+            m_openSourceOnly = openSourceOnly;
+        }
         
         @DataBoundSetter
         public void setIncludeSCAGenerateIRX(boolean includeSCAGenerateIRX) {
