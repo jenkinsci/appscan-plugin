@@ -39,10 +39,9 @@ public class StaticAnalyzer extends Scanner {
             this(target,false,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean hasOptionsUploadDirect, boolean openSourceOnly, boolean includeSCAGenerateIRX, boolean includeSCAUploadDirect, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean hasOptionsUploadDirect, boolean includeSCAGenerateIRX, boolean includeSCAUploadDirect, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
             super(target, hasOptions, hasOptionsUploadDirect);
             m_includeSCAGenerateIRX=includeSCAGenerateIRX;
-            m_openSourceOnly=openSourceOnly;
             m_includeSCAUploadDirect=includeSCAUploadDirect;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
