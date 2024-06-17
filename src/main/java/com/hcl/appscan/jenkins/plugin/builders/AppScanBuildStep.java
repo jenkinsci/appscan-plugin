@@ -241,9 +241,18 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         perform((Run<?,?>)build, launcher, listener);
         m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
         Map<String,String> properties= getScanProperties(build, listener);
-        if(properties.containsKey("includeSCA")) {
-            m_scanner = ScannerFactory.getScanner("Software Composition Analyzer", m_target);
-          perform((Run<?,?>)build, launcher, listener);
+        if(properties.containsKey(CoreConstants.INCLUDE_SCA)) {
+            includeSCAProperties = properties;
+            m_target = includeSCAProperties.get(CoreConstants.TARGET);
+            perform((Run<?,?>)build, launcher, listener);
+
+            if(!includeSCAProperties.containsKey(CoreConstants.TARGET)) {
+                includeSCAProperties.put(CoreConstants.TARGET,m_target);
+            }
+            includeSCAProperties.remove(CoreConstants.SCANNER_TYPE);
+            includeSCAProperties.put(CoreConstants.SCANNER_TYPE,Scanner.SOFTWARE_COMPOSITION_ANALYZER);
+        } else if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, m_target);
         }
 	        return true;
     }
@@ -301,11 +310,16 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                         failureConditions.add(nonCompliantCondition);
                         failureMessage=Messages.error_noncompliant_issues();
                     }
-	    	if(new ResultsInspector(failureConditions, provider).shouldFail()){
-                    build.setDescription(failureMessage);
-                    throw new AbortException(failureMessage);
-                }
-                    
+
+                    if(includeSCAProperties!=null) {
+                        if(new ResultsInspector(failureConditions, provider).shouldFailCombined(includeSCAProperties)) {
+                            build.setDescription(failureMessage);
+                            throw new AbortException(failureMessage);
+                        }
+                    } else if (new ResultsInspector(failureConditions, provider).shouldFail()) {
+                        build.setDescription(failureMessage);
+                        throw new AbortException(failureMessage);
+                    }
 	    } catch(NullPointerException e) {
 	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
 	    }

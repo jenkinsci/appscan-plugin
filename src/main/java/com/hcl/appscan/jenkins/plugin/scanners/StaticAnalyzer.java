@@ -39,9 +39,10 @@ public class StaticAnalyzer extends Scanner {
             this(target,false,false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean hasOptionsUploadDirect, boolean includeSCAGenerateIRX, boolean includeSCAUploadDirect, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean hasOptionsUploadDirect, boolean openSourceOnly, boolean includeSCAGenerateIRX, boolean includeSCAUploadDirect, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
             super(target, hasOptions, hasOptionsUploadDirect);
             m_includeSCAGenerateIRX=includeSCAGenerateIRX;
+            m_openSourceOnly=openSourceOnly;
             m_includeSCAUploadDirect=includeSCAUploadDirect;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
@@ -53,6 +54,7 @@ public class StaticAnalyzer extends Scanner {
 		super(target, hasOptions, hasOptionsUploadDirect);
                 m_includeSCAGenerateIRX=false;
                 m_includeSCAUploadDirect=false;
+                m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
                 m_scanSpeed="";
@@ -97,6 +99,11 @@ public class StaticAnalyzer extends Scanner {
             m_includeSCAUploadDirect = includeSCAUploadDirect;
         }
 
+        @DataBoundSetter
+        public void setSourceCodeOnly(boolean sourceCodeOnly) {
+            m_sourceCodeOnly = sourceCodeOnly;
+        }
+
         public boolean isSourceCodeOnly() {
             if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
                 return m_sourceCodeOnly;
@@ -119,11 +126,6 @@ public class StaticAnalyzer extends Scanner {
         }
 
         @DataBoundSetter
-        public void setSourceCodeOnly(boolean sourceCodeOnly) {
-            m_sourceCodeOnly = sourceCodeOnly;
-        }
-
-        @DataBoundSetter
         public void setScanMethod(String scanMethod) {
          	m_scanMethod =scanMethod;
         }
@@ -141,6 +143,9 @@ public class StaticAnalyzer extends Scanner {
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
                 if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
             		properties.put(CoreConstants.UPLOAD_DIRECT, "");
+                }
+                if (m_openSourceOnly && getHasOptions()) {
+                    properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
                 }
                 if ((m_includeSCAGenerateIRX || m_includeSCAUploadDirect) && (getHasOptions() || getHasOptionsUploadDirect())) {
                     properties.put(CoreConstants.INCLUDE_SCA, "");
