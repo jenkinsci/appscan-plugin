@@ -88,8 +88,8 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 			return FormValidation.validateRequired(password);
 		}
 
-                public FormValidation doCheckAcceptInvalidCerts(@QueryParameter Boolean acceptInvalidCerts,@QueryParameter String url){
-            		if((url.isEmpty() || url.contains("appscan.com")) && acceptInvalidCerts) {
+                public FormValidation doCheckAcceptInvalidCerts(@QueryParameter Boolean acceptInvalidCerts,@QueryParameter String username){
+            		if((!username.trim().startsWith("local")) && acceptInvalidCerts) {
                 		return FormValidation.error(Messages.error_asoc_certificates_ui());
             		}
             		return FormValidation.ok();

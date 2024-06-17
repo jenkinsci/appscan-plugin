@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022, 2023.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022, 2024.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -21,6 +21,7 @@ import java.util.Comparator;
 import javax.annotation.Nonnull;
 
 import com.hcl.appscan.sdk.scanners.ScanConstants;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -309,11 +310,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
         Map<String, String> properties = getScanProperties(build,listener);
-    	final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
+        String target = properties.get(CoreConstants.TARGET);
+        final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
         if(isAppScan360) {
-            if (m_type.equals("Dynamic Analyzer")) {
-                throw new AbortException(Messages.error_dynamic_analyzer_AppScan360());
+            if (m_type.equals("Dynamic Analyzer") && properties.containsKey(Scanner.PRESENCE_ID)) {
+                throw new AbortException(Messages.error_presence_AppScan360());
             } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
                 throw new AbortException(Messages.error_sca_AppScan360());
             } if (m_intervention) {
@@ -327,6 +329,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
         if (m_type.equals("Static Analyzer") && properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
             progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
+        }
+
+        if(m_type.equals("Dynamic Analyzer") && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(target, m_authProvider, m_authProvider.getProxy())) {
+            throw new AbortException(Messages.error_url_validation(target));
         }
 
     	
