@@ -12,13 +12,13 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	<f:entry title="${%label.static.scan.options}" field="scanMethod"/>
                <f:radioBlock name="scanMethod" title="${%label.create.irx}" checked="true" value="createIRX" inline="true">
                <f:nested>
-               <f:optionalBlock title="${%label.additional.options}" checked="${instance.isAdditionalOptions()}" name="hasOptions" field="hasOptions" inline="true">
+               <f:optionalBlock title="${%label.additional.options}" checked="true" name="hasOptions" field="hasOptions" inline="true">
                    <f:entry field="sourceCodeOnly">
                        <f:checkbox title="${%label.sourcecode.only}" name="sourceCodeOnly"/>
                    </f:entry>
 
                    <f:entry field="includeSCAGenerateIRX">
-               		<f:checkbox title="${%label.include.sca.generate.irx}" name="includeSCAGenerateIRX" />
+               		<f:checkbox title="${%label.include.sca.generate.irx}" checked="true" name="includeSCAGenerateIRX" />
                            </f:entry>
                  
                  <f:entry title="${%label.scan.speed.option}">

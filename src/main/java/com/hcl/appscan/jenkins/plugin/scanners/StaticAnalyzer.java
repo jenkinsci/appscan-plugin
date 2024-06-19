@@ -53,7 +53,6 @@ public class StaticAnalyzer extends Scanner {
 		super(target, hasOptions, hasOptionsUploadDirect);
                 m_includeSCAGenerateIRX=false;
                 m_includeSCAUploadDirect=false;
-                m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
                 m_scanSpeed="";
@@ -87,6 +86,10 @@ public class StaticAnalyzer extends Scanner {
         public void setOpenSourceOnly(boolean openSourceOnly) {
             m_openSourceOnly = openSourceOnly;
         }
+
+        public boolean getOpenSourceOnly() {
+            return m_openSourceOnly;
+        }
         
         @DataBoundSetter
         public void setIncludeSCAGenerateIRX(boolean includeSCAGenerateIRX) {
@@ -111,7 +114,7 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public boolean isIncludeSCAGenerateIRX() {
-            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+            if(m_scanMethod.equals(CoreConstants.CREATE_IRX)){
                 return m_includeSCAGenerateIRX;
             }
             return false;

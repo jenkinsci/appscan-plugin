@@ -17,11 +17,6 @@ public class ResultsInspector {
 
 	private List<FailureCondition> m_conditions;
 	private IResultsProvider m_resultsProvider;
-    public int totalCountSAST;
-    private int criticalCountSAST;
-    private int highCountSAST;
-    private int mediumCountSAST;
-    private int lowCountSAST;
 	
 	public ResultsInspector(List<FailureCondition> conditions, IResultsProvider resultsProvider) {
 		m_conditions = conditions;
@@ -67,30 +62,50 @@ public class ResultsInspector {
 		}
 	}
 
-    private void issuesCountSAST() {
-        totalCountSAST = m_resultsProvider.getFindingsCount();
-        criticalCountSAST = m_resultsProvider.getCriticalCount();
-        highCountSAST = m_resultsProvider.getHighCount();
-        mediumCountSAST = m_resultsProvider.getMediumCount();
-        lowCountSAST = m_resultsProvider.getLowCount();
+    private void issuesCountSAST(Map<String,String> properties) {
+        properties.put("totalCountSAST", String.valueOf(m_resultsProvider.getFindingsCount()));
+        properties.put("criticalCountSAST", String.valueOf(m_resultsProvider.getCriticalCount()));
+        properties.put("highCountSAST", String.valueOf(m_resultsProvider.getHighCount()));
+        properties.put("mediumCountSAST", String.valueOf(m_resultsProvider.getMediumCount()));
+        properties.put("lowCountSAST", String.valueOf(m_resultsProvider.getLowCount()));
     }
 
     private boolean exceedsThresholdCombined(String type, int threshold, Map<String,String> properties) {
         String scanType = properties.get(CoreConstants.SCANNER_TYPE);
         if (scanType.equals(Scanner.STATIC_ANALYZER)) {
-            issuesCountSAST();
+            issuesCountSAST(properties);
         } else {
             switch(type.toLowerCase()) {
                 case "total": //$NON-NLS-1$
-                    return (totalCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                    if(properties.containsKey("totalCountSAST")) {
+                        int totalCountSAST = Integer.parseInt(properties.remove("totalCountSAST"));
+                        return (totalCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                    }
+                    return m_resultsProvider.getFindingsCount() > threshold;
                 case "critical": //$NON-NLS-1$
-                    return criticalCountSAST+m_resultsProvider.getCriticalCount() > threshold;
+                    if(properties.containsKey("criticalCountSAST")) {
+                        int criticalCountSAST = Integer.parseInt(properties.remove("criticalCountSAST"));
+                        return (criticalCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                    }
+                    return m_resultsProvider.getCriticalCount() > threshold;
                 case "high": //$NON-NLS-1$
-                    return highCountSAST+m_resultsProvider.getHighCount() > threshold;
+                    if(properties.containsKey("highCountSAST")) {
+                        int highCountSAST = Integer.parseInt(properties.remove("highCountSAST"));
+                        return (highCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                    }
+                    return m_resultsProvider.getHighCount() > threshold;
                 case "medium": //$NON-NLS-1$
-                    return mediumCountSAST+m_resultsProvider.getMediumCount() > threshold;
+                    if(properties.containsKey("mediumCountSAST")) {
+                        int mediumCountSAST = Integer.parseInt(properties.remove("mediumCountSAST"));
+                        return (mediumCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                    }
+                    return m_resultsProvider.getMediumCount() > threshold;
                 case "low": //$NON-NLS-1$
-                    return lowCountSAST+m_resultsProvider.getLowCount() > threshold;
+                    if(properties.containsKey("lowCountSAST")) {
+                        int lowCountSAST = Integer.parseInt(properties.remove("lowCountSAST"));
+                        return (lowCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                    }
+                    return m_resultsProvider.getLowCount() > threshold;
                 default:
                     return false;
             }
