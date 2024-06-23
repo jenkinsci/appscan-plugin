@@ -36,7 +36,7 @@ public class StaticAnalyzer extends Scanner {
         
         @Deprecated
         public StaticAnalyzer(String target){
-            this(target,false,false);
+            this(target,true,false);
         }
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean hasOptionsUploadDirect, boolean includeSCAGenerateIRX, boolean includeSCAUploadDirect, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
@@ -51,7 +51,7 @@ public class StaticAnalyzer extends Scanner {
 	@DataBoundConstructor
 	public StaticAnalyzer(String target,boolean hasOptions, boolean hasOptionsUploadDirect) {
 		super(target, hasOptions, hasOptionsUploadDirect);
-                m_includeSCAGenerateIRX=false;
+                m_includeSCAGenerateIRX=true;
                 m_includeSCAUploadDirect=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
@@ -96,9 +96,23 @@ public class StaticAnalyzer extends Scanner {
             m_includeSCAGenerateIRX = includeSCAGenerateIRX;
         }
 
+        public boolean isIncludeSCAGenerateIRX() {
+            if(m_scanMethod.equals(CoreConstants.CREATE_IRX)){
+                return m_includeSCAGenerateIRX;
+            }
+            return false;
+        }
+
         @DataBoundSetter
         public void setIncludeSCAUploadDirect(boolean includeSCAUploadDirect) {
             m_includeSCAUploadDirect = includeSCAUploadDirect;
+        }
+
+        public boolean isIncludeSCAUploadDirect() {
+            if(m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
+                return m_includeSCAUploadDirect;
+            }
+            return false;
         }
 
         @DataBoundSetter
@@ -109,20 +123,6 @@ public class StaticAnalyzer extends Scanner {
         public boolean isSourceCodeOnly() {
             if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
                 return m_sourceCodeOnly;
-            }
-            return false;
-        }
-
-        public boolean isIncludeSCAGenerateIRX() {
-            if(m_scanMethod.equals(CoreConstants.CREATE_IRX)){
-                return m_includeSCAGenerateIRX;
-            }
-            return false;
-        }
-
-        public boolean isIncludeSCAUploadDirect() {
-            if(m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
-                return m_includeSCAUploadDirect;
             }
             return false;
         }

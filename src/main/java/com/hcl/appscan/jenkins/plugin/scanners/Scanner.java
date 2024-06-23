@@ -35,9 +35,17 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		return m_hasOptions;
 	}
 
+    public boolean hasOptions() {
+        return m_hasOptions;
+    }
+
 	public boolean getHasOptionsUploadDirect() {
 		return m_hasOptionsUploadDirect;
 	}
+
+    public boolean hasOptionsUploadDirect() {
+        return m_hasOptionsUploadDirect;
+    }
 	
 	public String getTarget() {
 		return m_target;
