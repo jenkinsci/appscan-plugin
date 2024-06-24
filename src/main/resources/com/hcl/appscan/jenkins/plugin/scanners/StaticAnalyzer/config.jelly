@@ -12,7 +12,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 	<f:entry title="${%label.static.scan.options}" field="scanMethod"/>
                <f:radioBlock name="scanMethod" title="${%label.create.irx}" checked="true" value="createIRX" inline="true">
                <f:nested>
-               <f:optionalBlock name="hasOptions" title="${%label.has.options}" checked="true" inline="true">
+               <f:optionalBlock title="${%label.additional.options}" name="hasOptions" checked="true" inline="true">
                    <f:entry field="sourceCodeOnly">
                        <f:checkbox title="${%label.sourcecode.only}" name="sourceCodeOnly"/>
                    </f:entry>
@@ -66,7 +66,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 
                <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" >
                    <f:nested>
-                   <f:optionalBlock title="${%label.has.options.upload.direct}" checked="${instance.hasOptionsUploadDirect()}" name="hasOptionsUploadDirect" field="hasOptionsUploadDirect" inline="true">
+                   <f:optionalBlock title="${%label.additional.options}" checked="${instance.hasOptionsUploadDirect()}" name="hasOptionsUploadDirect" field="hasOptionsUploadDirect" inline="true">
                    <f:entry field="includeSCAUploadDirect">
                        <f:checkbox title="${%label.include.sca.upload.direct}" checked="${instance.isIncludeSCAUploadDirect()}" name="includeSCAUploadDirect"/>
                    </f:entry>

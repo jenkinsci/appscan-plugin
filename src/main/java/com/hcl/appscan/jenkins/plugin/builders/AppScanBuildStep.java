@@ -402,10 +402,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         properties.put(CoreConstants.SCAN_NAME, updatedScanType(scanType) + "_" + m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
-        if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !isAppScan360 && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER)) {
-            if(ServiceUtil.activeSubscriptionsCheck(modifiedScanTypes(scanType),m_authProvider)) {
-                progress.setStatus(new Message(Message.WARNING,"You don't have a valid subscription to use SCA technology."));
-            }
+        if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !isAppScan360 && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER) && !ServiceUtil.activeSubscriptionsCheck(modifiedScanTypes(scanType),m_authProvider)) {
+            progress.setStatus(new Message(Message.WARNING,"You don't have a valid subscription to use SCA technology."));
         } else {
             validations(isAppScan360, properties, target, progress);
             final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
