@@ -36,7 +36,7 @@ public class StaticAnalyzer extends Scanner {
         
         @Deprecated
         public StaticAnalyzer(String target){
-            this(target,true,false);
+            this(target,true,false, true, false, false, CoreConstants.CREATE_IRX, EMPTY);
         }
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean hasOptionsUploadDirect, boolean includeSCAGenerateIRX, boolean includeSCAUploadDirect, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
@@ -97,10 +97,10 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public boolean isIncludeSCAGenerateIRX() {
-            if(m_scanMethod.equals(CoreConstants.CREATE_IRX)){
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
                 return m_includeSCAGenerateIRX;
             }
-            return false;
+            return true;
         }
 
         @DataBoundSetter
