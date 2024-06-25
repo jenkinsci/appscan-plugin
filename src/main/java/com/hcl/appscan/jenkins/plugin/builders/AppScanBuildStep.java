@@ -304,6 +304,30 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
 	    }
 	}
+
+    private void validations(boolean isAppScan360, Map<String, String> properties, IProgress progress, String target) throws AbortException {
+        if(isAppScan360) {
+            if (m_type.equals(Scanner.DYNAMIC_ANALYZER) && properties.containsKey(Scanner.PRESENCE_ID)) {
+                throw new AbortException(Messages.error_presence_AppScan360());
+            } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
+                throw new AbortException(Messages.error_sca_AppScan360());
+            } if (m_intervention) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
+            } if (properties.get(CoreConstants.OPEN_SOURCE_ONLY) != null) {
+                throw new AbortException(Messages.error_sca_AppScan360());
+            }
+        } else if (m_authProvider.getacceptInvalidCerts()) {
+            progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
+        }
+
+        if (m_type.equals(Scanner.STATIC_ANALYZER) && properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
+        }
+
+        if(!isAppScan360 && m_type.equals(Scanner.DYNAMIC_ANALYZER) && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(target, m_authProvider, m_authProvider.getProxy())) {
+            throw new AbortException(Messages.error_url_validation(target));
+        }
+    }
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
     	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
@@ -313,28 +337,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         String target = properties.get(CoreConstants.TARGET);
         final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
-        if(isAppScan360) {
-            if (m_type.equals("Dynamic Analyzer") && properties.containsKey(Scanner.PRESENCE_ID)) {
-                throw new AbortException(Messages.error_presence_AppScan360());
-            } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
-                throw new AbortException(Messages.error_sca_AppScan360());
-            } if (m_intervention) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
-            } if (properties.get("openSourceOnly") != null) {
-                throw new AbortException(Messages.error_sca_AppScan360());
-            }
-        } else if (m_authProvider.getacceptInvalidCerts()) {
-            progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
-        }
 
-        if (m_type.equals("Static Analyzer") && properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
-        }
-
-        if(m_type.equals("Dynamic Analyzer") && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(target, m_authProvider, m_authProvider.getProxy())) {
-            throw new AbortException(Messages.error_url_validation(target));
-        }
-
+        validations(isAppScan360, properties, progress, target);
     	
     	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
