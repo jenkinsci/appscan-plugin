@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+1.4.0 (June, 2024)
+------
+- Support for executing DAST Scans via AppScan 360°.
+- Support for Personal Scan.
+- Bug fixes.
+
 1.3.1 (March, 2024)
 ------
 - Migration to version 4 of ASoC REST APIs.
