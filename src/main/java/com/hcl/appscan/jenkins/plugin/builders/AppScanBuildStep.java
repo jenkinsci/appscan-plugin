@@ -102,7 +102,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_failBuild;
 	private String m_scanStatus;
 	private IAuthenticationProvider m_authProvider;
-    private Map<String, String> includeSCAProperties;
+	private Map<String, String> includeSCAProperties;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
@@ -336,7 +336,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             } if(properties.containsKey(CoreConstants.INCLUDE_SCA)) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
             } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
-                    throw new AbortException(Messages.error_sca_AppScan360());
+                throw new AbortException(Messages.error_sca_AppScan360());
             } if (m_intervention) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
             } if (properties.get(CoreConstants.OPEN_SOURCE_ONLY) != null) {
@@ -359,7 +359,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
     }
 
-    private String updatedScanType(String scanType) {
+    private String updatedScanTypesForBuildSummaryName(String scanType) {
         if(scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER)) {
             return "SCA";
         } else if (scanType.equals(Scanner.STATIC_ANALYZER)) {
@@ -369,7 +369,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
     }
 
-    private String modifiedScanTypes(String scanType) {
+    private String modifiedScanTypesForSubscriptionCheck(String scanType) {
         if(scanType.equals(Scanner.STATIC_ANALYZER)) {
             return "StaticAnalyzer";
         } else if (scanType.equals(Scanner.DYNAMIC_ANALYZER)) {
@@ -396,10 +396,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         if (properties.containsKey(CoreConstants.SCAN_NAME)) {
             properties.remove(CoreConstants.SCAN_NAME);
         }
-        properties.put(CoreConstants.SCAN_NAME, updatedScanType(scanType) + "_" + m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+        properties.put(CoreConstants.SCAN_NAME, updatedScanTypesForBuildSummaryName(scanType) + "_" + m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
-        if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !isAppScan360 && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER) && !ServiceUtil.activeSubscriptionsCheck(modifiedScanTypes(scanType),m_authProvider)) {
+        if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !isAppScan360 && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER) && !ServiceUtil.activeSubscriptionsCheck(modifiedScanTypesForSubscriptionCheck(scanType),m_authProvider)) {
             progress.setStatus(new Message(Message.WARNING,"You don't have a valid subscription to use SCA technology."));
         } else {
             validations(isAppScan360, properties, target, progress);
@@ -472,7 +472,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                     label = Messages.label_asoc_homepage();
                 }
 
-                String buildSummaryName = updatedScanType(scanType) + "_" + m_name;
+                String buildSummaryName = updatedScanTypesForBuildSummaryName(scanType) + "_" + m_name;
                 build.addAction(new ResultsRetriever(build, provider, resolver == null ? buildSummaryName : Util.replaceMacro(buildSummaryName, resolver), asocAppUrl, label));
 
                 if (m_wait)
@@ -481,7 +481,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
 
                 if (properties.containsKey("SASTFailed") && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER)) {
-                    throw new AbortException("The build failed because of SAST scan failure");
+                    throw new AbortException(Messages.error_build_failure_sast());
                 }
     }
     
