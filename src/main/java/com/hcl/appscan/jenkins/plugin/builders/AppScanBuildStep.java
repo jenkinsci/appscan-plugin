@@ -242,8 +242,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         Map<String,String> properties= getScanProperties(build, listener);
         m_target = properties.get(CoreConstants.TARGET);
         if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-            includeSCAProperties.remove(CoreConstants.SCANNER_TYPE);
-            includeSCAProperties.put(CoreConstants.SCANNER_TYPE,Scanner.SOFTWARE_COMPOSITION_ANALYZER);
             m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, m_target);
         } else if (!((JenkinsAuthenticationProvider) m_authProvider).isAppScan360() && properties.containsKey(CoreConstants.INCLUDE_SCA)) {
             includeSCAProperties = properties;
@@ -253,7 +251,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 includeSCAProperties.put(CoreConstants.TARGET,m_target);
             }
 
-            includeSCAProperties.remove(CoreConstants.SCANNER_TYPE);
             includeSCAProperties.put(CoreConstants.SCANNER_TYPE,Scanner.SOFTWARE_COMPOSITION_ANALYZER);
         }
     }
@@ -454,7 +451,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                     message += ", " + provider.getMessage();
                 }
                 build.setDescription(message);
-                if (properties.containsKey(CoreConstants.INCLUDE_SCA) && scanType.equals(Scanner.STATIC_ANALYZER)) {
+                if (properties.containsKey(CoreConstants.INCLUDE_SCA) && scanType.equals(Scanner.STATIC_ANALYZER) && !properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
                     properties.put("SASTFailed", "");
                 } else {
                     throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +

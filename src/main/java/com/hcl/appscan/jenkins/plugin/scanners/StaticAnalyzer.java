@@ -100,7 +100,7 @@ public class StaticAnalyzer extends Scanner {
             if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
                 return m_includeSCAGenerateIRX;
             }
-            return true;
+            return false;
         }
 
         @DataBoundSetter
@@ -149,7 +149,7 @@ public class StaticAnalyzer extends Scanner {
                 if (m_openSourceOnly && getHasOptions()) {
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
                 }
-                if ((m_includeSCAGenerateIRX || m_includeSCAUploadDirect) && (getHasOptions() || getHasOptionsUploadDirect())) {
+                if ((m_includeSCAGenerateIRX && getHasOptions()) || (m_includeSCAUploadDirect && getHasOptionsUploadDirect())) {
                     properties.put(CoreConstants.INCLUDE_SCA, "");
                 }
                 if (m_sourceCodeOnly && getHasOptions()) {
