@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2022, 2023.
+ * @ Copyright HCL Technologies Ltd. 2017, 2022, 2024.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -60,7 +60,7 @@ public class DynamicAnalyzer extends Scanner {
 
 	@Deprecated
 	public DynamicAnalyzer(String target, boolean hasOptions, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
-		super(target, hasOptions);
+		super(target, hasOptions, false);
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
@@ -75,7 +75,7 @@ public class DynamicAnalyzer extends Scanner {
 	@DataBoundConstructor
 
 	public DynamicAnalyzer(String target, boolean hasOptions) {
-		super(target, hasOptions);
+		super(target, hasOptions, false);
 		m_presenceId = EMPTY;
 		m_scanFile = EMPTY;
 		m_scanType = EMPTY;
@@ -327,13 +327,18 @@ public class DynamicAnalyzer extends Scanner {
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
-			if(authProvider.isAppScan360()){
-				return FormValidation.error(Messages.error_dynamic_AppScan360());
-			}
-            		if(presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+            		if(!authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
                 		return FormValidation.error(Messages.error_url_validation_ui());
             		}
 			return FormValidation.validateRequired(target);
+		}
+
+		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
+			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+			if(authProvider.isAppScan360()){
+				return FormValidation.error(Messages.error_presence_AppScan360());
+			}
+			return FormValidation.ok();
 		}
 
 		public FormValidation doCheckLoginUser(@QueryParameter String loginUser) {

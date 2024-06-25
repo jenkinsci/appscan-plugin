@@ -28,31 +28,37 @@ public class StaticAnalyzer extends Scanner {
 	private static final String STATIC_ANALYZER = "Static Analyzer"; //$NON-NLS-1$
         
         private boolean m_openSourceOnly;
+        private String m_includeSCAGenerateIRX;
+        private boolean m_includeSCAUploadDirect;
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
         private String m_scanSpeed;
         
         @Deprecated
         public StaticAnalyzer(String target){
-            this(target,false);
+            this(target,true, false, false, EMPTY, EMPTY, false, EMPTY, false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
-            super(target, hasOptions);
-            m_openSourceOnly=openSourceOnly;
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, boolean hasOptionsUploadDirect, String includeSCAGenerateIRX, boolean includeSCAUploadDirect){
+            super(target, hasOptions, hasOptionsUploadDirect);
+            m_openSourceOnly = openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
+            m_includeSCAGenerateIRX=includeSCAGenerateIRX;
+            m_includeSCAUploadDirect=includeSCAUploadDirect;
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions) {
-		super(target, hasOptions);
+	public StaticAnalyzer(String target,boolean hasOptions, boolean hasOptionsUploadDirect) {
+		super(target, hasOptions, hasOptionsUploadDirect);
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
                 m_scanSpeed="";
-	}
+                m_includeSCAGenerateIRX="true";
+                m_includeSCAUploadDirect=false;
+        }
 
 	@Override
 	public String getType() {
@@ -77,22 +83,37 @@ public class StaticAnalyzer extends Scanner {
         		}
         	return null;
     	}
-       
-        public boolean isOpenSourceOnly() {
-            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
-                return m_openSourceOnly;
-            }
-            return false;
-        }
-        
+
         @DataBoundSetter
         public void setOpenSourceOnly(boolean openSourceOnly) {
             m_openSourceOnly = openSourceOnly;
         }
 
-        public boolean isSourceCodeOnly() {
-            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
-                return m_sourceCodeOnly;
+        public boolean getOpenSourceOnly() {
+            return m_openSourceOnly;
+        }
+        
+        @DataBoundSetter
+        public void setIncludeSCAGenerateIRX(String includeSCAGenerateIRX) {
+            m_includeSCAGenerateIRX = includeSCAGenerateIRX;
+        }
+
+        public String getIncludeSCAGenerateIRX() {
+            return m_includeSCAGenerateIRX;
+        }
+
+        public String isIncludeSCAGenerateIRX(String includeSCAGenerateIRX) {
+            return m_includeSCAGenerateIRX;
+        }
+
+        @DataBoundSetter
+        public void setIncludeSCAUploadDirect(boolean includeSCAUploadDirect) {
+            m_includeSCAUploadDirect = includeSCAUploadDirect;
+        }
+
+        public boolean isIncludeSCAUploadDirect() {
+            if(m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
+                return m_includeSCAUploadDirect;
             }
             return false;
         }
@@ -100,6 +121,13 @@ public class StaticAnalyzer extends Scanner {
         @DataBoundSetter
         public void setSourceCodeOnly(boolean sourceCodeOnly) {
             m_sourceCodeOnly = sourceCodeOnly;
+        }
+
+        public boolean isSourceCodeOnly() {
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_sourceCodeOnly;
+            }
+            return false;
         }
 
         @DataBoundSetter
@@ -120,9 +148,12 @@ public class StaticAnalyzer extends Scanner {
 		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
                 if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
             		properties.put(CoreConstants.UPLOAD_DIRECT, "");
-        	}
-        	if (m_openSourceOnly && getHasOptions()) {
+                }
+                if (m_openSourceOnly && getHasOptions()) {
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
+                }
+                if ((m_includeSCAGenerateIRX == null || (m_includeSCAGenerateIRX.equals("true")  && getHasOptions() && m_scanMethod.equals(CoreConstants.CREATE_IRX)) || (m_includeSCAUploadDirect && getHasOptionsUploadDirect() && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)))) {
+                    properties.put(CoreConstants.INCLUDE_SCA, "");
                 }
                 if (m_sourceCodeOnly && getHasOptions()) {
                     properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
@@ -142,16 +173,20 @@ public class StaticAnalyzer extends Scanner {
 			return "Static Analysis (SAST)";
 		}
 
-		public FormValidation doCheckOpenSourceOnly(@QueryParameter Boolean openSourceOnly, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
-			if(openSourceOnly) {
-                		if(checkAppScan360Connection.isAppScan360()) {
-                    			return FormValidation.error(Messages.error_sca_ui());
-                	  	} else {
-                    			return FormValidation.warning(Messages.warning_sca_ui());
-                		}
-            		}
-                	return FormValidation.ok();
-		}
+        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter Boolean includeSCAGenerateIRX, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
+            if (includeSCAGenerateIRX && checkAppScan360Connection.isAppScan360()) {
+                    return FormValidation.error(Messages.error_include_sca_ui());
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter Boolean includeSCAUploadDirect, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
+            if (includeSCAUploadDirect && checkAppScan360Connection.isAppScan360()) {
+                    return FormValidation.error(Messages.error_include_sca_ui());
+            }
+            return FormValidation.ok();
+        }
 	}
 }
