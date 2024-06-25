@@ -18,7 +18,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
                    </f:entry>
 
                    <f:entry field="includeSCAGenerateIRX">
-               		<f:checkbox title="${%label.include.sca.generate.irx}" default="true" checked="${instance.isIncludeSCAGenerateIRX()}" name="includeSCAGenerateIRX" />
+               		<f:checkbox title="${%label.include.sca.generate.irx}" checked="${instance.isIncludeSCAGenerateIRX('true')}" default="true" name="includeSCAGenerateIRX" />
                            </f:entry>
                  
                  <f:entry title="${%label.scan.speed.option}">
