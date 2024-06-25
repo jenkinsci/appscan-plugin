@@ -36,26 +36,28 @@ public class StaticAnalyzer extends Scanner {
         
         @Deprecated
         public StaticAnalyzer(String target){
-            this(target,true,false, true, false, false, CoreConstants.CREATE_IRX, EMPTY);
+            this(target,true, false, false, EMPTY, EMPTY, false, true, false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean hasOptionsUploadDirect, boolean includeSCAGenerateIRX, boolean includeSCAUploadDirect, boolean sourceCodeOnly, String scanMethod, String scanSpeed){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, boolean hasOptionsUploadDirect, boolean includeSCAGenerateIRX, boolean includeSCAUploadDirect){
             super(target, hasOptions, hasOptionsUploadDirect);
-            m_includeSCAGenerateIRX=includeSCAGenerateIRX;
-            m_includeSCAUploadDirect=includeSCAUploadDirect;
+            m_openSourceOnly = openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
+            m_includeSCAGenerateIRX=includeSCAGenerateIRX;
+            m_includeSCAUploadDirect=includeSCAUploadDirect;
         }
         
 	@DataBoundConstructor
 	public StaticAnalyzer(String target,boolean hasOptions, boolean hasOptionsUploadDirect) {
 		super(target, hasOptions, hasOptionsUploadDirect);
-                m_includeSCAGenerateIRX=true;
-                m_includeSCAUploadDirect=false;
+                m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
                 m_scanSpeed="";
+        m_includeSCAGenerateIRX=true;
+        m_includeSCAUploadDirect=false;
 	}
 
 	@Override
@@ -96,11 +98,12 @@ public class StaticAnalyzer extends Scanner {
             m_includeSCAGenerateIRX = includeSCAGenerateIRX;
         }
 
+        public boolean getIncludeSCAGenerateIRX() {
+            return m_includeSCAGenerateIRX;
+        }
+
         public boolean isIncludeSCAGenerateIRX() {
-            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
-                return m_includeSCAGenerateIRX;
-            }
-            return false;
+            return m_includeSCAGenerateIRX;
         }
 
         @DataBoundSetter
@@ -149,7 +152,7 @@ public class StaticAnalyzer extends Scanner {
                 if (m_openSourceOnly && getHasOptions()) {
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
                 }
-                if ((m_includeSCAGenerateIRX && getHasOptions()) || (m_includeSCAUploadDirect && getHasOptionsUploadDirect())) {
+                if ((m_includeSCAGenerateIRX && getHasOptions() && m_scanMethod.equals(CoreConstants.CREATE_IRX)) || (m_includeSCAUploadDirect && getHasOptionsUploadDirect() && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT))) {
                     properties.put(CoreConstants.INCLUDE_SCA, "");
                 }
                 if (m_sourceCodeOnly && getHasOptions()) {
