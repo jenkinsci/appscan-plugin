@@ -2,8 +2,8 @@ CHANGELOG
 =========
 1.4.0 (June, 2024)
 ------
-- Support for executing DAST Scans via AppScan 360°.
-- Support for Personal Scan.
+- Support for executing DAST Scans via HCL AppScan 360°.
+- Support for Personal Scans in HCL AppScan on Cloud and HCL AppScan 360°.
 - Bug fixes.
 
 1.3.1 (March, 2024)
