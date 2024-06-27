@@ -329,7 +329,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    }
 	}
 
-    private void validations(boolean isAppScan360, Map<String, String> properties, String target, IProgress progress) throws AbortException {
+    private void validations(boolean isAppScan360, Map<String, String> properties, IProgress progress, String target) throws AbortException {
         if(isAppScan360) {
             if (m_type.equals(Scanner.DYNAMIC_ANALYZER) && properties.containsKey(Scanner.PRESENCE_ID)) {
                 throw new AbortException(Messages.error_presence_AppScan360());
@@ -346,12 +346,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
-        if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
-        }
-
         if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !target.endsWith(".irx")) {
             throw new AbortException(Messages.error_invalid_format_include_sca());
+        }
+      
+        if (m_type.equals(Scanner.STATIC_ANALYZER) && properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
         }
 
         if(!isAppScan360 && m_type.equals(Scanner.DYNAMIC_ANALYZER) && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(target, m_authProvider, m_authProvider.getProxy())) {
