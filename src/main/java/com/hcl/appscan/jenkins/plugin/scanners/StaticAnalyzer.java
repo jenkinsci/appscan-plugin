@@ -103,7 +103,10 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public String isIncludeSCAGenerateIRX(String includeSCAGenerateIRX) {
-            return m_includeSCAGenerateIRX;
+            if (m_includeSCAGenerateIRX != null) {
+                return m_includeSCAGenerateIRX.equalsIgnoreCase(includeSCAGenerateIRX) ? "true" : "false";
+            }
+            return null;
         }
 
         @DataBoundSetter

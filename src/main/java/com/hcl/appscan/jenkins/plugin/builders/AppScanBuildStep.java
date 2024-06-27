@@ -374,10 +374,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             return "StaticAnalyzer";
         } else if (scanType.equals(Scanner.DYNAMIC_ANALYZER)) {
             return "DynamicAnalyzer";
-        } else if (scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER)) {
+        } else {
             return "ScaAnalyzer";
         }
-        return "";
     }
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
@@ -402,7 +401,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !isAppScan360 && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER) && !ServiceUtil.activeSubscriptionsCheck(modifiedScanTypesForSubscriptionCheck(scanType),m_authProvider)) {
             progress.setStatus(new Message(Message.WARNING,"You don't have a valid subscription to use SCA technology."));
         } else {
-            validations(isAppScan360, properties, target, progress);
+            validations(isAppScan360, properties, progress, target);
             final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
 
             IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
