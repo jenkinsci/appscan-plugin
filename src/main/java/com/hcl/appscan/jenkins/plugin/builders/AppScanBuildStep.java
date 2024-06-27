@@ -315,12 +315,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                         failureMessage=Messages.error_noncompliant_issues();
                     }
 
-                    if(includeSCAProperties!=null) {
-                        if(new ResultsInspector(failureConditions, provider).shouldFailCombined(includeSCAProperties)) {
-                            build.setDescription(failureMessage);
-                            throw new AbortException(failureMessage);
-                        }
-                    } else if (new ResultsInspector(failureConditions, provider).shouldFail()) {
+                    boolean iSFail;
+                    if(includeSCAProperties != null) {
+                        iSFail = new ResultsInspector(failureConditions, provider).shouldFailCombined(includeSCAProperties);
+                    } else {
+                        iSFail = new ResultsInspector(failureConditions, provider).shouldFail();
+                    }
+
+                    if(iSFail) {
                         build.setDescription(failureMessage);
                         throw new AbortException(failureMessage);
                     }
