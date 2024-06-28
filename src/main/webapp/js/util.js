@@ -70,24 +70,6 @@ function waitClicked(e) {
 	}
 }
 
-function sourceCodeOnlyClicked(e){
-	if (e.checked) {
-		var osoCheckbox = getComponent(e, 'openSourceOnly');
-		if (osoCheckbox != null) {
-			osoCheckbox.checked = false;
-		}
-	}
-}
-
-function openSourceOnlyClicked(e){
-	if (e.checked) {
-		var scoCheckbox = getComponent(e, 'sourceCodeOnly');
-		if (scoCheckbox != null) {
-			scoCheckbox.checked = false;
-		}
-	}
-}
-
 function aseFailBuildClicked(e) {
 	if(e.checked) {
 		var waitCheckbox = getComponent(e, 'wait');
