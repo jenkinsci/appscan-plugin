@@ -29,6 +29,7 @@ public class StaticAnalyzer extends Scanner {
         
         private boolean m_openSourceOnly;
         private String m_includeSCAGenerateIRX;
+        private boolean m_hasOptionsUploadDirect;
         private boolean m_includeSCAUploadDirect;
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
@@ -36,27 +37,29 @@ public class StaticAnalyzer extends Scanner {
         
         @Deprecated
         public StaticAnalyzer(String target){
-            this(target,true, false, false, EMPTY, EMPTY, false, EMPTY, false);
+            this(target,true, false, false, EMPTY, EMPTY, EMPTY, false, false);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, boolean hasOptionsUploadDirect, String includeSCAGenerateIRX, boolean includeSCAUploadDirect){
-            super(target, hasOptions, hasOptionsUploadDirect);
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, boolean includeSCAUploadDirect){
+            super(target, hasOptions);
             m_openSourceOnly = openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
             m_includeSCAGenerateIRX=includeSCAGenerateIRX;
+            m_hasOptionsUploadDirect=hasOptionsUploadDirect;
             m_includeSCAUploadDirect=includeSCAUploadDirect;
         }
         
 	@DataBoundConstructor
 	public StaticAnalyzer(String target,boolean hasOptions, boolean hasOptionsUploadDirect) {
-		super(target, hasOptions, hasOptionsUploadDirect);
+		super(target, hasOptions);
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
                 m_scanSpeed="";
                 m_includeSCAGenerateIRX="true";
+                m_hasOptionsUploadDirect=false;
                 m_includeSCAUploadDirect=false;
         }
 
@@ -98,10 +101,7 @@ public class StaticAnalyzer extends Scanner {
             m_includeSCAGenerateIRX = includeSCAGenerateIRX;
         }
 
-        public String getIncludeSCAGenerateIRX() {
-            return m_includeSCAGenerateIRX;
-        }
-
+        //using this method in the jelly file to determine the checkbox value
         public String isIncludeSCAGenerateIRX(String includeSCAGenerateIRX) {
             if (m_includeSCAGenerateIRX != null) {
                 return m_includeSCAGenerateIRX.equalsIgnoreCase(includeSCAGenerateIRX) ? "true" : "false";
@@ -110,10 +110,21 @@ public class StaticAnalyzer extends Scanner {
         }
 
         @DataBoundSetter
+        public void setHasOptionsUploadDirect(boolean hasOptionsUploadDirect) {
+            m_hasOptionsUploadDirect = hasOptionsUploadDirect;
+        }
+
+        //using this method in the jelly file to determine the checkbox value
+        public boolean hasOptionsUploadDirect() {
+            return m_hasOptionsUploadDirect;
+        }
+
+        @DataBoundSetter
         public void setIncludeSCAUploadDirect(boolean includeSCAUploadDirect) {
             m_includeSCAUploadDirect = includeSCAUploadDirect;
         }
 
+        //using this method in the jelly file to determine the checkbox value
         public boolean isIncludeSCAUploadDirect() {
             if(m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
                 return m_includeSCAUploadDirect;
@@ -155,7 +166,7 @@ public class StaticAnalyzer extends Scanner {
                 if (m_openSourceOnly && getHasOptions()) {
                     properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
                 }
-                if ((m_includeSCAGenerateIRX == null || (m_includeSCAGenerateIRX.equals("true")  && getHasOptions() && m_scanMethod.equals(CoreConstants.CREATE_IRX)) || (m_includeSCAUploadDirect && getHasOptionsUploadDirect() && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)))) {
+                if ((m_includeSCAGenerateIRX == null || (m_includeSCAGenerateIRX.equals("true")  && getHasOptions() && m_scanMethod.equals(CoreConstants.CREATE_IRX)) || (m_includeSCAUploadDirect && hasOptionsUploadDirect() && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)))) {
                     properties.put(CoreConstants.INCLUDE_SCA, "");
                 }
                 if (m_sourceCodeOnly && getHasOptions()) {
