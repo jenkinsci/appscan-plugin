@@ -237,10 +237,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         return (DescriptorImpl)super.getDescriptor();
     }
 
+    //to execute SAST & SCA scans consecutively, 1st perform method call to execute SAST then after changing the scan type to SCA
     private void includeSCAImplementation(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
         Map<String,String> properties= getScanProperties(build, listener);
         m_target = properties.get(CoreConstants.TARGET);
+
+        //handling the OSO job upgrade scenario
         if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
             m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, m_target);
         } else if (!((JenkinsAuthenticationProvider) m_authProvider).isAppScan360() && properties.containsKey(CoreConstants.INCLUDE_SCA)) {
@@ -315,14 +318,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                         failureMessage=Messages.error_noncompliant_issues();
                     }
 
-                    boolean iSFail;
+                    boolean isFail;
                     if(includeSCAProperties != null) {
-                        iSFail = new ResultsInspector(failureConditions, provider).shouldFailCombined(includeSCAProperties);
+                        isFail = new ResultsInspector(failureConditions, provider).shouldFailCombined(includeSCAProperties);
                     } else {
-                        iSFail = new ResultsInspector(failureConditions, provider).shouldFail();
+                        isFail = new ResultsInspector(failureConditions, provider).shouldFail();
                     }
 
-                    if(iSFail) {
+                    if(isFail) {
                         build.setDescription(failureMessage);
                         throw new AbortException(failureMessage);
                     }
@@ -348,6 +351,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
+        //includeSCA is only available if the user upload an IRX file.
         if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !target.endsWith(".irx")) {
             throw new AbortException(Messages.error_invalid_format_include_sca());
         }
@@ -370,16 +374,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             return "DAST";
         }
     }
-
-    private String modifiedScanTypesForSubscriptionCheck(String scanType) {
-        if(scanType.equals(Scanner.STATIC_ANALYZER)) {
-            return "StaticAnalyzer";
-        } else if (scanType.equals(Scanner.DYNAMIC_ANALYZER)) {
-            return "DynamicAnalyzer";
-        } else {
-            return "ScaAnalyzer";
-        }
-    }
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
         m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
@@ -393,14 +387,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
         String target = properties.get(CoreConstants.TARGET);
         String scanType = properties.get(CoreConstants.SCANNER_TYPE);
-
-        if (properties.containsKey(CoreConstants.SCAN_NAME)) {
-            properties.remove(CoreConstants.SCAN_NAME);
-        }
-        properties.put(CoreConstants.SCAN_NAME, updatedScanTypesForBuildSummaryName(scanType) + "_" + m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
-        if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !isAppScan360 && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER) && !ServiceUtil.activeSubscriptionsCheck(modifiedScanTypesForSubscriptionCheck(scanType),m_authProvider)) {
+        //need to update the scan name based on the scanType being used
+        properties.put(CoreConstants.SCAN_NAME, updatedScanTypesForBuildSummaryName(scanType) + "_" + m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+
+
+        //the build would be success with SAST scan execution if the user did not subscribe to SCA technology
+        if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !isAppScan360 && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER) && !ServiceUtil.activeSubscriptionsCheck(scanType.replaceAll(" ",""), m_authProvider)) {
             progress.setStatus(new Message(Message.WARNING,"You don't have a valid subscription to use SCA technology."));
         } else {
             validations(isAppScan360, properties, progress, target);
@@ -452,6 +446,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                     message += ", " + provider.getMessage();
                 }
                 build.setDescription(message);
+
+                //if the SAST scan gets failed, the build would get fail after SCA execution only
                 if (properties.containsKey(CoreConstants.INCLUDE_SCA) && scanType.equals(Scanner.STATIC_ANALYZER) && !properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
                     properties.put("SASTFailed", "");
                 } else {
