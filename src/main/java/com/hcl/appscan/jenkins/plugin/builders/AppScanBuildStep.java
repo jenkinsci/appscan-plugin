@@ -103,7 +103,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_failBuild;
 	private String m_scanStatus;
 	private IAuthenticationProvider m_authProvider;
-	private Map<String, String> includeSCAProperties;
+	private Map<String, String> scanProperties;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
@@ -241,20 +241,17 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     //to execute SAST & SCA scans consecutively, 1st perform method call to execute SAST then after changing the scan type to SCA
     private void includeSCAImplementation(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
         m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
-        Map<String, String> properties = getScanProperties(build, listener);
-        m_target = properties.get(CoreConstants.TARGET);
+        scanProperties = getScanProperties(build, listener);
+        m_target = scanProperties.get(CoreConstants.TARGET);
 
-        if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, m_target);
-        } else if (!((JenkinsAuthenticationProvider) m_authProvider).isAppScan360() && properties.containsKey(CoreConstants.INCLUDE_SCA)) {
-            includeSCAProperties = properties;
+        if (!((JenkinsAuthenticationProvider) m_authProvider).isAppScan360() && scanProperties.containsKey(CoreConstants.INCLUDE_SCA)) {
             perform((Run<?,?>)build, launcher, listener);
 
-            if(!includeSCAProperties.containsKey(CoreConstants.TARGET)) {
-                includeSCAProperties.put(CoreConstants.TARGET,m_target);
+            if(!scanProperties.containsKey(CoreConstants.TARGET)) {
+                scanProperties.put(CoreConstants.TARGET,m_target);
             }
 
-            includeSCAProperties.put(CoreConstants.SCANNER_TYPE,Scanner.SOFTWARE_COMPOSITION_ANALYZER);
+            scanProperties.put(CoreConstants.SCANNER_TYPE,Scanner.SOFTWARE_COMPOSITION_ANALYZER);
         }
     }
 
@@ -319,8 +316,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                     }
 
                     boolean isFail;
-                    if(includeSCAProperties != null) {
-                        isFail =new CombinedResultsInspector(failureConditions, provider).shouldFail(includeSCAProperties);
+                    if(scanProperties.containsKey(CoreConstants.INCLUDE_SCA)) {
+                        isFail =new CombinedResultsInspector(failureConditions, provider).shouldFail(scanProperties);
                     } else {
                         isFail = new ResultsInspector(failureConditions, provider).shouldFail();
                     }
@@ -343,8 +340,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
-
-
+        if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, m_target);
+        }
     }
 
     public String shortTypeName(String scanType) {
@@ -369,19 +367,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
         final IProgress progress = new ScanProgress(listener);
         final boolean suspend = m_wait;
-        Map<String, String> properties;
-
-        if(includeSCAProperties!=null) {
-            properties = includeSCAProperties;
-        } else {
-            properties = getScanProperties(build,listener);
-        }
+        Map<String, String> properties = scanProperties;
 
         String scanType = properties.get(CoreConstants.SCANNER_TYPE);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
-        m_scanner.validations(m_authProvider,properties, progress);
         generalValidations(isAppScan360,properties,progress);
+        m_scanner.validations(m_authProvider,properties, progress);
 
 
         //need to update the scan name based on the scanType being used
