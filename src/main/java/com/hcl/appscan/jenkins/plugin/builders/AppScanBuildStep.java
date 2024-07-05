@@ -454,7 +454,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             } else {
                 provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
                 VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?, ?>) build, listener) : null;
-                String asocAppUrl = m_authProvider.getServer() + "/ui/main/myapps/" + m_application + "/scans/" + scan.getScanId();
+                String asocAppUrl = m_authProvider.getServer() + "/main/myapps/" + m_application + "/scans/" + scan.getScanId();
                 String label;
                 if (isAppScan360) {
                     label = Messages.label_appscan360_homepage();
