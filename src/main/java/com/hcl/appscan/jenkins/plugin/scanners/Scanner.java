@@ -6,6 +6,8 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
+import com.hcl.appscan.sdk.logging.IProgress;
 import hudson.AbortException;
 import hudson.Util;
 import hudson.model.AbstractDescribableImpl;
@@ -38,7 +40,9 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	}
 	
 	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
-	
+
+	public abstract void validations(IAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException;
+
 	public abstract String getType();
 	
 	protected String resolvePath(String path, VariableResolver<String> resolver) {

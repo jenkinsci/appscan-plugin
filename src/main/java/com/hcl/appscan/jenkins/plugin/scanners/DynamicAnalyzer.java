@@ -12,6 +12,8 @@ import java.util.Map;
 
 import com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials;
 import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.logging.IProgress;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -196,8 +198,18 @@ public class DynamicAnalyzer extends Scanner {
 		}
 	}
 
+	public void validations(IAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+		if (((JenkinsAuthenticationProvider) authProvider).isAppScan360()) {
+			if (properties.containsKey(Scanner.PRESENCE_ID)) {
+				throw new AbortException(Messages.error_presence_AppScan360());
+			}
+		} else if (!properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
+		}
+	}
+
 	@Override
-	public Map<String, String> getProperties(VariableResolver<String> resolver) throws hudson.AbortException {
+	public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
 		Map<String, String> properties = new HashMap<String, String>();
 		if (resolver == null) {
 			properties.put(TARGET, getTarget());

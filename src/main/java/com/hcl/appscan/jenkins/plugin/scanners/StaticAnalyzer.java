@@ -11,6 +11,10 @@ import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
 import java.util.HashMap;
 import java.util.Map;
+import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
+import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.logging.Message;
+import hudson.AbortException;
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
 import org.jenkinsci.Symbol;
@@ -29,37 +33,37 @@ public class StaticAnalyzer extends Scanner {
         
         private boolean m_openSourceOnly;
         private String m_includeSCAGenerateIRX;
-        private boolean m_hasOptionsUploadDirect;
+        private boolean m_additionalOptionsUploadDirect;
         private boolean m_includeSCAUploadDirect;
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
         private String m_scanSpeed;
         
         @Deprecated
-        public StaticAnalyzer(String target){
-            this(target,true, false, false, EMPTY, EMPTY, EMPTY, false, false);
+        public StaticAnalyzer(String target) {
+            this(target, true);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, boolean includeSCAUploadDirect){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean additionalOptionsUploadDirect, boolean includeSCAUploadDirect){
             super(target, hasOptions);
             m_openSourceOnly = openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
             m_includeSCAGenerateIRX=includeSCAGenerateIRX;
-            m_hasOptionsUploadDirect=hasOptionsUploadDirect;
+            m_additionalOptionsUploadDirect=additionalOptionsUploadDirect;
             m_includeSCAUploadDirect=includeSCAUploadDirect;
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions, boolean hasOptionsUploadDirect) {
+	public StaticAnalyzer(String target,boolean hasOptions) {
 		super(target, hasOptions);
                 m_openSourceOnly=false;
                 m_sourceCodeOnly=false;
                 m_scanMethod=CoreConstants.CREATE_IRX;
                 m_scanSpeed="";
                 m_includeSCAGenerateIRX="true";
-                m_hasOptionsUploadDirect=false;
+                m_additionalOptionsUploadDirect=false;
                 m_includeSCAUploadDirect=false;
         }
 
@@ -101,6 +105,13 @@ public class StaticAnalyzer extends Scanner {
             m_includeSCAGenerateIRX = includeSCAGenerateIRX;
         }
 
+        public String getIncludeSCAGenerateIRX() {
+            if(!m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_includeSCAGenerateIRX;
+            }
+            return "";
+        }
+
         //using this method in the jelly file to determine the checkbox value
         public String isIncludeSCAGenerateIRX(String includeSCAGenerateIRX) {
             if (m_includeSCAGenerateIRX != null) {
@@ -110,13 +121,13 @@ public class StaticAnalyzer extends Scanner {
         }
 
         @DataBoundSetter
-        public void setHasOptionsUploadDirect(boolean hasOptionsUploadDirect) {
-            m_hasOptionsUploadDirect = hasOptionsUploadDirect;
+        public void setAdditionalOptionsUploadDirect(boolean additionalOptionsUploadDirect) {
+            m_additionalOptionsUploadDirect = additionalOptionsUploadDirect;
         }
 
         //using this method in the jelly file to determine the checkbox value
-        public boolean hasOptionsUploadDirect() {
-            return m_hasOptionsUploadDirect;
+        public boolean isAdditionalOptionsUploadDirect() {
+            return m_additionalOptionsUploadDirect;
         }
 
         @DataBoundSetter
@@ -156,29 +167,48 @@ public class StaticAnalyzer extends Scanner {
         public boolean isScanMethod(String scanMethod) {
             return m_scanMethod.equals(scanMethod);
         }
-	
-	public Map<String, String> getProperties(VariableResolver<String> resolver) {
-		Map<String, String> properties = new HashMap<String, String>();
-		properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
-                if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
-            		properties.put(CoreConstants.UPLOAD_DIRECT, "");
+
+        public void validations(IAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+            if (((JenkinsAuthenticationProvider) authProvider).isAppScan360()) {
+                if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+                    throw new AbortException(Messages.error_sca_AppScan360());
                 }
-                if (m_openSourceOnly && getHasOptions()) {
-                    properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
+                if (properties.containsKey(CoreConstants.INCLUDE_SCA)) {
+                    progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
                 }
-                if ((m_includeSCAGenerateIRX == null || (m_includeSCAGenerateIRX.equals("true")  && getHasOptions() && m_scanMethod.equals(CoreConstants.CREATE_IRX)) || (m_includeSCAUploadDirect && hasOptionsUploadDirect() && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)))) {
-                    properties.put(CoreConstants.INCLUDE_SCA, "");
-                }
-                if (m_sourceCodeOnly && getHasOptions()) {
-                    properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
-                }
-                if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
-                    properties.put(SCAN_SPEED, m_scanSpeed);
-                }
-		return properties;
-	}
-	
-	@Symbol("static_analyzer") //$NON-NLS-1$
+            }
+
+            if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
+            }
+            //includeSCA is only available if the user upload an IRX file.
+            if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
+                throw new AbortException(Messages.error_invalid_format_include_sca());
+            }
+        }
+
+        public Map<String,String> getProperties(VariableResolver<String> resolver) {
+            Map<String, String> properties = new HashMap<String, String>();
+            properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
+            if (m_scanMethod != null && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
+                properties.put(CoreConstants.UPLOAD_DIRECT, "");
+            }
+            if (m_openSourceOnly && getHasOptions()) {
+                properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
+            }
+            if (m_includeSCAGenerateIRX == null || (m_includeSCAGenerateIRX.equals("true")  && getHasOptions() && m_scanMethod.equals(CoreConstants.CREATE_IRX)) || (m_includeSCAUploadDirect && m_additionalOptionsUploadDirect && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT))) {
+                properties.put(CoreConstants.INCLUDE_SCA, "");
+            }
+            if (m_sourceCodeOnly && getHasOptions()) {
+                properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
+            }
+            if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
+                properties.put(SCAN_SPEED, m_scanSpeed);
+            }
+            return properties;
+        }
+
+        @Symbol("static_analyzer") //$NON-NLS-1$
 	@Extension
 	public static final class DescriptorImpl extends ScanDescriptor {
 		

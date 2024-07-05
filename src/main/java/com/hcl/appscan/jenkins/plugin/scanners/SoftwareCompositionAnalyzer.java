@@ -7,6 +7,11 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
+import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.logging.Message;
+import hudson.AbortException;
 import hudson.Extension;
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
@@ -37,7 +42,16 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         return SOFTWARE_COMPOSITION_ANALYZER;
     }
 
-    public Map<String, String> getProperties(VariableResolver<String> resolver) {
+    public void validations(IAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+        if (((JenkinsAuthenticationProvider) authProvider).isAppScan360()) {
+            throw new AbortException(Messages.error_sca_AppScan360());
+        }
+        if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
+        }
+    }
+
+    public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
         Map<String, String> properties = new HashMap<String, String>();
         properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
         return properties;
