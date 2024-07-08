@@ -372,8 +372,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         String scanType = properties.get(CoreConstants.SCANNER_TYPE);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
-        generalValidations(isAppScan360,properties,progress);
         m_scanner.validations(m_authProvider,properties, progress);
+        generalValidations(isAppScan360,properties,progress);
 
 
         //need to update the scan name based on the scanType being used

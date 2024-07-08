@@ -117,7 +117,7 @@ public class StaticAnalyzer extends Scanner {
             if (m_includeSCAGenerateIRX != null) {
                 return m_includeSCAGenerateIRX.equalsIgnoreCase(includeSCAGenerateIRX) ? "true" : "false";
             }
-            return null;
+            return "true";
         }
 
         @DataBoundSetter

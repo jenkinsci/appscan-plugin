@@ -46,9 +46,6 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         if (((JenkinsAuthenticationProvider) authProvider).isAppScan360()) {
             throw new AbortException(Messages.error_sca_AppScan360());
         }
-        if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
-        }
     }
 
     public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
