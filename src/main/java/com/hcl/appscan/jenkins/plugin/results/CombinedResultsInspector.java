@@ -50,25 +50,25 @@ public class CombinedResultsInspector {
                 case "critical": //$NON-NLS-1$
                     if(properties.containsKey("criticalCountSAST")) {
                         int criticalCountSAST = Integer.parseInt(properties.remove("criticalCountSAST"));
-                        return (criticalCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                        return (criticalCountSAST+m_resultsProvider.getCriticalCount()) > threshold;
                     }
                     return m_resultsProvider.getCriticalCount() > threshold;
                 case "high": //$NON-NLS-1$
                     if(properties.containsKey("highCountSAST")) {
                         int highCountSAST = Integer.parseInt(properties.remove("highCountSAST"));
-                        return (highCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                        return (highCountSAST+m_resultsProvider.getHighCount()) > threshold;
                     }
                     return m_resultsProvider.getHighCount() > threshold;
                 case "medium": //$NON-NLS-1$
                     if(properties.containsKey("mediumCountSAST")) {
                         int mediumCountSAST = Integer.parseInt(properties.remove("mediumCountSAST"));
-                        return (mediumCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                        return (mediumCountSAST+m_resultsProvider.getMediumCount()) > threshold;
                     }
                     return m_resultsProvider.getMediumCount() > threshold;
                 case "low": //$NON-NLS-1$
                     if(properties.containsKey("lowCountSAST")) {
                         int lowCountSAST = Integer.parseInt(properties.remove("lowCountSAST"));
-                        return (lowCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
+                        return (lowCountSAST+m_resultsProvider.getLowCount()) > threshold;
                     }
                     return m_resultsProvider.getLowCount() > threshold;
                 default:

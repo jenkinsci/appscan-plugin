@@ -50,21 +50,21 @@ public class StaticAnalyzer extends Scanner {
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
-            m_includeSCAGenerateIRX=includeSCAGenerateIRX;
+            m_includeSCAGenerateIRX=includeSCAGenerateIRX == null ? "true": includeSCAGenerateIRX;
             m_additionalOptionsUploadDirect=additionalOptionsUploadDirect;
             m_includeSCAUploadDirect=includeSCAUploadDirect;
         }
         
 	@DataBoundConstructor
 	public StaticAnalyzer(String target,boolean hasOptions) {
-		super(target, hasOptions);
-                m_openSourceOnly=false;
-                m_sourceCodeOnly=false;
-                m_scanMethod=CoreConstants.CREATE_IRX;
-                m_scanSpeed="";
-                m_includeSCAGenerateIRX="true";
-                m_additionalOptionsUploadDirect=false;
-                m_includeSCAUploadDirect=false;
+            super(target, hasOptions);
+            m_openSourceOnly=false;
+            m_sourceCodeOnly=false;
+            m_scanMethod=CoreConstants.CREATE_IRX;
+            m_scanSpeed="";
+            m_includeSCAGenerateIRX="true";
+            m_additionalOptionsUploadDirect=false;
+            m_includeSCAUploadDirect=false;
         }
 
 	@Override
@@ -102,7 +102,11 @@ public class StaticAnalyzer extends Scanner {
         
         @DataBoundSetter
         public void setIncludeSCAGenerateIRX(String includeSCAGenerateIRX) {
-            m_includeSCAGenerateIRX = includeSCAGenerateIRX;
+            if(getHasOptions() && includeSCAGenerateIRX.equals("true")) {
+                m_includeSCAGenerateIRX = "true";
+            } else {
+                m_includeSCAGenerateIRX = "false";
+            }
         }
 
         public String getIncludeSCAGenerateIRX() {
@@ -132,7 +136,7 @@ public class StaticAnalyzer extends Scanner {
 
         @DataBoundSetter
         public void setIncludeSCAUploadDirect(boolean includeSCAUploadDirect) {
-            m_includeSCAUploadDirect = includeSCAUploadDirect;
+            m_includeSCAUploadDirect = isAdditionalOptionsUploadDirect() && includeSCAUploadDirect;
         }
 
         //using this method in the jelly file to determine the checkbox value
@@ -145,7 +149,7 @@ public class StaticAnalyzer extends Scanner {
 
         @DataBoundSetter
         public void setSourceCodeOnly(boolean sourceCodeOnly) {
-            m_sourceCodeOnly = sourceCodeOnly;
+            m_sourceCodeOnly = sourceCodeOnly && getHasOptions();
         }
 
         public boolean isSourceCodeOnly() {
@@ -196,10 +200,10 @@ public class StaticAnalyzer extends Scanner {
             if (m_openSourceOnly && getHasOptions()) {
                 properties.put(CoreConstants.OPEN_SOURCE_ONLY, "");
             }
-            if (m_sourceCodeOnly && getHasOptions()) {
+            if (m_sourceCodeOnly && !m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
                 properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
             }
-            if ((m_includeSCAGenerateIRX == null && !(m_openSourceOnly || m_sourceCodeOnly)) || (m_includeSCAGenerateIRX!=null && m_includeSCAGenerateIRX.equals("true")  && getHasOptions() && m_scanMethod.equals(CoreConstants.CREATE_IRX)) || (m_includeSCAUploadDirect && m_additionalOptionsUploadDirect && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT))) {
+            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || m_includeSCAGenerateIRX.equals("true"))) || (m_includeSCAUploadDirect && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT))) {
                 properties.put(CoreConstants.INCLUDE_SCA, "");
             }
             if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
