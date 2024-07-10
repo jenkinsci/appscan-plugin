@@ -46,7 +46,7 @@ public class StaticAnalyzer extends Scanner {
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean additionalOptionsUploadDirect, boolean includeSCAUploadDirect){
             super(target, hasOptions);
-            m_openSourceOnly = openSourceOnly;
+            m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
@@ -181,7 +181,6 @@ public class StaticAnalyzer extends Scanner {
                     progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
                 }
             }
-
             if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
             }

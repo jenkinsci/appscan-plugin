@@ -16,7 +16,7 @@ public class ResultsInspector extends CombinedResultsInspector {
 	private IResultsProvider m_resultsProvider;
 	
 	public ResultsInspector(List<FailureCondition> conditions, IResultsProvider resultsProvider) {
-        super(conditions, resultsProvider);
+		super(conditions, resultsProvider);
 	}
         
         

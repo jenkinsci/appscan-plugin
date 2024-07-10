@@ -7,10 +7,8 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.logging.IProgress;
-import com.hcl.appscan.sdk.logging.Message;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.RelativePath;

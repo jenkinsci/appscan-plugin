@@ -264,7 +264,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     
         @Override
         public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-            includeSCAImplementation(run, launcher, listener);
+	        includeSCAImplementation(run, launcher, listener);
 	        perform(run, launcher, listener);
         }
     
