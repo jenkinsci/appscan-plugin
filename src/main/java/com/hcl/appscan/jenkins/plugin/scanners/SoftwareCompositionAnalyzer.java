@@ -40,8 +40,8 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         return SOFTWARE_COMPOSITION_ANALYZER;
     }
 
-    public void validations(IAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
-        if (((JenkinsAuthenticationProvider) authProvider).isAppScan360()) {
+    public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+        if (authProvider.isAppScan360()) {
             throw new AbortException(Messages.error_sca_AppScan360());
         }
     }

@@ -7,14 +7,13 @@ import com.hcl.appscan.sdk.results.IResultsProvider;
 import java.util.List;
 import java.util.Map;
 
-public class CombinedResultsInspector {
+public class CombinedResultsInspector extends ResultsInspector {
 
     private List<FailureCondition> m_conditions;
     private IResultsProvider m_resultsProvider;
 
     public CombinedResultsInspector(List<FailureCondition> conditions, IResultsProvider resultsProvider) {
-        m_conditions = conditions;
-        m_resultsProvider = resultsProvider;
+        super(conditions, resultsProvider);
     }
 
     public boolean shouldFail(Map<String,String> properties) {
@@ -28,11 +27,11 @@ public class CombinedResultsInspector {
     }
 
     private void issuesCountSAST(Map<String,String> properties) {
-        properties.put("totalCountSAST", String.valueOf(m_resultsProvider.getFindingsCount()));
-        properties.put("criticalCountSAST", String.valueOf(m_resultsProvider.getCriticalCount()));
-        properties.put("highCountSAST", String.valueOf(m_resultsProvider.getHighCount()));
-        properties.put("mediumCountSAST", String.valueOf(m_resultsProvider.getMediumCount()));
-        properties.put("lowCountSAST", String.valueOf(m_resultsProvider.getLowCount()));
+        properties.put("totalCount", String.valueOf(m_resultsProvider.getFindingsCount()));
+        properties.put("criticalCount", String.valueOf(m_resultsProvider.getCriticalCount()));
+        properties.put("highCount", String.valueOf(m_resultsProvider.getHighCount()));
+        properties.put("mediumCount", String.valueOf(m_resultsProvider.getMediumCount()));
+        properties.put("lowCount", String.valueOf(m_resultsProvider.getLowCount()));
     }
 
     private boolean exceedsThresholdCombined(String type, int threshold, Map<String,String> properties) {
@@ -42,32 +41,32 @@ public class CombinedResultsInspector {
         } else {
             switch(type.toLowerCase()) {
                 case "total": //$NON-NLS-1$
-                    if(properties.containsKey("totalCountSAST")) {
+                    if(properties.containsKey("totalCount")) {
                         int totalCountSAST = Integer.parseInt(properties.remove("totalCountSAST"));
                         return (totalCountSAST+m_resultsProvider.getFindingsCount()) > threshold;
                     }
                     return m_resultsProvider.getFindingsCount() > threshold;
                 case "critical": //$NON-NLS-1$
-                    if(properties.containsKey("criticalCountSAST")) {
-                        int criticalCountSAST = Integer.parseInt(properties.remove("criticalCountSAST"));
+                    if(properties.containsKey("criticalCount")) {
+                        int criticalCountSAST = Integer.parseInt(properties.remove("criticalCount"));
                         return (criticalCountSAST+m_resultsProvider.getCriticalCount()) > threshold;
                     }
                     return m_resultsProvider.getCriticalCount() > threshold;
                 case "high": //$NON-NLS-1$
-                    if(properties.containsKey("highCountSAST")) {
-                        int highCountSAST = Integer.parseInt(properties.remove("highCountSAST"));
+                    if(properties.containsKey("highCount")) {
+                        int highCountSAST = Integer.parseInt(properties.remove("highCount"));
                         return (highCountSAST+m_resultsProvider.getHighCount()) > threshold;
                     }
                     return m_resultsProvider.getHighCount() > threshold;
                 case "medium": //$NON-NLS-1$
-                    if(properties.containsKey("mediumCountSAST")) {
-                        int mediumCountSAST = Integer.parseInt(properties.remove("mediumCountSAST"));
+                    if(properties.containsKey("mediumCount")) {
+                        int mediumCountSAST = Integer.parseInt(properties.remove("mediumCount"));
                         return (mediumCountSAST+m_resultsProvider.getMediumCount()) > threshold;
                     }
                     return m_resultsProvider.getMediumCount() > threshold;
                 case "low": //$NON-NLS-1$
-                    if(properties.containsKey("lowCountSAST")) {
-                        int lowCountSAST = Integer.parseInt(properties.remove("lowCountSAST"));
+                    if(properties.containsKey("lowCount")) {
+                        int lowCountSAST = Integer.parseInt(properties.remove("lowCount"));
                         return (lowCountSAST+m_resultsProvider.getLowCount()) > threshold;
                     }
                     return m_resultsProvider.getLowCount() > threshold;

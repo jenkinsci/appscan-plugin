@@ -198,12 +198,11 @@ public class DynamicAnalyzer extends Scanner {
 		}
 	}
 
-	public void validations(IAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
-		if (((JenkinsAuthenticationProvider) authProvider).isAppScan360()) {
-			if (properties.containsKey(Scanner.PRESENCE_ID)) {
-				throw new AbortException(Messages.error_presence_AppScan360());
-			}
-		} else if (!properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
+			throw new AbortException(Messages.error_presence_AppScan360());
+		}
+        if (!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
 	}

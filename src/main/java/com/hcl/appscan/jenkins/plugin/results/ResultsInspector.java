@@ -10,13 +10,14 @@ import java.util.List;
 
 import com.hcl.appscan.sdk.results.IResultsProvider;
 
-public class ResultsInspector extends CombinedResultsInspector {
+public class ResultsInspector {
 
 	private List<FailureCondition> m_conditions;
 	private IResultsProvider m_resultsProvider;
 	
 	public ResultsInspector(List<FailureCondition> conditions, IResultsProvider resultsProvider) {
-		super(conditions, resultsProvider);
+		m_conditions = conditions;
+        m_resultsProvider = resultsProvider;
 	}
         
         
