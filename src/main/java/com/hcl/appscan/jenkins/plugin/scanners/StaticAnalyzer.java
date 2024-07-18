@@ -14,6 +14,7 @@ import java.util.Map;
 import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
@@ -179,15 +180,18 @@ public class StaticAnalyzer extends Scanner {
                 }
                 if (properties.containsKey(CoreConstants.INCLUDE_SCA)) {
                     progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
+                    properties.remove(CoreConstants.INCLUDE_SCA);
                 }
+            } else if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.activeSubscriptionsCheck("ScaAnalyzer", authProvider)) {
+                progress.setStatus(new Message(Message.WARNING, "Only SAST scan execution takes place as SCA scan is not present under the active subscriptions"));
+                properties.remove(CoreConstants.INCLUDE_SCA);
             }
-            if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
-            }
+
             //includeSCA is only available if the user upload an IRX file.
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
+
         }
 
         public Map<String,String> getProperties(VariableResolver<String> resolver) {

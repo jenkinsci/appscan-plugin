@@ -20,7 +20,6 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
-import com.hcl.appscan.jenkins.plugin.results.CombinedResultsInspector;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import com.hcl.appscan.sdk.utils.ServiceUtil;
 import org.jenkinsci.Symbol;
@@ -41,7 +40,6 @@ import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.IResultsProvider;
-import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
 
 import com.hcl.appscan.sdk.utils.SystemUtil;
@@ -103,7 +101,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_failBuild;
 	private String m_scanStatus;
 	private IAuthenticationProvider m_authProvider;
-	private Map<String, String> scanProperties;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
@@ -271,6 +268,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			Map<String, String> properties = m_scanner.getProperties(resolver);
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
+			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 			properties.put(CoreConstants.PERSONAL_SCAN, Boolean.toString(m_personalScan));
 			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
@@ -296,18 +294,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                         failureConditions.add(nonCompliantCondition);
                         failureMessage=Messages.error_noncompliant_issues();
                     }
-
-                    boolean isFail;
-                    if(scanProperties.containsKey(CoreConstants.INCLUDE_SCA)) {
-                        isFail =new CombinedResultsInspector(failureConditions, provider).shouldFail(scanProperties);
-                    } else {
-                        isFail = new ResultsInspector(failureConditions, provider).shouldFail();
-                    }
-
-                    if(isFail) {
+                    if(new ResultsInspector(failureConditions, provider).shouldFail()) {
                         build.setDescription(failureMessage);
                         throw new AbortException(failureMessage);
                     }
+
 	    } catch(NullPointerException e) {
 	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
 	    }
@@ -323,30 +314,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
 
         if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
             m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, m_target);
-            scanProperties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
-        }
-
-        if(properties.containsKey(CoreConstants.INCLUDE_SCA)) {
-            scanProperties.put(CoreConstants.SCANNER_TYPE,"IncludeSCA");
-        }
-    }
-
-    public String shortTypeName(String scanType) {
-        if(scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER)) {
-            return "SCA";
-        } else if (scanType.equals(Scanner.STATIC_ANALYZER)) {
-            return "SAST";
-        } else {
-            return "DAST";
-        }
-    }
-
-    private String updatedScanType(String scanType) {
-        if(scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER)) {
-            return "ScaAnalyzer";
-        } else {
-            return scanType.replaceAll(" ","");
+            properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
         }
     }
     
@@ -354,33 +324,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
         final IProgress progress = new ScanProgress(listener);
         final boolean suspend = m_wait;
-        Map<String, String> properties;
-        if(scanProperties != null) {
-            properties = scanProperties;
-        } else {
-            scanProperties = getScanProperties(build,listener);
-            properties = scanProperties;
-        }
+        Map<String, String> properties = getScanProperties(build,listener);
 
-        m_target = scanProperties.get(CoreConstants.TARGET);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
-        String scanType = properties.get(CoreConstants.SCANNER_TYPE);
-
-        if(!properties.containsKey(CoreConstants.TARGET)) {
-            properties.put(CoreConstants.TARGET,m_target);
-        }
 
         m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress);
         validateGeneralSettings(isAppScan360,properties,progress);
 
-
-        //need to update the scan name based on the scanType being used
-        properties.put(CoreConstants.SCAN_NAME, shortTypeName(scanType) + "_" + m_name + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
-
-        //the build would be success with SAST scan execution if the user did not subscribe to SCA technology
-        if(!isAppScan360 && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER) && !ServiceUtil.activeSubscriptionsCheck(updatedScanType(scanType), m_authProvider)) {
-            progress.setStatus(new Message(Message.WARNING,"You don't have a valid subscription to use SCA technology."));
-        } else {
             final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
 
             IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
@@ -396,7 +346,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                         setInstallDir();
                         scan.run();
 
-                        IResultsProvider provider = new NonCompliantIssuesResultProvider(scan.getScanId(), scan.getType(), scan.getServiceProvider(), progress);
+                        IResultsProvider provider = scan.getResultsProvider(true);
                         provider.setReportFormat(scan.getReportFormat());
                         if (suspend) {
                             progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
@@ -430,13 +380,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 }
                 build.setDescription(message);
 
-                //if the SAST scan gets failed, the build would get fail after SCA execution only
-                if (properties.containsKey(CoreConstants.INCLUDE_SCA) && scanType.equals(Scanner.STATIC_ANALYZER) && !properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-                    properties.put("SASTFailed", "");
-                } else {
-                    throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
-                            ", Scan Name: " + scan.getName())));
-                }
+                    throw new AbortException(message);
             } else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
                 progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " " + Messages.check_server(m_authProvider.getServer())));
                 build.setDescription(Messages.error_server_unavailable());
@@ -451,18 +395,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 } else {
                     label = Messages.label_asoc_homepage();
                 }
-
-                String buildSummaryName = shortTypeName(scanType) + "_" + m_name;
-                build.addAction(new ResultsRetriever(build, provider, resolver == null ? buildSummaryName : Util.replaceMacro(buildSummaryName, resolver), asocAppUrl, label));
+                build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
 
                 if (m_wait)
                     shouldFailBuild(provider, build);
             }
-        }
-
-                if (properties.containsKey("SASTFailed") && scanType.equals(Scanner.SOFTWARE_COMPOSITION_ANALYZER)) {
-                    throw new AbortException(Messages.error_build_failure_sast());
-                }
     }
     
     private void setInstallDir() {

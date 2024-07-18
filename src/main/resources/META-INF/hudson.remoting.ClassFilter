@@ -12,6 +12,7 @@ com.hcl.appscan.sdk.scan.IScanServiceProvider
 com.hcl.appscan.sdk.scan.CloudScanServiceProvider
 com.hcl.appscan.sdk.scan.ASEScanServiceProvider
 com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever
+com.hcl.appscan.sdk.results.CloudCombinedResultsProvider
 com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials
 com.hcl.appscan.jenkins.plugin.auth.ASECredentials
 com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider
