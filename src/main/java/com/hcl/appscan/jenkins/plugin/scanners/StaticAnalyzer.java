@@ -183,7 +183,7 @@ public class StaticAnalyzer extends Scanner {
                     properties.remove(CoreConstants.INCLUDE_SCA);
                 }
             } else if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.activeSubscriptionsCheck("ScaAnalyzer", authProvider)) {
-                progress.setStatus(new Message(Message.WARNING, "Only SAST scan execution takes place as SCA scan is not present under the active subscriptions"));
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
                 properties.remove(CoreConstants.INCLUDE_SCA);
             }
 
