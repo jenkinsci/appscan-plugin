@@ -1,13 +1,12 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019.
+ * @ Copyright HCL Technologies Ltd. 2017, 2024.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
-import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
 import com.hcl.appscan.sdk.logging.IProgress;
 import hudson.AbortException;
 import hudson.Util;
