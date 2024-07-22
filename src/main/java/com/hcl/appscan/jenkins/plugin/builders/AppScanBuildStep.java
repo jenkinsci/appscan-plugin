@@ -102,7 +102,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	private boolean m_failBuild;
 	private String m_scanStatus;
 	private IAuthenticationProvider m_authProvider;
-    private Map<String, String> includeSCAProperties;
 	private static final File JENKINS_INSTALL_DIR=new File(System.getProperty("user.dir"),".appscan");//$NON-NLS-1$ //$NON-NLS-2$
 	
 	@Deprecated
@@ -383,7 +382,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 				  message += ", " + provider.getMessage();
 			  }
 			  build.setDescription(message);
-			  throw new AbortException(message);
+			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, ("Scan Name: " + scan.getName())));
 		  }
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
             progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));

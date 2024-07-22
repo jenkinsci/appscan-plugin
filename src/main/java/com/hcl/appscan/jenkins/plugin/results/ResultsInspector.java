@@ -17,7 +17,7 @@ public class ResultsInspector {
 	
 	public ResultsInspector(List<FailureCondition> conditions, IResultsProvider resultsProvider) {
 		m_conditions = conditions;
-        m_resultsProvider = resultsProvider;
+		m_resultsProvider = resultsProvider;
 	}
         
         
