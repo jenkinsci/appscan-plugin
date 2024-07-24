@@ -33,8 +33,8 @@ public class StaticAnalyzer extends Scanner {
         
         private boolean m_openSourceOnly;
         private String m_includeSCAGenerateIRX;
-        private boolean m_additionalOptionsUploadDirect;
-        private boolean m_includeSCAUploadDirect;
+        private boolean m_hasOptionsUploadDirect;
+        private String m_includeSCAUploadDirect;
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
         private String m_scanSpeed;
@@ -44,14 +44,14 @@ public class StaticAnalyzer extends Scanner {
             this(target, true);
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean additionalOptionsUploadDirect, boolean includeSCAUploadDirect){
+        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
             super(target, hasOptions);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
             m_includeSCAGenerateIRX=includeSCAGenerateIRX == null ? "true": includeSCAGenerateIRX;
-            m_additionalOptionsUploadDirect=additionalOptionsUploadDirect;
+            m_hasOptionsUploadDirect=hasOptionsUploadDirect;
             m_includeSCAUploadDirect=includeSCAUploadDirect;
         }
         
@@ -63,8 +63,8 @@ public class StaticAnalyzer extends Scanner {
             m_scanMethod=CoreConstants.CREATE_IRX;
             m_scanSpeed="";
             m_includeSCAGenerateIRX="true";
-            m_additionalOptionsUploadDirect=false;
-            m_includeSCAUploadDirect=false;
+            m_hasOptionsUploadDirect=false;
+            m_includeSCAUploadDirect="false";
         }
 
 	@Override
@@ -125,26 +125,37 @@ public class StaticAnalyzer extends Scanner {
         }
 
         @DataBoundSetter
-        public void setAdditionalOptionsUploadDirect(boolean additionalOptionsUploadDirect) {
-            m_additionalOptionsUploadDirect = additionalOptionsUploadDirect;
+        public void setHasOptionsUploadDirect(boolean hasOptionsUploadDirect) {
+            m_hasOptionsUploadDirect = hasOptionsUploadDirect;
         }
 
         //using this method in the jelly file to determine the checkbox value
-        public boolean isAdditionalOptionsUploadDirect() {
-            return m_additionalOptionsUploadDirect;
+        public boolean getHasOptionsUploadDirect() {
+            return m_hasOptionsUploadDirect;
         }
 
         @DataBoundSetter
-        public void setIncludeSCAUploadDirect(boolean includeSCAUploadDirect) {
-            m_includeSCAUploadDirect = isAdditionalOptionsUploadDirect() && includeSCAUploadDirect;
+        public void setIncludeSCAUploadDirect(String includeSCAUploadDirect) {
+            if(m_hasOptionsUploadDirect && includeSCAUploadDirect.equals("true")) {
+                m_includeSCAUploadDirect = "true";
+            } else {
+                m_includeSCAUploadDirect = "false";
+            }
+        }
+
+        public String getIncludeSCAUploadDirect() {
+            if(m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)){
+                return m_includeSCAUploadDirect;
+            }
+            return "";
         }
 
         //using this method in the jelly file to determine the checkbox value
-        public boolean isIncludeSCAUploadDirect() {
-            if(m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
-                return m_includeSCAUploadDirect;
+        public String isIncludeSCAUploadDirect(String includeSCAUploadDirect) {
+            if (m_includeSCAUploadDirect != null) {
+                return m_includeSCAUploadDirect.equalsIgnoreCase(includeSCAUploadDirect) ? "true" : "false";
             }
-            return false;
+            return "false";
         }
 
         @DataBoundSetter
@@ -205,7 +216,7 @@ public class StaticAnalyzer extends Scanner {
             if (m_sourceCodeOnly && !m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
                 properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
             }
-            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || m_includeSCAGenerateIRX.equals("true"))) || (m_includeSCAUploadDirect && m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT))) {
+            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || m_includeSCAGenerateIRX.equals("true"))) || (m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && m_includeSCAUploadDirect.equals("true"))) {
                 properties.put(CoreConstants.INCLUDE_SCA, "");
             }
             if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {

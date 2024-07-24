@@ -66,9 +66,9 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 
                <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" >
                    <f:nested>
-                   <f:optionalBlock title="${%label.additional.options}" checked="${instance.isAdditionalOptionsUploadDirect()}" name="additionalOptionsUploadDirect" inline="true">
+                   <f:optionalBlock title="${%label.additional.options}" checked="${instance.getHasOptionsUploadDirect()}" name="hasOptionsUploadDirect" inline="true">
                    <f:entry field="includeSCAUploadDirect">
-                       <f:checkbox title="${%label.include.sca.upload.direct}" checked="${instance.isIncludeSCAUploadDirect()}" default="false" name="includeSCAUploadDirect"/>
+                       <f:checkbox title="${%label.include.sca.upload.direct}" checked="${instance.isIncludeSCAUploadDirect('true')}" default="false" name="includeSCAUploadDirect"/>
                    </f:entry>
                    </f:optionalBlock>
                    </f:nested>
