@@ -216,7 +216,7 @@ public class StaticAnalyzer extends Scanner {
             if (m_sourceCodeOnly && !m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
                 properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
             }
-            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || m_includeSCAGenerateIRX.equals("true"))) || (m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && m_includeSCAUploadDirect.equals("true"))) {
+            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || m_includeSCAGenerateIRX.equals("true"))) || (m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && m_includeSCAUploadDirect != null && m_includeSCAUploadDirect.equals("true"))) {
                 properties.put(CoreConstants.INCLUDE_SCA, "");
             }
             if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {

@@ -316,7 +316,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
         if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
             progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
-            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, m_target);
+            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.TARGET));
             properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
         }
     }
@@ -326,7 +326,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
         Map<String, String> properties = getScanProperties(build,listener);
-        String target = properties.get(CoreConstants.TARGET);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
         m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress);
