@@ -50,7 +50,7 @@ public class StaticAnalyzer extends Scanner {
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
             m_scanSpeed=scanSpeed;
-            m_includeSCAGenerateIRX=includeSCAGenerateIRX == null ? "true": includeSCAGenerateIRX;
+            m_includeSCAGenerateIRX=includeSCAGenerateIRX == null ? Boolean.toString(true): includeSCAGenerateIRX;
             m_hasOptionsUploadDirect=hasOptionsUploadDirect;
             m_includeSCAUploadDirect=includeSCAUploadDirect;
         }
@@ -62,9 +62,9 @@ public class StaticAnalyzer extends Scanner {
             m_sourceCodeOnly=false;
             m_scanMethod=CoreConstants.CREATE_IRX;
             m_scanSpeed="";
-            m_includeSCAGenerateIRX="true";
+            m_includeSCAGenerateIRX=Boolean.toString(true);
             m_hasOptionsUploadDirect=false;
-            m_includeSCAUploadDirect="false";
+            m_includeSCAUploadDirect=Boolean.toString(false);
         }
 
 	@Override
@@ -216,7 +216,7 @@ public class StaticAnalyzer extends Scanner {
             if (m_sourceCodeOnly && !m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
                 properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
             }
-            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || Boolean.parseBoolean(m_includeSCAGenerateIRX))) || (m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && m_includeSCAUploadDirect != null && Boolean.parseBoolean(m_includeSCAUploadDirect))) {
+            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || Boolean.parseBoolean(m_includeSCAGenerateIRX))) || (m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && Boolean.parseBoolean(m_includeSCAUploadDirect))) {
                 properties.put(CoreConstants.INCLUDE_SCA, "");
             }
             if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
