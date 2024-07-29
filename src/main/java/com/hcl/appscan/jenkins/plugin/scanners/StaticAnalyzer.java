@@ -102,10 +102,10 @@ public class StaticAnalyzer extends Scanner {
         
         @DataBoundSetter
         public void setIncludeSCAGenerateIRX(String includeSCAGenerateIRX) {
-            if(getHasOptions() && includeSCAGenerateIRX.equals("true")) {
-                m_includeSCAGenerateIRX = "true";
+            if(getHasOptions() && Boolean.parseBoolean(includeSCAGenerateIRX)) {
+                m_includeSCAGenerateIRX = Boolean.toString(true);
             } else {
-                m_includeSCAGenerateIRX = "false";
+                m_includeSCAGenerateIRX = Boolean.toString(false);
             }
         }
 
@@ -119,9 +119,9 @@ public class StaticAnalyzer extends Scanner {
         //using this method in the jelly file to determine the checkbox value
         public String isIncludeSCAGenerateIRX(String includeSCAGenerateIRX) {
             if (m_includeSCAGenerateIRX != null) {
-                return m_includeSCAGenerateIRX.equalsIgnoreCase(includeSCAGenerateIRX) ? "true" : "false";
+                return m_includeSCAGenerateIRX.equalsIgnoreCase(includeSCAGenerateIRX) ? Boolean.toString(true) : Boolean.toString(false);
             }
-            return "true";
+            return Boolean.toString(true);
         }
 
         @DataBoundSetter
@@ -136,10 +136,10 @@ public class StaticAnalyzer extends Scanner {
 
         @DataBoundSetter
         public void setIncludeSCAUploadDirect(String includeSCAUploadDirect) {
-            if(m_hasOptionsUploadDirect && includeSCAUploadDirect.equals("true")) {
-                m_includeSCAUploadDirect = "true";
+            if(m_hasOptionsUploadDirect && Boolean.parseBoolean(includeSCAUploadDirect)) {
+                m_includeSCAUploadDirect = Boolean.toString(true);
             } else {
-                m_includeSCAUploadDirect = "false";
+                m_includeSCAUploadDirect = Boolean.toString(false);
             }
         }
 
@@ -153,9 +153,9 @@ public class StaticAnalyzer extends Scanner {
         //using this method in the jelly file to determine the checkbox value
         public String isIncludeSCAUploadDirect(String includeSCAUploadDirect) {
             if (m_includeSCAUploadDirect != null) {
-                return m_includeSCAUploadDirect.equalsIgnoreCase(includeSCAUploadDirect) ? "true" : "false";
+                return m_includeSCAUploadDirect.equalsIgnoreCase(includeSCAUploadDirect) ? Boolean.toString(true) : Boolean.toString(false);
             }
-            return "false";
+            return Boolean.toString(false);
         }
 
         @DataBoundSetter
@@ -216,7 +216,7 @@ public class StaticAnalyzer extends Scanner {
             if (m_sourceCodeOnly && !m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT)) {
                 properties.put(CoreConstants.SOURCE_CODE_ONLY, "");
             }
-            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || m_includeSCAGenerateIRX.equals("true"))) || (m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && m_includeSCAUploadDirect != null && m_includeSCAUploadDirect.equals("true"))) {
+            if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || Boolean.parseBoolean(m_includeSCAGenerateIRX))) || (m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && m_includeSCAUploadDirect != null && Boolean.parseBoolean(m_includeSCAUploadDirect))) {
                 properties.put(CoreConstants.INCLUDE_SCA, "");
             }
             if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
@@ -234,17 +234,17 @@ public class StaticAnalyzer extends Scanner {
 			return "Static Analysis (SAST)";
 		}
 
-        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter Boolean includeSCAGenerateIRX, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter String includeSCAGenerateIRX, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
-            if (includeSCAGenerateIRX && checkAppScan360Connection.isAppScan360()) {
+            if (Boolean.parseBoolean(includeSCAGenerateIRX) && checkAppScan360Connection.isAppScan360()) {
                     return FormValidation.error(Messages.error_include_sca_ui());
             }
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter Boolean includeSCAUploadDirect, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
-            if (includeSCAUploadDirect && checkAppScan360Connection.isAppScan360()) {
+            if (Boolean.parseBoolean(includeSCAUploadDirect) && checkAppScan360Connection.isAppScan360()) {
                     return FormValidation.error(Messages.error_include_sca_ui());
             }
             return FormValidation.ok();
