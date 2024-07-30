@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019, 2020.
+ * @ Copyright HCL Technologies Ltd. 2019, 2024.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -151,7 +151,7 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	}
 	
 	private String getReportName() {
-		String name = (getScanType() + FileUtil.getValidFilename(getName())).replaceAll(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$
+		String name = FileUtil.getValidFilename(getName()).replaceAll(" ", ""); //$NON-NLS-1$ //$NON-NLS-2$
 		return name + REPORT_SUFFIX + "." + m_provider.getResultsFormat().toLowerCase(); //$NON-NLS-1$
 	}
 	

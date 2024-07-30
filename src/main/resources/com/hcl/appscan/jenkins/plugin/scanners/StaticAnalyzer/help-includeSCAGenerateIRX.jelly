@@ -1,4 +1,4 @@
 <?jelly escape-by-default='true'?>
 <div>
-	${%description.open.source.only.scan}
+	${%description.include.sca}
 </div>

@@ -305,27 +305,19 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    }
 	}
 
-    private void validations(boolean isAppScan360, Map<String, String> properties, IProgress progress, String target) throws AbortException {
+    private void validateGeneralSettings(boolean isAppScan360, Map<String, String> properties, IProgress progress) {
         if(isAppScan360) {
-            if (m_type.equals(Scanner.DYNAMIC_ANALYZER) && properties.containsKey(Scanner.PRESENCE_ID)) {
-                throw new AbortException(Messages.error_presence_AppScan360());
-            } if (m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER)) {
-                throw new AbortException(Messages.error_sca_AppScan360());
-            } if (m_intervention) {
+            if (m_intervention) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
-            } if (properties.get(CoreConstants.OPEN_SOURCE_ONLY) != null) {
-                throw new AbortException(Messages.error_sca_AppScan360());
             }
         } else if (m_authProvider.getacceptInvalidCerts()) {
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
-        if (m_type.equals(Scanner.STATIC_ANALYZER) && properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+        if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
             progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
-        }
-
-        if(!isAppScan360 && m_type.equals(Scanner.DYNAMIC_ANALYZER) && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(target, m_authProvider, m_authProvider.getProxy())) {
-            throw new AbortException(Messages.error_url_validation(target));
+            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.TARGET));
+            properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
         }
     }
     
@@ -334,13 +326,15 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
         Map<String, String> properties = getScanProperties(build,listener);
-        String target = properties.get(CoreConstants.TARGET);
-        final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
-        validations(isAppScan360, properties, progress, target);
-    	
-    	IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
+        m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress);
+        validateGeneralSettings(isAppScan360,properties,progress);
+
+
+        final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
+
+        IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -353,7 +347,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					setInstallDir();
 		    		scan.run();
 		    		
-                                IResultsProvider provider=new NonCompliantIssuesResultProvider(scan.getScanId(), scan.getType(), scan.getServiceProvider(), progress);
+                                IResultsProvider provider=scan.getResultsProvider(true);
                                 provider.setReportFormat(scan.getReportFormat());
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
@@ -387,8 +381,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 				  message += ", " + provider.getMessage();
 			  }
 			  build.setDescription(message);
-			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, (" Scan Id: " + scan.getScanId() +
-					", Scan Name: " + scan.getName())));
+			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, ("Scan Name: " + scan.getName())));
 		  }
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
             progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));

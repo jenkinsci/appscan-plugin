@@ -12,6 +12,7 @@ import java.util.Map;
 
 import com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials;
 import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
+import com.hcl.appscan.sdk.logging.IProgress;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -196,8 +197,17 @@ public class DynamicAnalyzer extends Scanner {
 		}
 	}
 
+	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
+			throw new AbortException(Messages.error_presence_AppScan360());
+		}
+        if (!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
+		}
+	}
+
 	@Override
-	public Map<String, String> getProperties(VariableResolver<String> resolver) throws hudson.AbortException {
+	public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
 		Map<String, String> properties = new HashMap<String, String>();
 		if (resolver == null) {
 			properties.put(TARGET, getTarget());
@@ -327,9 +337,9 @@ public class DynamicAnalyzer extends Scanner {
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
-            		if(presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
-                		return FormValidation.error(Messages.error_url_validation_ui());
-            		}
+			if(!authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+				return FormValidation.error(Messages.error_url_validation_ui());
+			}
 			return FormValidation.validateRequired(target);
 		}
 

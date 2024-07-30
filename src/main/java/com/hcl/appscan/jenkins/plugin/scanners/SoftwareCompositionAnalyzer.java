@@ -1,5 +1,5 @@
 /**
- * @ Copyright HCL Technologies Ltd. 2023.
+ * @ Copyright HCL Technologies Ltd. 2023, 2024.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -7,6 +7,8 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+import com.hcl.appscan.sdk.logging.IProgress;
+import hudson.AbortException;
 import hudson.Extension;
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
@@ -37,7 +39,13 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         return SOFTWARE_COMPOSITION_ANALYZER;
     }
 
-    public Map<String, String> getProperties(VariableResolver<String> resolver) {
+    public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+        if (authProvider.isAppScan360()) {
+            throw new AbortException(Messages.error_sca_AppScan360());
+        }
+    }
+
+    public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
         Map<String, String> properties = new HashMap<String, String>();
         properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
         return properties;

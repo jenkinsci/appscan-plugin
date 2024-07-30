@@ -9,21 +9,19 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 		<f:textbox />
 	</f:entry>
 
-	<f:entry title="${%label.static.scan.options}">
-               <f:radioBlock name="scanMethod" title="${%label.create.irx}" checked="true" value="createIRX" inline="true" help="/plugin/appscan/help/createIRX.html" >
+	<f:entry title="${%label.static.scan.options}" field="scanMethod"/>
+               <f:radioBlock name="scanMethod" title="${%label.create.irx}" checked="true" value="createIRX" inline="true">
                <f:nested>
-               <f:optionalBlock title="${%label.additional.options}" field="hasOptions" checked="${instance.isAdditionalOptions()}" inline="true">
-                           <f:entry field="openSourceOnly">
-               		<f:checkbox title="${%label.opensource.only}" onclick="openSourceOnlyClicked(this);" name="openSourceOnly"/>
-                           </f:entry>
+               <f:optionalBlock title="${%label.additional.options}" name="hasOptions" checked="true" inline="true">
+                   <f:entry field="sourceCodeOnly">
+                       <f:checkbox title="${%label.sourcecode.only}" name="sourceCodeOnly"/>
+                   </f:entry>
 
-                           <f:entry field="sourceCodeOnly">
-                       <f:checkbox title="${%label.sourcecode.only}" onclick="sourceCodeOnlyClicked(this);" name="sourceCodeOnly"/>
-               			   </f:entry>
+                   <f:entry field="includeSCAGenerateIRX">
+               		<f:checkbox title="${%label.include.sca.generate.irx}" checked="${instance.isIncludeSCAGenerateIRX('true')}" default="true" name="includeSCAGenerateIRX" />
+                           </f:entry>
                  
-                 <f:entry title="${%label.scan.speed.option}" help="/plugin/appscan/help/scanSpeed.html">
-			           </f:entry>
-			             <f:entry>
+                 <f:entry title="${%label.scan.speed.option}">
             			 <f:radioBlock name="scanSpeed" title="${%label.normal}" checked="${instance.checkScanSpeed('normal')}" value="normal" inline="true">
                                                                                     <f:entry>
                                                                                         <div style="border-style:solid;border-color:lightgrey">
@@ -65,10 +63,15 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
                	</f:nested>
                </f:radioBlock>
 
-               <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" help="/plugin/appscan/help/uploadDirect.html" >
+
+               <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" >
+                   <f:nested>
+                   <f:optionalBlock title="${%label.additional.options}" checked="${instance.getHasOptionsUploadDirect()}" name="hasOptionsUploadDirect" inline="true">
+                   <f:entry field="includeSCAUploadDirect">
+                       <f:checkbox title="${%label.include.sca.upload.direct}" checked="${instance.isIncludeSCAUploadDirect('true')}" default="false" name="includeSCAUploadDirect"/>
+                   </f:entry>
+                   </f:optionalBlock>
+                   </f:nested>
                </f:radioBlock>
-
-
-        </f:entry>
 
 </j:jelly>
