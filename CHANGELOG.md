@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+1.4.1 (July, 2024)
+------
+- Support to execute SAST and SCA scans as a single pipeline job for HCL AppScan on Cloud.
+- Updated Jenkins build console log to display the ASoC Scan Overview URL.
+- Bug fixes.
+
 1.4.0 (June, 2024)
 ------
 - Support for executing DAST Scans via HCL AppScan 360° v1.3 and above.
