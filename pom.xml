@@ -40,7 +40,7 @@
 	
   <groupId>com.hcl.security</groupId>
   <artifactId>appscan</artifactId>
-  <version>1.4.1</version>
+  <version>1.4.2-SNAPSHOT</version>
   <description>This plugin allows you to execute security scans with HCL AppScan</description>
   <packaging>hpi</packaging>
 
@@ -99,7 +99,7 @@
   	<connection>scm:git:ssh://github.com/jenkinsci/appscan-plugin.git</connection>
   	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/appscan-plugin</url>
-    <tag>appscan-1.4.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
 </project>
