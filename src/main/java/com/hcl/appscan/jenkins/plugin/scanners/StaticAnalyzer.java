@@ -192,7 +192,7 @@ public class StaticAnalyzer extends Scanner {
                     progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
                     properties.remove(CoreConstants.INCLUDE_SCA);
                 }
-            } else if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.activeSubscriptionsCheck("ScaAnalyzer", authProvider)) {
+            } else if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
                 properties.remove(CoreConstants.INCLUDE_SCA);
             }
