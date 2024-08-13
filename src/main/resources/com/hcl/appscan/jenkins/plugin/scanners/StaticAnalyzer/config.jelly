@@ -1,77 +1,82 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-<!--
-© Copyright IBM Corporation 2016.
-LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
--->
+    <!--
+    © Copyright IBM Corporation 2016.
+    LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+    -->
+    <f:optionalBlock title="${%label.rescan}" name="rescan" checked="true" inline="true">
+        <f:entry title="${%label.scan.id}" field="scanId">
+            <f:textbox />
+        </f:entry>
+    </f:optionalBlock>
 
-	    <f:entry title="${%label.target.directory}" field="target">
-		<f:textbox />
-	</f:entry>
+    <f:entry title="${%label.target.directory}" field="target">
+        <f:textbox />
+    </f:entry>
 
-	<f:entry title="${%label.static.scan.options}" field="scanMethod"/>
-               <f:radioBlock name="scanMethod" title="${%label.create.irx}" checked="true" value="createIRX" inline="true">
-               <f:nested>
-               <f:optionalBlock title="${%label.additional.options}" name="hasOptions" checked="true" inline="true">
-                   <f:entry field="sourceCodeOnly">
-                       <f:checkbox title="${%label.sourcecode.only}" name="sourceCodeOnly"/>
-                   </f:entry>
+    <f:entry title="${%label.static.scan.options}" field="scanMethod"/>
+    <f:radioBlock name="scanMethod" title="${%label.create.irx}" checked="true" value="createIRX" inline="true">
+        <f:nested>
+            <f:optionalBlock title="${%label.additional.options}" name="hasOptions" checked="true" inline="true">
+                <f:entry field="sourceCodeOnly">
+                    <f:checkbox title="${%label.sourcecode.only}" name="sourceCodeOnly"/>
+                </f:entry>
 
-                   <f:entry field="includeSCAGenerateIRX">
-               		<f:checkbox title="${%label.include.sca.generate.irx}" checked="${instance.isIncludeSCAGenerateIRX('true')}" default="true" name="includeSCAGenerateIRX" />
-                           </f:entry>
+                <f:entry field="includeSCAGenerateIRX">
+                    <f:checkbox title="${%label.include.sca.generate.irx}" checked="${instance.isIncludeSCAGenerateIRX('true')}" default="true" name="includeSCAGenerateIRX" />
+                </f:entry>
                  
-                 <f:entry title="${%label.scan.speed.option}">
-            			 <f:radioBlock name="scanSpeed" title="${%label.normal}" checked="${instance.checkScanSpeed('normal')}" value="normal" inline="true">
-                                                                                    <f:entry>
-                                                                                        <div style="border-style:solid;border-color:lightgrey">
-                                                                                            <ul>
-                                                                                                Performs a complete analysis of the code, identifying vulnerabilities in detail and differentiating issues that could be reported as false positives. This scan takes the longest to complete.
-                                                                                            </ul>
-                                                                                        </div>
-                                                                                    </f:entry>
-                                                  </f:radioBlock>
-                         <f:radioBlock name="scanSpeed" title="${%label.fast}" checked="${(instance.checkScanSpeed('fast') == null) ? 'true' : (instance.checkScanSpeed('fast'))}" value="fast" inline="true">
-                                                                                     <f:entry>
-                                                                                         <div style="border-style:solid;border-color:lightgrey">
-                                                                                             <ul>
-                                                                                                Performs a comprehensive analysis of your files to identify vulnerabilities, taking longer to complete than “Faster” or “Fastest” scans.
-                                                                                             </ul>
-                                                                                         </div>
-                                                                                     </f:entry>
-                                                 </f:radioBlock>
-                         <f:radioBlock name="scanSpeed" title="${%label.faster}" checked="${instance.checkScanSpeed('faster')}" value="faster" inline="true">
-                                                                                     <f:entry>
-                                                                                         <div style="border-style:solid;border-color:lightgrey">
-                                                                                             <ul>
-                                                                                                 Provides a medium level of detail of analysis and identification of security issues.  This scan takes more time to complete than the “Fastest” option.
-                                                                                             </ul>
-                                                                                         </div>
-                                                                                     </f:entry>
-                                                 </f:radioBlock>
-            			<f:radioBlock name="scanSpeed" title="${%label.fastest}" checked="${instance.checkScanSpeed('fastest')}" value="fastest" inline="true">
-                                    <f:entry>
-                                        <div style="border-style:solid;border-color:lightgrey">
-                                            <ul>
-                                                Performs a surface-level analysis of your files to identify the most pressing issues for remediation, taking the least amount of time to complete.
-                                            </ul>
-                                        </div>
-                                    </f:entry>
-                        </f:radioBlock>
-                  </f:entry>
-               	</f:optionalBlock>
-               	</f:nested>
-               </f:radioBlock>
+                <f:entry title="${%label.scan.speed.option}">
+                    <f:radioBlock name="scanSpeed" title="${%label.normal}" checked="${instance.checkScanSpeed('normal')}" value="normal" inline="true">
+                        <f:entry>
+                            <div style="border-style:solid;border-color:lightgrey">
+                                <ul>
+                                    Performs a complete analysis of the code, identifying vulnerabilities in detail and differentiating issues that could be reported as false positives. This scan takes the longest to complete.
+                                </ul>
+                            </div>
+                        </f:entry>
+                    </f:radioBlock>
+                    <f:radioBlock name="scanSpeed" title="${%label.fast}" checked="${(instance.checkScanSpeed('fast') == null) ? 'true' : (instance.checkScanSpeed('fast'))}" value="fast" inline="true">
+                        <f:entry>
+                            <div style="border-style:solid;border-color:lightgrey">
+                                <ul>
+                                    Performs a comprehensive analysis of your files to identify vulnerabilities, taking longer to complete than “Faster” or “Fastest” scans.
+                                </ul>
+                            </div>
+                        </f:entry>
+                    </f:radioBlock>
+                    <f:radioBlock name="scanSpeed" title="${%label.faster}" checked="${instance.checkScanSpeed('faster')}" value="faster" inline="true">
+                        <f:entry>
+                            <div style="border-style:solid;border-color:lightgrey">
+                                <ul>
+                                    Provides a medium level of detail of analysis and identification of security issues.  This scan takes more time to complete than the “Fastest” option.
+                                </ul>
+                            </div>
+                        </f:entry>
+                    </f:radioBlock>
+                    <f:radioBlock name="scanSpeed" title="${%label.fastest}" checked="${instance.checkScanSpeed('fastest')}" value="fastest" inline="true">
+                        <f:entry>
+                            <div style="border-style:solid;border-color:lightgrey">
+                                <ul>
+                                    Performs a surface-level analysis of your files to identify the most pressing issues for remediation, taking the least amount of time to complete.
+                                </ul>
+                            </div>
+                        </f:entry>
+                    </f:radioBlock>
+                </f:entry>
+            </f:optionalBlock>
+        </f:nested>
+    </f:radioBlock>
 
 
-               <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" >
-                   <f:nested>
-                   <f:optionalBlock title="${%label.additional.options}" checked="${instance.getHasOptionsUploadDirect()}" name="hasOptionsUploadDirect" inline="true">
-                   <f:entry field="includeSCAUploadDirect">
-                       <f:checkbox title="${%label.include.sca.upload.direct}" checked="${instance.isIncludeSCAUploadDirect('true')}" default="false" name="includeSCAUploadDirect"/>
-                   </f:entry>
-                   </f:optionalBlock>
-                   </f:nested>
-               </f:radioBlock>
+    <f:radioBlock name="scanMethod" title="${%label.upload.direct}" checked="${instance.isScanMethod('uploadDirect')}" value="uploadDirect" inline="true" >
+        <f:nested>
+            <f:optionalBlock title="${%label.additional.options}" checked="${instance.getHasOptionsUploadDirect()}" name="hasOptionsUploadDirect" inline="true">
+                <f:entry field="includeSCAUploadDirect">
+                    <f:checkbox title="${%label.include.sca.upload.direct}" checked="${instance.isIncludeSCAUploadDirect('true')}" default="false" name="includeSCAUploadDirect"/>
+                </f:entry>
+            </f:optionalBlock>
+        </f:nested>
+    </f:radioBlock>
 
 </j:jelly>
