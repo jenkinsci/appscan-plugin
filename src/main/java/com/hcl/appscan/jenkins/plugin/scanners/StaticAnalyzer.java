@@ -41,11 +41,11 @@ public class StaticAnalyzer extends Scanner {
         
         @Deprecated
         public StaticAnalyzer(String target) {
-            this(target, true);
+            this(target, true,false,"");
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
-            super(target, hasOptions);
+        public StaticAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
+            super(target, hasOptions, rescan, scanId);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
@@ -56,8 +56,8 @@ public class StaticAnalyzer extends Scanner {
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions) {
-            super(target, hasOptions);
+	public StaticAnalyzer(String target,boolean hasOptions, boolean rescan, String scanId) {
+            super(target, hasOptions, rescan, scanId);
             m_openSourceOnly=false;
             m_sourceCodeOnly=false;
             m_scanMethod=CoreConstants.CREATE_IRX;
@@ -201,7 +201,13 @@ public class StaticAnalyzer extends Scanner {
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
+            
+            // todo : if the user has ++ Should we throw warning about the Include sca or Should we change he selection from the back end 
+            if(properties.containsKey(CoreConstants.SCAN_ID) && properties.containsKey(CoreConstants.INCLUDE_SCA)){
+                 properties.remove(CoreConstants.INCLUDE_SCA);
+            }
 
+            //ToDo : ++Validate the Scan id entered by the user id the Scan is rescan. Method has to be written in the Scanner-- refer ResolvePath
         }
 
         public Map<String,String> getProperties(VariableResolver<String> resolver) {
@@ -221,6 +227,9 @@ public class StaticAnalyzer extends Scanner {
             }
             if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
                 properties.put(SCAN_SPEED, m_scanSpeed);
+            }
+            if(getRescan() && getScanId()!=null && !getScanId().isEmpty() ){
+                properties.put(CoreConstants.SCAN_ID,getScanId());
             }
             return properties;
         }
