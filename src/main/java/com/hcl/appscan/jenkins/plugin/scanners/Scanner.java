@@ -25,9 +25,8 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	private String m_target;
 	private boolean m_hasOptions;
-        
-        private boolean m_rescan;
-        private String m_scanId;
+	private boolean m_rescan;
+	private String m_scanId;
 	
 	public Scanner(String target, boolean hasOptions) {
 		m_target = target;
