@@ -81,10 +81,10 @@
 
     <script type="text/javascript">
             // Attach event listener to the rescan checkbox
-        document.getElementsByName('rescan')[0].addEventListener('change', toggleIncludeSCAGenerateIRX);
+        document.getElementsByName('rescan')[0].addEventListener('change', toggleVisibilityBasedOnRescan);
 
         // Initial call to set the correct visibility on page load
-        toggleIncludeSCAGenerateIRX();
+        toggleVisibilityBasedOnRescan();
     </script>
 
 

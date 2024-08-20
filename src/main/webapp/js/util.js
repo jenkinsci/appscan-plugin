@@ -70,14 +70,22 @@ function waitClicked(e) {
 	}
 }
 
-function toggleIncludeSCAGenerateIRX() {
-        var rescanChecked = document.getElementsByName('rescan')[0].checked;
-        var includeSCACheckbox = document.getElementById('includeSCAGenerateIRX').parentElement.parentElement;
-        if (rescanChecked) {
-            includeSCACheckbox.style.display = 'none';
-        } else {
-            includeSCACheckbox.style.display = '';
-        }
+function toggleVisibilityBasedOnRescan() {
+    // Get the checked state of the "Rescan" checkbox
+    var isRescanChecked = document.getElementsByName('rescan')[0].checked;
+
+    // Get the parent elements of the checkboxes to be hidden or shown
+    var scaCheckboxContainer = document.getElementById('includeSCAGenerateIRX').parentElement.parentElement;
+    var personalScanContainer = document.getElementById('personalScanCheckbox').parentElement.parentElement;
+
+    // Toggle visibility based on the "Rescan" checkbox state
+    if (isRescanChecked) {
+        scaCheckboxContainer.style.display = 'none';
+        personalScanContainer.style.display = 'none';
+    } else {
+        scaCheckboxContainer.style.display = '';
+        personalScanContainer.style.display = '';
+    }
 }
 
 function aseFailBuildClicked(e) {
