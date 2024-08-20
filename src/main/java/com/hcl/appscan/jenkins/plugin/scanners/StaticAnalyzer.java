@@ -41,7 +41,7 @@ public class StaticAnalyzer extends Scanner {
         
         @Deprecated
         public StaticAnalyzer(String target) {
-            this(target, true,false,"");
+            this(target, true, false, "");
         }
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
@@ -202,12 +202,9 @@ public class StaticAnalyzer extends Scanner {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
             
-            // todo : if the user has ++ Should we throw warning about the Include sca or Should we change he selection from the back end 
             if(properties.containsKey(CoreConstants.SCAN_ID) && properties.containsKey(CoreConstants.INCLUDE_SCA)){
                  properties.remove(CoreConstants.INCLUDE_SCA);
             }
-
-            //ToDo : ++Validate the Scan id entered by the user id the Scan is rescan. Method has to be written in the Scanner-- refer ResolvePath
         }
 
         public Map<String,String> getProperties(VariableResolver<String> resolver) {
