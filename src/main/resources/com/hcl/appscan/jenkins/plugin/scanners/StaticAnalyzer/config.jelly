@@ -23,7 +23,7 @@
                 </f:entry>
 
                 <f:entry field="includeSCAGenerateIRX">
-                    <f:checkbox title="${%label.include.sca.generate.irx}" checked="${instance.isIncludeSCAGenerateIRX('true')}" default="true" name="includeSCAGenerateIRX" />
+                    <f:checkbox  id="includeSCAGenerateIRX" title="${%label.include.sca.generate.irx}" checked="${instance.isIncludeSCAGenerateIRX('true')}" default="true" name="includeSCAGenerateIRX" />
                 </f:entry>
                  
                 <f:entry title="${%label.scan.speed.option}">
@@ -78,5 +78,14 @@
             </f:optionalBlock>
         </f:nested>
     </f:radioBlock>
+
+    <script type="text/javascript">
+            // Attach event listener to the rescan checkbox
+        document.getElementsByName('rescan')[0].addEventListener('change', toggleIncludeSCAGenerateIRX);
+
+        // Initial call to set the correct visibility on page load
+        toggleIncludeSCAGenerateIRX();
+    </script>
+
 
 </j:jelly>
