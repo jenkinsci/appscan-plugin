@@ -70,24 +70,6 @@ function waitClicked(e) {
 	}
 }
 
-function includeSCAGenerateIRXClicked(e){
-	if (e.checked) {
-		var rescanCheckbox = getComponent(e, 'rescan');
-		if (rescanCheckbox != null) {
-			rescanCheckbox.checked = false;
-		}
-	}
-}
-
-function personalScanClicked(e){
-	if (e.checked) {
-		var rescanCheckbox = getComponent(e, 'rescan');
-		if (rescanCheckbox != null) {
-			rescanCheckbox.checked = false;
-		}
-	}
-}
-
 function toggleIncludeSCAGenerateIRX() {
         var rescanChecked = document.getElementsByName('rescan')[0].checked;
         var includeSCACheckbox = document.getElementById('includeSCAGenerateIRX').parentElement.parentElement;
