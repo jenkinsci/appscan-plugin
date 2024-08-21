@@ -48,7 +48,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		return m_target;
 	}
         
-	public boolean getRescan() {
+	public boolean isRescan() {
 		return m_rescan;
 	}
         

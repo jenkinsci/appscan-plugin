@@ -202,11 +202,12 @@ public class StaticAnalyzer extends Scanner {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
             
-            if(properties.containsKey(CoreConstants.SCAN_ID) && properties.containsKey(CoreConstants.INCLUDE_SCA)){
+            if(properties.containsKey(CoreConstants.SCAN_ID)){
                  properties.remove(CoreConstants.INCLUDE_SCA);
             }
         }
 
+        @Override
         public Map<String,String> getProperties(VariableResolver<String> resolver) {
             Map<String, String> properties = new HashMap<String, String>();
             properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
@@ -225,7 +226,7 @@ public class StaticAnalyzer extends Scanner {
             if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
                 properties.put(SCAN_SPEED, m_scanSpeed);
             }
-            if(getRescan() && getScanId()!=null && !getScanId().isEmpty() ){
+            if(isRescan() && getScanId()!=null && !getScanId().isEmpty() ){
                 properties.put(CoreConstants.SCAN_ID,getScanId());
             }
             return properties;
@@ -247,6 +248,10 @@ public class StaticAnalyzer extends Scanner {
             }
             return FormValidation.ok();
         }
+        
+        public FormValidation doCheckScanId(@QueryParameter String scanId) {
+			return FormValidation.validateRequired(scanId);
+		}
 
         public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);

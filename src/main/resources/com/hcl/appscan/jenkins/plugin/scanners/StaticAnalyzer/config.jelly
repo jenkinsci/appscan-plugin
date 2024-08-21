@@ -4,7 +4,7 @@
 © Copyright IBM Corporation 2016.
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
-    <f:optionalBlock title="${%label.rescan}" name="rescan" checked="${instance.getRescan()}" inline="true">
+    <f:optionalBlock title="${%label.rescan}" name="rescan" checked="${instance.isRescan()}" inline="true">
         <f:entry title="${%label.scan.id}" field="scanId">
             <f:textbox />
         </f:entry>
