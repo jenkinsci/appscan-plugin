@@ -250,7 +250,7 @@ public class StaticAnalyzer extends Scanner {
         }
         
         public FormValidation doCheckScanId(@QueryParameter String scanId) {
-			return FormValidation.validateRequired(scanId);
+            return FormValidation.validateRequired(scanId);
 		}
 
         public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {

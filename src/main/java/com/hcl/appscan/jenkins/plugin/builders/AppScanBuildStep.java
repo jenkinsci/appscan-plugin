@@ -305,7 +305,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    }
 	}
 
-    private void validateGeneralSettings(boolean isAppScan360, Map<String, String> properties, IProgress progress) {
+    private void validateGeneralSettings(boolean isAppScan360, Map<String, String> properties, IProgress progress) throws AbortException {
         if(isAppScan360) {
             if (m_intervention) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
@@ -318,6 +318,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
             m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.TARGET));
             properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
+        }
+
+        if(properties.containsKey(CoreConstants.SCAN_ID) && !ServiceUtil.isScanId(properties.get(CoreConstants.SCAN_ID), m_authProvider, properties)) {
+            throw new AbortException("Please enter valid scanId");
         }
     }
     
