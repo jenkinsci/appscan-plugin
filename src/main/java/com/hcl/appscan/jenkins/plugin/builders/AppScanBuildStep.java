@@ -321,7 +321,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
 
         if(properties.containsKey(CoreConstants.SCAN_ID) && !ServiceUtil.isScanId(properties.get(CoreConstants.SCAN_ID), m_authProvider, properties)) {
-            throw new AbortException("Please enter valid scanId");
+            throw new AbortException(Messages.error_invalid_scan_id(properties.containsKey(CoreConstants.SCAN_ID)));
         }
     }
     
