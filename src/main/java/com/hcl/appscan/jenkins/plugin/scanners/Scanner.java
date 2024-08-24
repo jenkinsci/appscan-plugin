@@ -61,6 +61,8 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	public abstract void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException;
 
 	public abstract String getType();
+
+	public boolean isNullOrEmpty(String string) { return string != null && !string.trim().isEmpty(); }
 	
 	protected String resolvePath(String path, VariableResolver<String> resolver) {
 		//First replace any variables in the path

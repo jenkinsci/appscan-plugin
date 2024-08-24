@@ -320,7 +320,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
         }
 
-        if(properties.containsKey(CoreConstants.SCAN_ID) && !ServiceUtil.isScanId(properties.get(CoreConstants.SCAN_ID), m_authProvider, properties)) {
+        if(properties.containsKey(CoreConstants.SCAN_ID) && !ServiceUtil.isScanId(properties.get(CoreConstants.SCAN_ID), properties.get(CoreConstants.APP_ID), properties.get(CoreConstants.SCANNER_TYPE), m_authProvider)) {
             throw new AbortException(Messages.error_invalid_scan_id(properties.containsKey(CoreConstants.SCAN_ID)));
         }
     }

@@ -226,7 +226,7 @@ public class StaticAnalyzer extends Scanner {
             if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
                 properties.put(SCAN_SPEED, m_scanSpeed);
             }
-            if(isRescan() && getScanId()!=null && !getScanId().isEmpty() ){
+            if(isRescan() && isNullOrEmpty(getScanId()) ){
                 properties.put(CoreConstants.SCAN_ID,getScanId());
             }
             return properties;
