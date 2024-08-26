@@ -71,20 +71,42 @@ function waitClicked(e) {
 }
 
 function toggleVisibilityBasedOnRescan() {
-    // Get the checked state of the "Rescan" checkbox
-    var isRescanChecked = document.getElementsByName('rescan')[0].checked;
+     var rescanChecked = document.getElementsByName('rescan')[0].checked;
+      
+    var isCreateIRXSelected = document.querySelector('input[type="radio"][value="createIRX"]').checked;
+    var hasOptionsChecked = document.getElementsByName('hasOptions')[0].checked;
+    var includeSCACheckbox = document.getElementById('includeSCAGenerateIRX');
 
-    // Get the parent elements of the checkboxes to be hidden or shown
-    var scaCheckboxContainer = document.getElementById('includeSCAGenerateIRX').parentElement.parentElement;
-    var personalScanContainer = document.getElementById('personalScanCheckbox').parentElement.parentElement;
+    var isUploadDirectSelected = document.querySelector('input[type="radio"][value="uploadDirect"]').checked;
+    var hasOptionsUploadDirectElement = document.getElementsByName('hasOptionsUploadDirect')[0];
+    var includeSCADirectCheckbox = document.getElementById('includeSCAUploadDirect');
 
-    // Toggle visibility based on the "Rescan" checkbox state
-    if (isRescanChecked) {
-        scaCheckboxContainer.style.display = 'none';
-        personalScanContainer.style.display = 'none';
+    var personalScanEntry = document.getElementById('personalScanCheckbox');
+
+     if (rescanChecked) {
+        if (hasOptionsChecked) {
+            includeSCACheckbox.disabled = true;
+        }
+        if (isUploadDirectSelected) {
+            hasOptionsUploadDirectElement.disabled = true;
+            includeSCADirectCheckbox.disabled = true;
+        }
+        if (personalScanEntry ) {
+            personalScanEntry.disabled = true;
+        }
     } else {
-        scaCheckboxContainer.style.display = '';
-        personalScanContainer.style.display = '';
+        if (isCreateIRXSelected) {
+            if (hasOptionsChecked) {
+                includeSCACheckbox.disabled = false;
+            }
+        } 
+        if (isUploadDirectSelected) {
+            hasOptionsUploadDirectElement.disabled = false;
+            includeSCADirectCheckbox.disabled = false;
+        }
+        if (personalScanEntry) {
+            personalScanEntry.disabled = false;
+        }
     }
 }
 
