@@ -204,6 +204,10 @@ public class DynamicAnalyzer extends Scanner {
         if (!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
+
+        if(!ServiceUtil.hasDastEntitlement(authProvider)) {
+            throw new AbortException("check");
+        }
 	}
 
 	@Override
@@ -337,6 +341,9 @@ public class DynamicAnalyzer extends Scanner {
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+            if(!ServiceUtil.hasDastEntitlement(authProvider)) {
+                return FormValidation.error("DAST technology is not present under active subscription");
+            }
 			if(!authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}

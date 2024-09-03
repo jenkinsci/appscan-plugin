@@ -8,6 +8,7 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.RelativePath;
@@ -43,6 +44,10 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         if (authProvider.isAppScan360()) {
             throw new AbortException(Messages.error_sca_AppScan360());
         }
+
+        if(!ServiceUtil.hasScaEntitlement(authProvider)) {
+            throw new AbortException("check");
+        }
     }
 
     public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
@@ -62,6 +67,9 @@ public class SoftwareCompositionAnalyzer extends Scanner {
 
         public FormValidation doCheckTarget(@QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+            if(!ServiceUtil.hasScaEntitlement(authProvider)) {
+                return FormValidation.error("SCA technology is not present under active subscription");
+            }
             if(authProvider.isAppScan360()){
                 return FormValidation.error(Messages.error_sca_AppScan360_ui());
             }

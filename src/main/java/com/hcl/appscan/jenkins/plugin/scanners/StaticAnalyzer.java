@@ -192,7 +192,13 @@ public class StaticAnalyzer extends Scanner {
                     progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
                     properties.remove(CoreConstants.INCLUDE_SCA);
                 }
-            } else if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
+            }
+
+            if(!ServiceUtil.hasSastEntitlement(authProvider)) {
+                throw new AbortException("You don't have a valid SAST Subscription.");
+            }
+
+            if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
                 properties.remove(CoreConstants.INCLUDE_SCA);
             }
@@ -249,5 +255,13 @@ public class StaticAnalyzer extends Scanner {
             }
             return FormValidation.ok();
         }
+
+            public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
+                JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+                if(!ServiceUtil.hasSastEntitlement(authProvider)) {
+                    return FormValidation.error("SAST technology is not present under active subscription");
+                }
+                return FormValidation.ok();
+            }
 	}
 }
