@@ -195,7 +195,7 @@ public class StaticAnalyzer extends Scanner {
             }
 
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
-                throw new AbortException("You don't have a valid SAST Subscription.");
+                throw new AbortException(Messages.error_sast_subscription_validation());
             }
 
             if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
@@ -259,7 +259,7 @@ public class StaticAnalyzer extends Scanner {
             public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
                 JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
                 if(!ServiceUtil.hasSastEntitlement(authProvider)) {
-                    return FormValidation.error("SAST technology is not present under active subscription");
+                    return FormValidation.error(Messages.error_sast_subscription_validation());
                 }
                 return FormValidation.ok();
             }

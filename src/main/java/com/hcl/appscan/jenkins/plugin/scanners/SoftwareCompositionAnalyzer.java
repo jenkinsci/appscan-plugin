@@ -46,7 +46,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         }
 
         if(!ServiceUtil.hasScaEntitlement(authProvider)) {
-            throw new AbortException("check");
+            throw new AbortException(Messages.error_sca_subscription_validation());
         }
     }
 
@@ -68,7 +68,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         public FormValidation doCheckTarget(@QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(!ServiceUtil.hasScaEntitlement(authProvider)) {
-                return FormValidation.error("SCA technology is not present under active subscription");
+                return FormValidation.error(Messages.error_sca_subscription_validation());
             }
             if(authProvider.isAppScan360()){
                 return FormValidation.error(Messages.error_sca_AppScan360_ui());
