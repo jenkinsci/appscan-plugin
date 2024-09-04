@@ -198,10 +198,10 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
-        if(!ServiceUtil.hasDastEntitlement(authProvider)) {
+		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_dast_subscription_validation());
-        }
-        if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
+		}
+		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
 			throw new AbortException(Messages.error_presence_AppScan360());
 		}
         if (!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
