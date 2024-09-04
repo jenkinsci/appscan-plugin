@@ -41,12 +41,12 @@ public class SoftwareCompositionAnalyzer extends Scanner {
     }
 
     public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
-        if (authProvider.isAppScan360()) {
-            throw new AbortException(Messages.error_sca_AppScan360());
-        }
-
         if(!ServiceUtil.hasScaEntitlement(authProvider)) {
             throw new AbortException(Messages.error_sca_subscription_validation());
+        }
+
+        if (authProvider.isAppScan360()) {
+            throw new AbortException(Messages.error_sca_AppScan360());
         }
     }
 

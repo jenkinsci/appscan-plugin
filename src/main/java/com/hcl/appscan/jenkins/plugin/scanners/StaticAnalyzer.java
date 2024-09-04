@@ -184,6 +184,10 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+            if(!ServiceUtil.hasSastEntitlement(authProvider)) {
+                throw new AbortException(Messages.error_sast_subscription_validation());
+            }
+
             if (authProvider.isAppScan360()) {
                 if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
                     throw new AbortException(Messages.error_sca_AppScan360());
@@ -192,10 +196,6 @@ public class StaticAnalyzer extends Scanner {
                     progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
                     properties.remove(CoreConstants.INCLUDE_SCA);
                 }
-            }
-
-            if(!ServiceUtil.hasSastEntitlement(authProvider)) {
-                throw new AbortException(Messages.error_sast_subscription_validation());
             }
 
             if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
@@ -207,7 +207,6 @@ public class StaticAnalyzer extends Scanner {
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
-
         }
 
         public Map<String,String> getProperties(VariableResolver<String> resolver) {
@@ -256,12 +255,12 @@ public class StaticAnalyzer extends Scanner {
             return FormValidation.ok();
         }
 
-            public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
-                JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
-                if(!ServiceUtil.hasSastEntitlement(authProvider)) {
+        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
+            JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+            if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                     return FormValidation.error(Messages.error_sast_subscription_validation());
-                }
-                return FormValidation.ok();
             }
+            return FormValidation.ok();
+        }
 	}
 }
