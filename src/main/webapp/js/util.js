@@ -110,6 +110,20 @@ function toggleVisibilityBasedOnRescan() {
     }
 }
 
+function toggleVisibilityBasedOnRescanSCA() {
+    var rescanChecked = document.getElementsByName('rescan')[0].checked;
+    var personalScanEntry = document.getElementById('personalScanCheckbox');
+     if (rescanChecked) {
+            if (personalScanEntry ) {
+                personalScanEntry.disabled = true;
+            }
+     } else {
+            if (personalScanEntry) {
+                personalScanEntry.disabled = false;
+            }
+     }
+}
+
 function aseFailBuildClicked(e) {
 	if(e.checked) {
 		var waitCheckbox = getComponent(e, 'wait');
