@@ -185,7 +185,7 @@ public class StaticAnalyzer extends Scanner {
 
         public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
-                throw new AbortException(Messages.error_sast_subscription_validation());
+                throw new AbortException(Messages.error_active_subscription_validation(getType()));
             }
 
             if (authProvider.isAppScan360()) {
@@ -258,7 +258,7 @@ public class StaticAnalyzer extends Scanner {
         public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
-                    return FormValidation.error(Messages.error_sast_subscription_validation());
+                    return FormValidation.error(Messages.error_active_subscription_validation_ui());
             }
             return FormValidation.ok();
         }
