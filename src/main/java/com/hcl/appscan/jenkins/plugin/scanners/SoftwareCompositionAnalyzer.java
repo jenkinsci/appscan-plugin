@@ -9,6 +9,7 @@ import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.RelativePath;
@@ -69,7 +70,11 @@ public class SoftwareCompositionAnalyzer extends Scanner {
             return "Software Composition Analysis (SCA)";
         }
 
-        public FormValidation doCheckScanId(@QueryParameter String scanId) {
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
+            if(scanId!=null && !scanId.isEmpty() && !ServiceUtil.isScanId(scanId,application,SOFTWARE_COMPOSITION_ANALYZER,provider)) {
+                return FormValidation.error(Messages.error_invalid_scan_id_ui());
+            }
             return FormValidation.validateRequired(scanId);
         }
 

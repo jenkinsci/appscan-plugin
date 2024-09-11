@@ -110,6 +110,15 @@ function toggleVisibilityBasedOnRescan() {
     }
 }
 
+function aseFailBuildClicked(e) {
+	if(e.checked) {
+		var waitCheckbox = getComponent(e, 'wait');
+		if (waitCheckbox != null) {
+			waitCheckbox.checked = true;
+		}
+	}
+}
+
 function toggleVisibilityBasedOnRescanSCA() {
     var rescanChecked = document.getElementsByName('rescan')[0].checked;
     var personalScanEntry = document.getElementById('personalScanCheckbox');
@@ -122,15 +131,6 @@ function toggleVisibilityBasedOnRescanSCA() {
                 personalScanEntry.disabled = false;
             }
      }
-}
-
-function aseFailBuildClicked(e) {
-	if(e.checked) {
-		var waitCheckbox = getComponent(e, 'wait');
-		if (waitCheckbox != null) {
-			waitCheckbox.checked = true;
-		}
-	}
 }
 
 function aseWaitClicked(e) {

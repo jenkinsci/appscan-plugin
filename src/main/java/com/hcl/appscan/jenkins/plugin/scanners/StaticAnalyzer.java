@@ -249,7 +249,11 @@ public class StaticAnalyzer extends Scanner {
             return FormValidation.ok();
         }
         
-        public FormValidation doCheckScanId(@QueryParameter String scanId) {
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
+            if(scanId!=null && !scanId.isEmpty() && !ServiceUtil.isScanId(scanId,application,STATIC_ANALYZER,provider)) {
+                return FormValidation.error(Messages.error_invalid_scan_id_ui());
+            }
             return FormValidation.validateRequired(scanId);
 		}
 

@@ -20,8 +20,12 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
+import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
+import com.hcl.appscan.sdk.scan.IScanServiceProvider;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import com.hcl.appscan.sdk.utils.ServiceUtil;
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -305,7 +309,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    }
 	}
 
-    private void validateGeneralSettings(boolean isAppScan360, Map<String, String> properties, IProgress progress) throws AbortException {
+    private void validateGeneralSettings(boolean isAppScan360, Map<String, String> properties, IProgress progress) throws IOException {
         if(isAppScan360) {
             if (m_intervention) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
@@ -320,8 +324,27 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
         }
 
-        if(properties.containsKey(CoreConstants.SCAN_ID) && !ServiceUtil.isScanId(properties.get(CoreConstants.SCAN_ID), properties.get(CoreConstants.APP_ID), properties.get(CoreConstants.SCANNER_TYPE), m_authProvider)) {
-            throw new AbortException(Messages.error_invalid_scan_id(properties.get(CoreConstants.SCAN_ID)));
+        if(properties.containsKey(CoreConstants.SCAN_ID)) {
+            try {
+                scanIdValidation(properties,progress);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void scanIdValidation(Map<String, String> properties, IProgress progress) throws JSONException, IOException {
+        IScanServiceProvider scanServiceProvider = new CloudScanServiceProvider(progress, m_authProvider);
+        JSONObject scanDetails = scanServiceProvider.getScanDetails(properties.get(CoreConstants.SCAN_ID));
+        JSONObject latestExecution = scanDetails == null ? null : scanDetails.getJSONObject("LatestExecution");
+        if(scanDetails == null) {
+            throw new AbortException(Messages.error_invalid_scan_id());
+        } else if(!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
+            throw new AbortException(Messages.error_invalid_scan_id_application());
+        } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(properties.get(CoreConstants.SCANNER_TYPE)))) {
+            throw new AbortException(Messages.error_invalid_scan_id_scan_type());
+        } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && latestExecution!=null && latestExecution.optString("GitRepository")!=null) {
+            throw new AbortException(Messages.error_invalid_scan_id_git_repo());
         }
     }
     
