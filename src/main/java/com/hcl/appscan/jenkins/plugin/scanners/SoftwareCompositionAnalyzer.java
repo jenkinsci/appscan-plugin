@@ -65,7 +65,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
             return "Software Composition Analysis (SCA)";
         }
 
-        public FormValidation doCheckTarget(@QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(!ServiceUtil.hasScaEntitlement(authProvider)) {
                 return FormValidation.error(Messages.error_active_subscription_validation_ui());
