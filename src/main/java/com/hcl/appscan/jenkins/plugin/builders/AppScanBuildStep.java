@@ -274,6 +274,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
 			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+			properties.put("Name", resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 			properties.put(CoreConstants.PERSONAL_SCAN, Boolean.toString(m_personalScan));
 			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
@@ -328,7 +329,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             try {
                 scanIdValidation(properties,progress);
             } catch (JSONException e) {
-                throw new RuntimeException(e);
+                //Ignore and move on.
             }
         }
     }
