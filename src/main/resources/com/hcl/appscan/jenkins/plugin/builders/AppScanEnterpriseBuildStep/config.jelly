@@ -156,7 +156,7 @@
 
     <f:entry>
 	    <div>
-	     ${%label.email.text} <a target="_blank" href="https://help.hcltechsw.com/appscan/Enterprise/9.0.3/topics/t_set_up_control_center.html">${%label.email.doc.link}</a>
+	     ${%label.email.text} <a target="_blank" href="https://help.hcl-software.com/appscan/Enterprise/9.0.3/topics/t_set_up_control_center.html">${%label.email.doc.link}</a>
 		</div>
     </f:entry>
 

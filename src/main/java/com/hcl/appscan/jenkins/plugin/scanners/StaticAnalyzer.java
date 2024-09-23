@@ -184,6 +184,12 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+            if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
+                throw new AbortException("Scan ID value is empty. Verify and try again.");
+            } else {
+                properties.remove(CoreConstants.INCLUDE_SCA);
+            }
+
             if (authProvider.isAppScan360()) {
                 if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
                     throw new AbortException(Messages.error_sca_AppScan360());
@@ -200,10 +206,6 @@ public class StaticAnalyzer extends Scanner {
             //includeSCA is only available if the user upload an IRX file.
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
-            }
-            
-            if(properties.containsKey(CoreConstants.SCAN_ID)){
-                 properties.remove(CoreConstants.INCLUDE_SCA);
             }
         }
 
@@ -241,9 +243,9 @@ public class StaticAnalyzer extends Scanner {
 			return "Static Analysis (SAST)";
 		}
 
-        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter String includeSCAGenerateIRX, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter String includeSCAGenerateIRX, @QueryParameter boolean rescan, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
-            if (Boolean.parseBoolean(includeSCAGenerateIRX) && checkAppScan360Connection.isAppScan360()) {
+            if (!rescan && Boolean.parseBoolean(includeSCAGenerateIRX) && checkAppScan360Connection.isAppScan360()) {
                     return FormValidation.error(Messages.error_include_sca_ui());
             }
             return FormValidation.ok();
