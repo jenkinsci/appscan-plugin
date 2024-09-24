@@ -195,6 +195,9 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
+			throw new AbortException(Messages.error_active_subscription_validation(getType()));
+		}
 		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
 			throw new AbortException(Messages.error_presence_AppScan360());
 		}
@@ -334,6 +337,9 @@ public class DynamicAnalyzer extends Scanner {
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+			if(!ServiceUtil.hasDastEntitlement(authProvider)) {
+				return FormValidation.error(Messages.error_active_subscription_validation_ui());
+			}
 			if(!authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}

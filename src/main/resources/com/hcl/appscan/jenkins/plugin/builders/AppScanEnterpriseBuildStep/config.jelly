@@ -21,6 +21,7 @@
     <f:section title="${%label.job.properties}" field="loginTypeOptions">
 	    <f:entry title="${%label.template}" field="template">
 	        <f:textbox placeholder="${%template.placeholder}"
+             data-maxsuggestions="99999"
 	         style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
 	         background-size: 16px;" />
 	    </f:entry>
@@ -30,15 +31,17 @@
 	    </f:entry>
 		        
 	    <f:entry title="${%label.folder}" field="folder">
-	        <f:textbox placeholder="${%folder.placeholder}" 
+	        <f:textbox placeholder="${%folder.placeholder}"
+             data-maxsuggestions="99999"
 	         style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
              background-size: 16px;" />
 	    </f:entry>
 	    
 	    <f:entry title="${%label.application}" field="application">
-	        <f:textbox placeholder="${%application.placeholder}" 
-	        style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
-            background-size: 16px;" />
+	        <f:textbox placeholder="${%application.placeholder}"
+             data-maxsuggestions="99999"
+             style="background: white url('${resURL}${%search.icon.url}') no-repeat 99% center;
+             background-size: 16px;" />
 	    </f:entry>
   
 	    <f:entry title="${%label.test.policy}" field="testPolicy">

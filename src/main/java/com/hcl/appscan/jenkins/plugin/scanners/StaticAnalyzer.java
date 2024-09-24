@@ -184,12 +184,16 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
-            if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
+            if(!ServiceUtil.hasSastEntitlement(authProvider)) {
+                throw new AbortException(Messages.error_active_subscription_validation(getType()));
+            }
+          
+           if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
                 throw new AbortException("Scan ID value is empty. Verify and try again.");
             } else if(properties.containsKey(CoreConstants.INCLUDE_SCA)) {
                 progress.setStatus(new Message(Message.WARNING, " only SAST will be executed, Include-SCA is not applicable for rescan"));
                 properties.remove(CoreConstants.INCLUDE_SCA);
-            }
+           }
 
             if (authProvider.isAppScan360()) {
                 if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
@@ -264,6 +268,14 @@ public class StaticAnalyzer extends Scanner {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
             if (Boolean.parseBoolean(includeSCAUploadDirect) && checkAppScan360Connection.isAppScan360()) {
                     return FormValidation.error(Messages.error_include_sca_ui());
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+            if(!ServiceUtil.hasSastEntitlement(authProvider)) {
+                    return FormValidation.error(Messages.error_active_subscription_validation_ui());
             }
             return FormValidation.ok();
         }
