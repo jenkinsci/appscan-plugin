@@ -325,6 +325,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         }
 
         if(properties.containsKey(CoreConstants.SCAN_ID)) {
+            if(properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
+                progress.setStatus(new Message(Message.WARNING, "Personal Scan is not applicable for rescan"));
+            }
+
             try {
                 scanIdValidation(properties,progress);
             } catch (JSONException e) {
@@ -337,12 +341,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         IScanServiceProvider scanServiceProvider = new CloudScanServiceProvider(progress, m_authProvider);
         JSONObject scanDetails = scanServiceProvider.getScanDetails(properties.get(CoreConstants.SCAN_ID));
         JSONObject latestExecution = scanDetails == null ? null : scanDetails.getJSONObject("LatestExecution");
-        if(!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
+        if(scanDetails == null) {
+            throw new AbortException(Messages.error_invalid_scan_id());
+        } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && latestExecution!=null && latestExecution.optString("GitRepository")!=null) {
+            throw new AbortException(Messages.error_invalid_scan_id_git_repo());
+        } else if (!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
             throw new AbortException(Messages.error_invalid_scan_id_application());
         } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(properties.get(CoreConstants.SCANNER_TYPE)))) {
             throw new AbortException(Messages.error_invalid_scan_id_scan_type());
-        } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && latestExecution!=null && latestExecution.optString("GitRepository")!=null) {
-            throw new AbortException(Messages.error_invalid_scan_id_git_repo());
         }
     }
     
@@ -401,12 +407,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
-			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
+			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
 			  if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
 				  message += ", " + provider.getMessage();
 			  }
 			  build.setDescription(message);
-			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, ("Scan Name: " + scan.getName())));
+			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, ("Scan Name: " + m_name)));
 		  }
         else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
             progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));

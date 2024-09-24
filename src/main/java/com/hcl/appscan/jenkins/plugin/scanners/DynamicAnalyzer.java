@@ -6,12 +6,9 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials;
-import com.hcl.appscan.jenkins.plugin.builders.AppScanBuildStep;
 import com.hcl.appscan.sdk.logging.IProgress;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;

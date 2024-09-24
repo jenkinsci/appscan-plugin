@@ -81,8 +81,6 @@ function toggleVisibilityBasedOnRescan() {
     var hasOptionsUploadDirectElement = document.getElementsByName('hasOptionsUploadDirect')[0];
     var includeSCADirectCheckbox = document.getElementById('includeSCAUploadDirect');
 
-    var personalScanEntry = document.getElementById('personalScanCheckbox');
-
      if (rescanChecked) {
         if (hasOptionsChecked) {
             includeSCACheckbox.disabled = true;
@@ -90,9 +88,6 @@ function toggleVisibilityBasedOnRescan() {
         if (isUploadDirectSelected) {
             hasOptionsUploadDirectElement.disabled = true;
             includeSCADirectCheckbox.disabled = true;
-        }
-        if (personalScanEntry ) {
-            personalScanEntry.disabled = true;
         }
     } else {
         if (isCreateIRXSelected) {
@@ -104,9 +99,6 @@ function toggleVisibilityBasedOnRescan() {
             hasOptionsUploadDirectElement.disabled = false;
             includeSCADirectCheckbox.disabled = false;
         }
-        if (personalScanEntry) {
-            personalScanEntry.disabled = false;
-        }
     }
 }
 
@@ -117,20 +109,6 @@ function aseFailBuildClicked(e) {
 			waitCheckbox.checked = true;
 		}
 	}
-}
-
-function toggleVisibilityBasedOnRescanSCA() {
-    var rescanChecked = document.getElementsByName('rescan')[0].checked;
-    var personalScanEntry = document.getElementById('personalScanCheckbox');
-     if (rescanChecked) {
-            if (personalScanEntry ) {
-                personalScanEntry.disabled = true;
-            }
-     } else {
-            if (personalScanEntry) {
-                personalScanEntry.disabled = false;
-            }
-     }
 }
 
 function aseWaitClicked(e) {

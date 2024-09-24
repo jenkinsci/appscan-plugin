@@ -5,7 +5,7 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 
-    <f:optionalBlock title="${%label.rescan}" name="rescan" checked="${instance.isRescan()}" help="/plugin/appscan/help/rescan.html" inline="true">
+    <f:optionalBlock title="${%label.rescan}" checked="${instance.isRescan()}" help="/plugin/appscan/help/rescan.html" inline="true">
         <f:entry title="${%label.scan.id}" field="scanId" help="/plugin/appscan/help/scanId.html">
             <f:textbox />
         </f:entry>
@@ -14,14 +14,5 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
     <f:entry title="${%label.target.directory}" field="target">
 		<f:textbox />
 	</f:entry>
-
-    <script type="text/javascript">
-        // Attach event listener to the rescan checkbox
-        document.getElementsByName('rescan')[0].addEventListener('change', toggleVisibilityBasedOnRescanSCA);
-        window.addEventListener('load', toggleVisibilityBasedOnRescanSCA);
-
-        // Initial call to set the correct visibility on page load
-        toggleVisibilityBasedOnRescanSCA();
-    </script>
 
 </j:jelly>

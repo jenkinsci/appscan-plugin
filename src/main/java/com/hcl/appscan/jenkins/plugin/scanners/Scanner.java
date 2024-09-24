@@ -13,9 +13,7 @@ import hudson.Util;
 import hudson.model.AbstractDescribableImpl;
 import hudson.util.VariableResolver;
 
-import java.io.File;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 

@@ -186,7 +186,8 @@ public class StaticAnalyzer extends Scanner {
         public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
             if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
                 throw new AbortException("Scan ID value is empty. Verify and try again.");
-            } else {
+            } else if(properties.containsKey(CoreConstants.INCLUDE_SCA)) {
+                progress.setStatus(new Message(Message.WARNING, " only SAST will be executed, Include-SCA is not applicable for rescan"));
                 properties.remove(CoreConstants.INCLUDE_SCA);
             }
 
