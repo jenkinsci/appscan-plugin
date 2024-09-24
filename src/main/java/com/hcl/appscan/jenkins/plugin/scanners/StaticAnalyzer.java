@@ -184,6 +184,10 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+            if(!ServiceUtil.hasSastEntitlement(authProvider)) {
+                throw new AbortException(Messages.error_active_subscription_validation(getType()));
+            }
+
             if (authProvider.isAppScan360()) {
                 if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
                     throw new AbortException(Messages.error_sca_AppScan360());
@@ -201,7 +205,6 @@ public class StaticAnalyzer extends Scanner {
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
-
         }
 
         public Map<String,String> getProperties(VariableResolver<String> resolver) {
@@ -246,6 +249,14 @@ public class StaticAnalyzer extends Scanner {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
             if (Boolean.parseBoolean(includeSCAUploadDirect) && checkAppScan360Connection.isAppScan360()) {
                     return FormValidation.error(Messages.error_include_sca_ui());
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
+            if(!ServiceUtil.hasSastEntitlement(authProvider)) {
+                    return FormValidation.error(Messages.error_active_subscription_validation_ui());
             }
             return FormValidation.ok();
         }
