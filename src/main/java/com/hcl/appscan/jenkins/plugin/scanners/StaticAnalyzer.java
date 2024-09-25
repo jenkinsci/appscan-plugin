@@ -190,9 +190,8 @@ public class StaticAnalyzer extends Scanner {
           
            if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
                 throw new AbortException("Scan ID value is empty. Verify and try again.");
-            } else if(properties.containsKey(CoreConstants.INCLUDE_SCA)) {
-                progress.setStatus(new Message(Message.WARNING, " only SAST will be executed, Include-SCA is not applicable for rescan"));
-                properties.remove(CoreConstants.INCLUDE_SCA);
+            } else {
+               properties.remove(CoreConstants.INCLUDE_SCA);
            }
 
             if (authProvider.isAppScan360()) {
