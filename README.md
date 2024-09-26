@@ -21,7 +21,7 @@ on the service to associate with your scans.
 
 **HCL AppScan 360° prerequisites**
 
-To execute scans in HCL AppScan 360°, you must have access to an instance of AppScan 360°. To learn more about AppScan 360° features and installation, click [here](https://help.hcl-software.com/appscan/360/1.0/appseccloud_plugins_integrations.html).
+To execute scans in HCL AppScan 360°, you must have access to an instance of AppScan 360°. To learn more about AppScan 360° features and installation, click [here](https://help.hcl-software.com/appscan/360/1.0/appseccloud_jenkins.html).
 
 **HCL AppScan Enterprise prerequisites**
 
@@ -87,14 +87,14 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
 						-   **Login Sequence File**: Provide a path to the login sequence file data. Supported file type is .CONFIG.
         -   **Software Composition Analysis (SCA)**
             -	**Rescan**: Select this option to rescan the same application, updating and overwriting the previous scan results with the latest findings.<br>
-              	**Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud/AppScan 360° organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/Presence_scanning.html).
+              	**Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud/AppScan 360° organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/appseccloud_scanning_rescan_cm.html).
              	- **Scan ID**: Enter the Scan ID of the parent scan based on the application and technology you selected earlier. You can retrieve Scan ID from the AppScan on Cloud/AppScan 360° Server.
             -   **Target**: Enter the complete path to the directory containing the files to scan, or provide the full path to an existing .irx file. Leave this field empty to scan all supported files within the workspace directory.
         -   **Static Analysis (SAST)**
             -	**Rescan**: Select this option to rescan the same application, updating and overwriting the previous scan results with the latest findings.<br>
-	    	**Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud/AppScan 360° organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/Presence_scanning.html).
+	    	**Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud/AppScan 360° organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/appseccloud_scanning_rescan_cm.html).
             	- **Scan ID**: Enter the Scan ID of the parent scan based on the application and technology you selected earlier. You can retrieve Scan ID from the AppScan on Cloud/AppScan 360° Server.		
-            -   **Target**: Enter the complete path to the directory containing the files to scan, or provide the full path to an existing .irx .war, .ear, .jar or .zip file. Leave this field empty to scan all supported files within the workspace directory.
+            -   **Target**: Enter the complete path to the directory containing the files to scan, or provide the full path to an existing .irx, .war, .ear, .jar or .zip file. Leave this field empty to scan all supported files within the workspace directory.
             -   **Scan Method**
                 -   **Generate IRX**: Generate an IRX archive locally from the specified files and folders.
                     -   **Additional Options**: If selected, the following options are available:
@@ -120,9 +120,12 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
         and the results have been retrieved from the service. If
         unselected, the job will continue once the scan has been
         submitted to the analysis service.
-    -   **Fail job if:** If selected, the Jenkins job will fail if the
+    -	**Fail build for non-compliance with application policies:** Fail
+      	the job if one or more issues are found which are non-compliant with
+     	 respect to the selected application's policies.
+    -   **Fail build if:** If selected, the Jenkins job will fail if the
         finding count(s) exceed the specified thresholds (see below).
-    -   **Add Condition:** Allows you to add thresholds for the number
+    -   **Add condition:** Allows you to add thresholds for the number
         of findings that will cause a build to fail. You can specify
         thresholds for total, critical, high, medium, and/or low finding counts.
         If multiple conditions are added, they will be treated as though
