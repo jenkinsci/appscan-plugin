@@ -4,7 +4,6 @@ CHANGELOG
 ------
 - Support for Rescan of SAST Scans in both HCL AppScan on Cloud and HCL AppScan 360°.
 - Support for Rescan of SCA Scans in HCL AppScan on Cloud.
-- Validation of active subscriptions for both HCL AppScan on Cloud and HCL AppScan 360°.
 - Bug fixes.
 
 1.4.1 (July, 2024)
