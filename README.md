@@ -21,7 +21,7 @@ on the service to associate with your scans.
 
 **HCL AppScan 360° prerequisites**
 
-To execute scans in HCL AppScan 360°, you must have access to an instance of AppScan 360°. To learn more about AppScan 360° features and installation, click [here](https://help.hcl-software.com/appscan/360/1.0/appseccloud_plugins_integrations.html).
+To execute scans in HCL AppScan 360°, you must have access to an instance of AppScan 360°. To learn more about AppScan 360° features and installation, click [here]((https://help.hcltechsw.com/appscan/360/1.0/appseccloud_plugins_integrations.html).
 
 **HCL AppScan Enterprise prerequisites**
 
@@ -68,13 +68,13 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
                     select your AppScan Presence from the list.
                     Information about creating an AppScan Presence is
                     available
-                    [here](https://help.hcl-software.com/appscan/ASoC/Presence_scanning.html).
+                    [here]((https://help.hcltechsw.com/appscan/ASoC/Presence_scanning.html).
                     **Note**: Presence is available in AppScan on Cloud only.
                 -   **Scan File**: If you have an AppScan Standard scan
                     file, enter its full path and file name in this
                     field. To learn more about AppScan Standard scan
                     files, see [this
-                    topic](https://help.hcl-software.com/appscan/ASoC/asd_AppScanStandard.html).
+                    topic]((https://help.hcltechsw.com/appscan/ASoC/asd_AppScanStandard.html).
 				-   **Application login**: Select a Login method from the available options so 
 											AppScan can scan pages that require authentication. 
 					- **Login not required**: Leave this selected if no login is needed.

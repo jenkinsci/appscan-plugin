@@ -326,7 +326,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
         if(properties.containsKey(CoreConstants.SCAN_ID)) {
             if(properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
-                progress.setStatus(new Message(Message.WARNING, "Personal Scan is not applicable for rescan"));
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_personal_scan_rescan()));
             }
 
             try {

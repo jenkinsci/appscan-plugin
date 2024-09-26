@@ -189,7 +189,7 @@ public class StaticAnalyzer extends Scanner {
             }
           
            if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
-                throw new AbortException("Scan ID value is empty. Verify and try again.");
+                throw new AbortException(Messages.error_empty_scan_id());
             } else {
                properties.remove(CoreConstants.INCLUDE_SCA);
            }
