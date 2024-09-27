@@ -41,11 +41,11 @@ public class StaticAnalyzer extends Scanner {
         
         @Deprecated
         public StaticAnalyzer(String target) {
-            this(target, true);
+            this(target, true, false, "");
         }
         
-        public StaticAnalyzer(String target, boolean hasOptions, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
-            super(target, hasOptions);
+        public StaticAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
+            super(target, hasOptions, rescan, scanId);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
@@ -56,8 +56,8 @@ public class StaticAnalyzer extends Scanner {
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions) {
-            super(target, hasOptions);
+	public StaticAnalyzer(String target,boolean hasOptions, boolean rescan, String scanId) {
+            super(target, hasOptions, rescan, scanId);
             m_openSourceOnly=false;
             m_sourceCodeOnly=false;
             m_scanMethod=CoreConstants.CREATE_IRX;
@@ -187,6 +187,12 @@ public class StaticAnalyzer extends Scanner {
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                 throw new AbortException(Messages.error_active_subscription_validation(getType()));
             }
+          
+           if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
+                throw new AbortException(Messages.error_empty_scan_id());
+            } else if(properties.containsKey(CoreConstants.SCAN_ID)) {
+               properties.remove(CoreConstants.INCLUDE_SCA);
+           }
 
             if (authProvider.isAppScan360()) {
                 if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
@@ -207,6 +213,7 @@ public class StaticAnalyzer extends Scanner {
             }
         }
 
+        @Override
         public Map<String,String> getProperties(VariableResolver<String> resolver) {
             Map<String, String> properties = new HashMap<String, String>();
             properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
@@ -222,8 +229,11 @@ public class StaticAnalyzer extends Scanner {
             if ((m_scanMethod.equals(CoreConstants.CREATE_IRX) && (m_includeSCAGenerateIRX == null || Boolean.parseBoolean(m_includeSCAGenerateIRX))) || (m_scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && Boolean.parseBoolean(m_includeSCAUploadDirect))) {
                 properties.put(CoreConstants.INCLUDE_SCA, "");
             }
-            if(m_scanSpeed!=null && !m_scanSpeed.isEmpty() && getHasOptions()) {
+            if(isNullOrEmpty(m_scanSpeed) && getHasOptions()) {
                 properties.put(SCAN_SPEED, m_scanSpeed);
+            }
+            if(isRescan() && isNullOrEmpty(getScanId()) ){
+                properties.put(CoreConstants.SCAN_ID,getScanId());
             }
             return properties;
         }
@@ -237,13 +247,21 @@ public class StaticAnalyzer extends Scanner {
 			return "Static Analysis (SAST)";
 		}
 
-        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter String includeSCAGenerateIRX, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter String includeSCAGenerateIRX, @QueryParameter boolean rescan, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
-            if (Boolean.parseBoolean(includeSCAGenerateIRX) && checkAppScan360Connection.isAppScan360()) {
+            if (!rescan && Boolean.parseBoolean(includeSCAGenerateIRX) && checkAppScan360Connection.isAppScan360()) {
                     return FormValidation.error(Messages.error_include_sca_ui());
             }
             return FormValidation.ok();
         }
+        
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
+            if(scanId!=null && !scanId.isEmpty() && !ServiceUtil.isScanId(scanId,application,STATIC_ANALYZER,provider)) {
+                return FormValidation.error(Messages.error_invalid_scan_id_ui());
+            }
+            return FormValidation.validateRequired(scanId);
+		}
 
         public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
