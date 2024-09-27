@@ -190,7 +190,7 @@ public class StaticAnalyzer extends Scanner {
           
            if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
                 throw new AbortException(Messages.error_empty_scan_id());
-            } else {
+            } else if(properties.containsKey(CoreConstants.SCAN_ID)) {
                properties.remove(CoreConstants.INCLUDE_SCA);
            }
 
