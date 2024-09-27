@@ -125,7 +125,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
      	 respect to the selected application's policies.
     -   **Fail build if:** If selected, the Jenkins job will fail if the
         finding count(s) exceed the specified thresholds (see below).
-    -   **Add condition:** Allows you to add thresholds for the number
+    	-   **Add condition:** Allows you to add thresholds for the number
         of findings that will cause a build to fail. You can specify
         thresholds for total, critical, high, medium, and/or low finding counts.
         If multiple conditions are added, they will be treated as though
