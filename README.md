@@ -216,6 +216,7 @@ The Mobile Scan functionality
 has been removed from Jenkins since version 1.0.10. The existing jobs that 
 have Mobile Scan configurations must therefore be updated accordingly.
 - If you are unable to view the scan report on the Jenkins, first verify that the "Test Name" field. Test Name can't contain any of the following characters: \/:*?"<>|
+- When running a rescan of a Git repository scan via SAST rescan in Jenkins, the scan will not be executed on the ASoC server. Although Jenkins will display an error, the build will not fail. Instead, Jenkins will show the scan results and summary from the parent scan.
 
 ## Additional Resources
 - [HCL AppScan Enterprise: Jenkins Integration](https://www.youtube.com/watch?v=XctRBAd0HQc)
