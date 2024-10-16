@@ -340,8 +340,11 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     private void scanIdValidation(Map<String, String> properties, IProgress progress) throws JSONException, IOException {
         IScanServiceProvider scanServiceProvider = new CloudScanServiceProvider(progress, m_authProvider);
         JSONObject scanDetails = scanServiceProvider.getScanDetails(properties.get(CoreConstants.SCAN_ID));
+        JSONObject sastScanDetails = ServiceUtil.sastScanDetails(properties.get(CoreConstants.SCAN_ID), m_authProvider);
         if(scanDetails == null) {
             throw new AbortException(Messages.error_invalid_scan_id());
+        } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && sastScanDetails!=null && sastScanDetails.get(" GitRepoPlatform")!=null) {
+            throw new AbortException(Messages.error_invalid_scan_id_git_repo());
         } else if (!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
             throw new AbortException(Messages.error_invalid_scan_id_application());
         } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(properties.get(CoreConstants.SCANNER_TYPE)))) {

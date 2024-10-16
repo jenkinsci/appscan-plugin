@@ -9,7 +9,12 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.app.CloudApplicationProvider;
 import com.hcl.appscan.sdk.logging.IProgress;
+import org.apache.wink.json4j.JSONArray;
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -41,7 +46,9 @@ public class DynamicAnalyzer extends Scanner {
 
 	private static final String DYNAMIC_ANALYZER = "Dynamic Analyzer"; //$NON-NLS-1$
 
-	private String m_presenceId;
+	private boolean m_incrementalScan;
+    private String m_executionId;
+    private String m_presenceId;
 	private String m_scanFile;
 	private String m_scanType;
 	private String m_optimization;
@@ -53,12 +60,14 @@ public class DynamicAnalyzer extends Scanner {
 
 	@Deprecated
 	public DynamicAnalyzer(String target) {
-		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+		this(target, false, false, EMPTY, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
 	}
 
 	@Deprecated
-	public DynamicAnalyzer(String target, boolean hasOptions, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
-		super(target, hasOptions);
+	public DynamicAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean incrementalScan, String executionId, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
+		super(target, hasOptions, rescan, scanId);
+        m_incrementalScan = incrementalScan;
+        m_executionId = executionId;
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
@@ -72,8 +81,8 @@ public class DynamicAnalyzer extends Scanner {
 
 	@DataBoundConstructor
 
-	public DynamicAnalyzer(String target, boolean hasOptions) {
-		super(target, hasOptions);
+	public DynamicAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId) {
+		super(target, hasOptions, rescan, scanId);
 		m_presenceId = EMPTY;
 		m_scanFile = EMPTY;
 		m_scanType = EMPTY;
@@ -104,6 +113,24 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	@DataBoundSetter
+    public void setIncrementalScan(boolean incrementalScan) {
+        m_incrementalScan = incrementalScan;
+    }
+
+    public boolean getIncrementalScan() {
+        return m_incrementalScan;
+    }
+
+    @DataBoundSetter
+    public void setExecutionId(String executionId) {
+        m_executionId = executionId;
+    }
+
+    public String getExecutionId() {
+        return m_executionId;
+    }
+
+    @DataBoundSetter
 	public void setPresenceId(String presenceId) {
 		m_presenceId = presenceId;
 	}
@@ -259,6 +286,9 @@ public class DynamicAnalyzer extends Scanner {
 		if (!m_presenceId.equals(EMPTY)) {
 				properties.put(PRESENCE_ID, m_presenceId);
 		}
+        if(isRescan() && isNullOrEmpty(getScanId()) ){
+            properties.put(CoreConstants.SCAN_ID,getScanId());
+        }
 
 		return properties;
 	}
@@ -285,6 +315,20 @@ public class DynamicAnalyzer extends Scanner {
 		public String getDisplayName() {
 			return "Dynamic Analysis (DAST)";
 		}
+
+        public ListBoxModel doFillExecutionIdItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
+            IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+            JSONArray executionDetails = ServiceUtil.getExecutionDetails(scanId, authProvider);
+            ListBoxModel model = new ListBoxModel();
+
+            if(executionDetails != null) {
+                for(int i = 0; i < executionDetails.size(); i++) {
+                    JSONObject value = executionDetails.getJSONObject(i);
+                    model.add((String) value.get("Id"), ((String) value.get("ExecutedAt")).substring(0,9));
+                }
+            }
+            return model;
+        }
 
 		public ListBoxModel doFillScanTypeItems() {
 			ListBoxModel model = new ListBoxModel();

@@ -6,11 +6,23 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 
-	<f:entry title="${%label.starting.url}" field="target">
-		<f:textbox />
+    <f:optionalBlock title="${%label.rescan}" name="rescan" field="rescan" checked="${instance.isRescan()}" help="/plugin/appscan/help/rescan.html" inline="true">
+        <f:entry title="${%label.scan.id}" field="scanId" help="/plugin/appscan/help/scanId.html">
+            <f:textbox />
+        </f:entry>
+
+        <f:optionalBlock title="${%label.incremental.scan}" field="incrementalScan" help="/plugin/appscan/help/rescan.html" inline="true">
+            <f:entry title="${%label.execution.id}" field="executionId">
+                <f:select />
+            </f:entry>
+        </f:optionalBlock>
+    </f:optionalBlock>
+
+    <f:entry title="${%label.starting.url}" field="target">
+		<f:textbox name="target"/>
 	</f:entry>
 
-	<f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
+	<f:optionalBlock title="${%label.additional.options}" name="hasOptionsDast" field="hasOptions" inline="true">
 		
 		<f:entry title="${%label.scan.optimization}" field="optimization"> 
 			<f:select />
@@ -48,5 +60,17 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 		</f:entry>
 						
 	</f:optionalBlock>
+
+    <script type="text/javascript">
+        // Attach event listener to the rescan checkbox
+        document.getElementsByName('rescan')[0].addEventListener('change', toggleVisibilityBasedOnRescanDAST);
+        document.getElementsByName('target')[0].addEventListener('change', toggleVisibilityBasedOnRescanDAST);
+        document.getElementsByName('hasOptionsDast')[0]?.addEventListener('change', toggleVisibilityBasedOnRescanDAST);
+
+        window.addEventListener('load', toggleVisibilityBasedOnRescanDAST);
+
+        // Initial call to set the correct visibility on page load
+        toggleVisibilityBasedOnRescanDAST();
+    </script>
 
 </j:jelly>

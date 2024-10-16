@@ -71,7 +71,7 @@ function waitClicked(e) {
 }
 
 function toggleVisibilityBasedOnRescan() {
-     var rescanChecked = document.getElementsByName('rescan')[0].checked;
+    var rescanChecked = document.getElementsByName('rescan')[1].checked;
       
     var isCreateIRXSelected = document.querySelector('input[type="radio"][value="createIRX"]').checked;
     var hasOptionsChecked = document.getElementsByName('hasOptions')[0].checked;
@@ -99,6 +99,20 @@ function toggleVisibilityBasedOnRescan() {
             hasOptionsUploadDirectElement.disabled = false;
             includeSCADirectCheckbox.disabled = false;
         }
+    }
+}
+
+function toggleVisibilityBasedOnRescanDAST() {
+    var rescanChecked = document.getElementsByName('rescan')[0].checked;
+    var startingURL = document.getElementsByName('target')[0];
+    var hasOptionsChecked = document.getElementsByName('hasOptionsDast')[0];
+
+     if (rescanChecked) {
+        startingURL.disabled = true;
+        hasOptionsChecked.disabled = true;
+    } else {
+        startingURL.disabled = false;
+        hasOptionsChecked.disabled = false;
     }
 }
 

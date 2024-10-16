@@ -81,12 +81,11 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
                
     <script type="text/javascript">
         // Attach event listener to the rescan checkbox
-        document.getElementsByName('rescan')[0].addEventListener('change', toggleVisibilityBasedOnRescan);
-
+        document.getElementsByName('rescan')[1].addEventListener('change', toggleVisibilityBasedOnRescan);
         document.getElementsByName('hasOptions')[0]?.addEventListener('change', toggleVisibilityBasedOnRescan);
         document.querySelector('input[name="scanMethod"][value="createIRX"]').addEventListener('change', toggleVisibilityBasedOnRescan);
         document.querySelector('input[name="scanMethod"][value="uploadDirect"]').addEventListener('change', toggleVisibilityBasedOnRescan);
-        
+
         window.addEventListener('load', toggleVisibilityBasedOnRescan);
         
         // Initial call to set the correct visibility on page load
