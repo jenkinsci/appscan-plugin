@@ -108,8 +108,18 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 			Callable<Boolean> callableTask = new Callable<Boolean>() {
 				@Override
 				public Boolean call() throws Exception {
-					String status = null;
-					if (rTemp.getAllActions().contains(ResultsRetriever.this) && CoreConstants.FAILED.equalsIgnoreCase(status = m_provider.getStatus())) {
+					String status = m_provider.getStatus();
+					int requestCounter=0;
+					while(status != null && (status.equalsIgnoreCase(CoreConstants.INQUEUE) || status.equalsIgnoreCase(CoreConstants.RUNNING) || status.equalsIgnoreCase(CoreConstants.UNKNOWN)) && requestCounter<10) {
+						Thread.sleep(60000);
+						if (status.equalsIgnoreCase(CoreConstants.UNKNOWN))
+							requestCounter++;   // In case of internet disconnect, polling the server 10 times to check the connection has established
+						else
+							requestCounter = 0;
+						status = m_provider.getStatus();
+					}
+
+					if (rTemp.getAllActions().contains(ResultsRetriever.this) && CoreConstants.FAILED.equalsIgnoreCase(status)) {
 						String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
 						if (m_provider.getMessage() != null  && m_provider.getMessage().trim().length() > 0) message += ", " + m_provider.getMessage();
 
