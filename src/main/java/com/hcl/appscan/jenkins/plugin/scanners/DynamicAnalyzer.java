@@ -6,6 +6,9 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -316,7 +319,7 @@ public class DynamicAnalyzer extends Scanner {
 			return "Dynamic Analysis (DAST)";
 		}
 
-        public ListBoxModel doFillExecutionIdItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
+        public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
             IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
             JSONArray executionDetails = ServiceUtil.getExecutionDetails(scanId, authProvider);
             ListBoxModel model = new ListBoxModel();
@@ -324,7 +327,9 @@ public class DynamicAnalyzer extends Scanner {
             if(executionDetails != null) {
                 for(int i = 0; i < executionDetails.size(); i++) {
                     JSONObject value = executionDetails.getJSONObject(i);
-                    model.add((String) value.get("Id"), ((String) value.get("ExecutedAt")).substring(0,9));
+                    ZonedDateTime zdt = ZonedDateTime.parse((String) value.get("CreatedAt")).withZoneSameInstant(ZoneId.of("America/New_York"));
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a");
+                    model.add(zdt.format(formatter), (String) value.get("Id"));
                 }
             }
             return model;
