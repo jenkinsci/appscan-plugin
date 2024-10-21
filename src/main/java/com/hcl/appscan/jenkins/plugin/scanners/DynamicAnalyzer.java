@@ -327,8 +327,8 @@ public class DynamicAnalyzer extends Scanner {
             if(executionDetails != null) {
                 for(int i = 0; i < executionDetails.size(); i++) {
                     JSONObject value = executionDetails.getJSONObject(i);
-                    ZonedDateTime zdt = ZonedDateTime.parse((String) value.get("CreatedAt")).withZoneSameInstant(ZoneId.of("America/New_York"));
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a");
+                    ZonedDateTime zdt = ZonedDateTime.parse((String) value.get("CreatedAt")).withZoneSameInstant(ZoneId.of("UTC"));
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a, z");
                     model.add(zdt.format(formatter), (String) value.get("Id"));
                 }
             }
