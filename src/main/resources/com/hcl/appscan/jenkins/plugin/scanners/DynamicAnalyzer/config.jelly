@@ -73,4 +73,11 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
         toggleVisibilityBasedOnRescanDAST();
     </script>
 
+    <style type="text/css">
+        .disabled {
+        background-color: #d3d3d3;
+        color: #888;
+        }
+    </style>
+
 </j:jelly>

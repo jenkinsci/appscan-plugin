@@ -73,7 +73,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
                    <f:nested>
                    <f:optionalBlock title="${%label.additional.options}" checked="${instance.getHasOptionsUploadDirect()}" name="hasOptionsUploadDirect" inline="true">
                    <f:entry field="includeSCAUploadDirect">
-                       <f:checkbox title="${%label.include.sca.upload.direct}" checked="${instance.isIncludeSCAUploadDirect('true')}" default="false" name="includeSCAUploadDirect"/>
+                       <f:checkbox id="includeSCAUploadDirect" title="${%label.include.sca.upload.direct}" checked="${instance.isIncludeSCAUploadDirect('true')}" default="false" name="includeSCAUploadDirect"/>
                    </f:entry>
                    </f:optionalBlock>
                    </f:nested>
@@ -83,8 +83,6 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
         // Attach event listener to the rescan checkbox
         document.getElementsByName('rescan')[1].addEventListener('change', toggleVisibilityBasedOnRescan);
         document.getElementsByName('hasOptions')[0]?.addEventListener('change', toggleVisibilityBasedOnRescan);
-        document.querySelector('input[name="scanMethod"][value="createIRX"]').addEventListener('change', toggleVisibilityBasedOnRescan);
-        document.querySelector('input[name="scanMethod"][value="uploadDirect"]').addEventListener('change', toggleVisibilityBasedOnRescan);
 
         window.addEventListener('load', toggleVisibilityBasedOnRescan);
         

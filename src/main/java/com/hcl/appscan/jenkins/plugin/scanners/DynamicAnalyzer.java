@@ -231,7 +231,7 @@ public class DynamicAnalyzer extends Scanner {
 		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
 			throw new AbortException(Messages.error_presence_AppScan360());
 		}
-        if (!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+        if (!isRescan() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
 	}
@@ -291,8 +291,11 @@ public class DynamicAnalyzer extends Scanner {
 		}
         if(isRescan() && isNullOrEmpty(getScanId()) ){
             properties.put(CoreConstants.SCAN_ID,getScanId());
+            if(m_incrementalScan) {
+                properties.put("IncrementalBaseJobId", m_executionId);
+                properties.put("IsIncrementalRetest", "true");
+            }
         }
-
 		return properties;
 	}
 
@@ -325,9 +328,9 @@ public class DynamicAnalyzer extends Scanner {
             ListBoxModel model = new ListBoxModel();
 
             if(executionDetails != null) {
-                for(int i = 0; i < executionDetails.size(); i++) {
+                for(int i = 0; i < executionDetails.length(); i++) {
                     JSONObject value = executionDetails.getJSONObject(i);
-                    ZonedDateTime zdt = ZonedDateTime.parse((String) value.get("CreatedAt")).withZoneSameInstant(ZoneId.of("UTC"));
+                    ZonedDateTime zdt = ZonedDateTime.parse((String) value.get("CreatedAt")).withZoneSameInstant(ZoneId.systemDefault());
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a, z");
                     model.add(zdt.format(formatter), (String) value.get("Id"));
                 }
@@ -384,16 +387,29 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.ok();
 		}
 
-		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
+		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @RelativePath("..") @QueryParameter boolean rescan) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
 			if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 				return FormValidation.error(Messages.error_active_subscription_validation_ui());
 			}
-			if(!authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+			if(!rescan && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}
-			return FormValidation.validateRequired(target);
+
+            if(rescan) {
+                return FormValidation.ok();
+            } else {
+                return FormValidation.validateRequired(target);
+            }
 		}
+
+        public FormValidation doCheckScanId(@QueryParameter String scanId) {
+                return FormValidation.validateRequired(scanId);
+        }
+
+        public FormValidation doCheckExecutionId(@QueryParameter String executionId) {
+            return FormValidation.validateRequired(executionId);
+        }
 
 		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);

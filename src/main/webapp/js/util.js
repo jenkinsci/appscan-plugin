@@ -73,32 +73,22 @@ function waitClicked(e) {
 function toggleVisibilityBasedOnRescan() {
     var rescanChecked = document.getElementsByName('rescan')[1].checked;
       
-    var isCreateIRXSelected = document.querySelector('input[type="radio"][value="createIRX"]').checked;
-    var hasOptionsChecked = document.getElementsByName('hasOptions')[0].checked;
+    //var isCreateIRXSelected = document.querySelector('input[type="radio"][value="createIRX"]').checked;
+    //var hasOptionsChecked = document.getElementsByName('hasOptions')[0].checked;
     var includeSCACheckbox = document.getElementById('includeSCAGenerateIRX');
 
-    var isUploadDirectSelected = document.querySelector('input[type="radio"][value="uploadDirect"]').checked;
+    //var isUploadDirectSelected = document.querySelector('input[type="radio"][value="uploadDirect"]').checked;
     var hasOptionsUploadDirectElement = document.getElementsByName('hasOptionsUploadDirect')[0];
     var includeSCADirectCheckbox = document.getElementById('includeSCAUploadDirect');
 
      if (rescanChecked) {
-        if (hasOptionsChecked) {
             includeSCACheckbox.disabled = true;
-        }
-        if (isUploadDirectSelected) {
             hasOptionsUploadDirectElement.disabled = true;
             includeSCADirectCheckbox.disabled = true;
-        }
     } else {
-        if (isCreateIRXSelected) {
-            if (hasOptionsChecked) {
-                includeSCACheckbox.disabled = false;
-            }
-        } 
-        if (isUploadDirectSelected) {
+            includeSCACheckbox.disabled = false;
             hasOptionsUploadDirectElement.disabled = false;
             includeSCADirectCheckbox.disabled = false;
-        }
     }
 }
 
@@ -108,9 +98,11 @@ function toggleVisibilityBasedOnRescanDAST() {
     var hasOptionsChecked = document.getElementsByName('hasOptionsDast')[0];
 
      if (rescanChecked) {
+        startingURL.classList.add('disabled');
         startingURL.disabled = true;
         hasOptionsChecked.disabled = true;
     } else {
+        startingURL.classList.remove('disabled');
         startingURL.disabled = false;
         hasOptionsChecked.disabled = false;
     }
