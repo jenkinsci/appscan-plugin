@@ -273,7 +273,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			Map<String, String> properties = m_scanner.getProperties(resolver);
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
-			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+			properties.put(CoreConstants.SCAN_NAME, (resolver == null ? m_name : Util.replaceMacro(m_name, resolver)) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 			properties.put(CoreConstants.PERSONAL_SCAN, Boolean.toString(m_personalScan));
 			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
@@ -338,12 +338,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
 
     private void scanIdValidation(Map<String, String> properties, IProgress progress) throws JSONException, IOException {
-        IScanServiceProvider scanServiceProvider = new CloudScanServiceProvider(progress, m_authProvider);
-        JSONObject scanDetails = scanServiceProvider.getScanDetails(properties.get(CoreConstants.SCAN_ID));
-        JSONObject sastScanDetails = ServiceUtil.sastScanDetails(properties.get(CoreConstants.SCAN_ID), m_authProvider);
+        JSONObject scanDetails = ServiceUtil.scanSpecificDetails(properties.get(CoreConstants.SCANNER_TYPE), properties.get(CoreConstants.SCAN_ID), m_authProvider);
         if(scanDetails == null) {
             throw new AbortException(Messages.error_invalid_scan_id());
-        } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && sastScanDetails!=null && sastScanDetails.get(" GitRepoPlatform")!=null) {
+        } else if (!scanDetails.get("RescanAllowed").equals(true)) {
+            throw new AbortException("Rescan is not allowed for this scan");
+        } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && scanDetails.get(" GitRepoPlatform")!=null) {
             throw new AbortException(Messages.error_invalid_scan_id_git_repo());
         } else if (!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
             throw new AbortException(Messages.error_invalid_scan_id_application());
