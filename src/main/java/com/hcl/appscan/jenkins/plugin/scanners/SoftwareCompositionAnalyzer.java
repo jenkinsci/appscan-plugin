@@ -16,6 +16,8 @@ import hudson.RelativePath;
 import hudson.model.ItemGroup;
 import hudson.util.FormValidation;
 import hudson.util.VariableResolver;
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -74,10 +76,19 @@ public class SoftwareCompositionAnalyzer extends Scanner {
             return "Software Composition Analysis (SCA)";
         }
 
-        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
-            if(scanId!=null && !scanId.isEmpty() && !ServiceUtil.isScanId(scanId,application,SOFTWARE_COMPOSITION_ANALYZER,provider)) {
-                return FormValidation.error(Messages.error_invalid_scan_id_ui());
+            if(scanId!=null && !scanId.isEmpty()) {
+                JSONObject scanDetails = ServiceUtil.scanSpecificDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId, provider);
+                if(scanDetails == null) {
+                    return FormValidation.error(Messages.error_invalid_scan_id());
+                } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(SOFTWARE_COMPOSITION_ANALYZER))) {
+                    return FormValidation.error(Messages.error_invalid_scan_id_scan_type());
+                } else if (!scanDetails.get("RescanAllowed").equals(true)) {
+                    return FormValidation.error("Rescan is not allowed for this scan");
+                } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
+                    return FormValidation.error(Messages.error_invalid_scan_id_application());
+                }
             }
             return FormValidation.validateRequired(scanId);
         }

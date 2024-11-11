@@ -403,8 +403,21 @@ public class DynamicAnalyzer extends Scanner {
             }
 		}
 
-        public FormValidation doCheckScanId(@QueryParameter String scanId) {
-                return FormValidation.validateRequired(scanId);
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
+            JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
+            if(scanId!=null && !scanId.isEmpty()) {
+                JSONObject scanDetails = ServiceUtil.scanSpecificDetails(DYNAMIC_ANALYZER, scanId, provider);
+                if(scanDetails == null) {
+                    return FormValidation.error(Messages.error_invalid_scan_id());
+                } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(DYNAMIC_ANALYZER))) {
+                    return FormValidation.error(Messages.error_invalid_scan_id_scan_type());
+                } else if (!scanDetails.get("RescanAllowed").equals(true)) {
+                    return FormValidation.error("Rescan is not allowed for this scan");
+                } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
+                    return FormValidation.error(Messages.error_invalid_scan_id_application());
+                }
+            }
+            return FormValidation.validateRequired(scanId);
         }
 
         public FormValidation doCheckExecutionId(@QueryParameter String executionId) {

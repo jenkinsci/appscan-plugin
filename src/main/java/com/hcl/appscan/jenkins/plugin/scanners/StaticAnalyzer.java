@@ -9,6 +9,8 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import com.hcl.appscan.sdk.logging.IProgress;
@@ -17,6 +19,8 @@ import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -207,6 +211,10 @@ public class StaticAnalyzer extends Scanner {
                 properties.remove(CoreConstants.INCLUDE_SCA);
             }
 
+            if(!properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !(new File(properties.get(TARGET)).isDirectory())) {
+                throw new AbortException("Please specify an directory for IRX generation");
+            }
+
             //includeSCA is only available if the user upload an IRX file.
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
@@ -255,15 +263,26 @@ public class StaticAnalyzer extends Scanner {
             return FormValidation.ok();
         }
         
-        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
-            if(scanId!=null && !scanId.isEmpty() && !ServiceUtil.isScanId(scanId,application,STATIC_ANALYZER,provider)) {
-                return FormValidation.error(Messages.error_invalid_scan_id_ui());
+            if(scanId!=null && !scanId.isEmpty()) {
+                JSONObject scanDetails = ServiceUtil.scanSpecificDetails(STATIC_ANALYZER, scanId, provider);
+                if(scanDetails == null) {
+                    return FormValidation.error(Messages.error_invalid_scan_id());
+                } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(STATIC_ANALYZER))) {
+                    return FormValidation.error(Messages.error_invalid_scan_id_scan_type());
+                } else if (!scanDetails.get("RescanAllowed").equals(true)) {
+                    return FormValidation.error("Rescan is not allowed for this scan");
+                } else if (scanDetails.get("GitRepoPlatform")!=null) {
+                    return FormValidation.error(Messages.error_invalid_scan_id_git_repo());
+                } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
+                    return FormValidation.error(Messages.error_invalid_scan_id_application());
+                }
             }
             return FormValidation.validateRequired(scanId);
 		}
 
-        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
             if (Boolean.parseBoolean(includeSCAUploadDirect) && checkAppScan360Connection.isAppScan360()) {
                     return FormValidation.error(Messages.error_include_sca_ui());
@@ -271,10 +290,13 @@ public class StaticAnalyzer extends Scanner {
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckTarget(@QueryParameter String target, @QueryParameter String scanMethod, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                     return FormValidation.error(Messages.error_active_subscription_validation_ui());
+            }
+            if(!scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && target!=null && !target.isEmpty() && !(new File(target).isDirectory())) {
+                return FormValidation.error("Please specify an directory for IRX generation");
             }
             return FormValidation.ok();
         }
