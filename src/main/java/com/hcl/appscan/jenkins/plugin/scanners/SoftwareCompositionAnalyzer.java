@@ -21,6 +21,7 @@ import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import java.util.HashMap;
@@ -28,24 +29,48 @@ import java.util.Map;
 
 public class SoftwareCompositionAnalyzer extends Scanner {
 
+    private boolean m_rescan;
+    private String m_scanId;
+
     @Deprecated
     public SoftwareCompositionAnalyzer(String target){
         super(target, false);
     }
 
-    public SoftwareCompositionAnalyzer(String target, boolean rescan, String scanId){
-        super(target, false, rescan, scanId);
+    public SoftwareCompositionAnalyzer(String target, boolean rescan, String scanId) {
+        super(target, false);
+        m_rescan = rescan;
+        m_scanId = scanId;
     }
 
     @DataBoundConstructor
-    public SoftwareCompositionAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId){
-        super(target, false, rescan, scanId);
+    public SoftwareCompositionAnalyzer(String target, boolean hasOptions){
+        super(target, hasOptions);
+        m_rescan = false;
+        m_scanId = EMPTY;
     }
 
 
     @Override
     public String getType() {
         return SOFTWARE_COMPOSITION_ANALYZER;
+    }
+
+    @DataBoundSetter
+    public void setRescan(boolean rescan) {
+        m_rescan = rescan;
+    }
+
+    public boolean getRescan() {
+        return m_rescan;
+    }
+
+    @DataBoundSetter
+    public void setScanId(String scanId) {
+        m_scanId = scanId;
+    }
+    public String getScanId() {
+        return m_scanId;
     }
 
     public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
@@ -61,7 +86,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
     public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
         Map<String, String> properties = new HashMap<String, String>();
         properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
-        if(isRescan() && isNullOrEmpty(getScanId())) {
+        if(getRescan() && isNullOrEmpty(getScanId())) {
             properties.put(CoreConstants.SCAN_ID,getScanId());
         }
         return properties;
@@ -82,10 +107,8 @@ public class SoftwareCompositionAnalyzer extends Scanner {
                 JSONObject scanDetails = ServiceUtil.scanSpecificDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId, provider);
                 if(scanDetails == null) {
                     return FormValidation.error(Messages.error_invalid_scan_id());
-                } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(SOFTWARE_COMPOSITION_ANALYZER))) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_scan_type());
                 } else if (!scanDetails.get("RescanAllowed").equals(true)) {
-                    return FormValidation.error("Rescan is not allowed for this scan");
+                    return FormValidation.error(Messages.error_scan_id_validation_rescan_allowed());
                 } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
                     return FormValidation.error(Messages.error_invalid_scan_id_application());
                 }

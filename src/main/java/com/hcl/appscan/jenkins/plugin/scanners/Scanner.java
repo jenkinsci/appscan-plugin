@@ -23,19 +23,10 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	private String m_target;
 	private boolean m_hasOptions;
-	private boolean m_rescan;
-	private String m_scanId;
 	
 	public Scanner(String target, boolean hasOptions) {
 		m_target = target;
 		m_hasOptions = hasOptions;
-	}
-        
-	public Scanner(String target, boolean hasOptions, boolean rescan, String scanId) {
-		m_target = target;
-		m_hasOptions = hasOptions;
-		m_rescan = rescan;
-		m_scanId = scanId;
 	}
 	
 	public boolean getHasOptions() {
@@ -44,14 +35,6 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	public String getTarget() {
 		return m_target;
-	}
-        
-	public boolean isRescan() {
-		return m_rescan;
-	}
-        
-	public String getScanId() {
-		return m_scanId;
 	}
 	
 	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;

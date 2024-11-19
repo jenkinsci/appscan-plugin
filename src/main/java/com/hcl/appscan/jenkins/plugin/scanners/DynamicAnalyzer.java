@@ -60,6 +60,8 @@ public class DynamicAnalyzer extends Scanner {
 	private String m_loginUser;
 	private Secret m_loginPassword;
 	private String m_trafficFile;
+	private boolean m_rescanDast;
+	private String m_scanId;
 
 	@Deprecated
 	public DynamicAnalyzer(String target) {
@@ -67,10 +69,12 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	@Deprecated
-	public DynamicAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean incrementalScan, String executionId, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
-		super(target, hasOptions, rescan, scanId);
-        m_incrementalScan = incrementalScan;
-        m_executionId = executionId;
+	public DynamicAnalyzer(String target, boolean hasOptions, boolean rescanDast, String scanId, boolean incrementalScan, String executionId, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
+		super(target, hasOptions);
+		m_rescanDast = rescanDast;
+		m_scanId = scanId;
+		m_incrementalScan = incrementalScan;
+		m_executionId = incrementalScan ? executionId : EMPTY;
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
@@ -84,8 +88,10 @@ public class DynamicAnalyzer extends Scanner {
 
 	@DataBoundConstructor
 
-	public DynamicAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId) {
-		super(target, hasOptions, rescan, scanId);
+	public DynamicAnalyzer(String target, boolean hasOptions) {
+		super(target, hasOptions);
+		m_rescanDast = false;
+		m_scanId = EMPTY;
 		m_presenceId = EMPTY;
 		m_scanFile = EMPTY;
 		m_scanType = EMPTY;
@@ -116,6 +122,23 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	@DataBoundSetter
+	public void setRescanDast(boolean rescanDast) {
+		m_rescanDast = rescanDast;
+	}
+
+	public boolean getRescanDast() {
+		return m_rescanDast;
+	}
+
+	@DataBoundSetter
+	public void setScanId(String scanId) {
+		m_scanId = scanId;
+	}
+	public String getScanId() {
+		return m_scanId;
+	}
+
+	@DataBoundSetter
     public void setIncrementalScan(boolean incrementalScan) {
         m_incrementalScan = incrementalScan;
     }
@@ -126,7 +149,7 @@ public class DynamicAnalyzer extends Scanner {
 
     @DataBoundSetter
     public void setExecutionId(String executionId) {
-        m_executionId = executionId;
+        m_executionId = m_incrementalScan ? executionId : EMPTY;
     }
 
     public String getExecutionId() {
@@ -231,7 +254,7 @@ public class DynamicAnalyzer extends Scanner {
 		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
 			throw new AbortException(Messages.error_presence_AppScan360());
 		}
-        if (!isRescan() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+        if (!getRescanDast() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
 	}
@@ -289,7 +312,7 @@ public class DynamicAnalyzer extends Scanner {
 		if (!m_presenceId.equals(EMPTY)) {
 				properties.put(PRESENCE_ID, m_presenceId);
 		}
-        if(isRescan() && isNullOrEmpty(getScanId()) ){
+        if(getRescanDast() && isNullOrEmpty(getScanId()) ){
             properties.put(CoreConstants.SCAN_ID,getScanId());
             if(m_incrementalScan) {
                 properties.put("IncrementalBaseJobId", m_executionId);
@@ -387,20 +410,20 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.ok();
 		}
 
-		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @RelativePath("..") @QueryParameter boolean rescan) {
+		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
 			if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 				return FormValidation.error(Messages.error_active_subscription_validation_ui());
 			}
-			if(!rescan && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+			if(!rescanDast && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}
 
-            if(rescan) {
-                return FormValidation.ok();
-            } else {
+            if(!rescanDast) {
                 return FormValidation.validateRequired(target);
             }
+
+            return FormValidation.ok();
 		}
 
         public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
@@ -409,10 +432,8 @@ public class DynamicAnalyzer extends Scanner {
                 JSONObject scanDetails = ServiceUtil.scanSpecificDetails(DYNAMIC_ANALYZER, scanId, provider);
                 if(scanDetails == null) {
                     return FormValidation.error(Messages.error_invalid_scan_id());
-                } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(DYNAMIC_ANALYZER))) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_scan_type());
                 } else if (!scanDetails.get("RescanAllowed").equals(true)) {
-                    return FormValidation.error("Rescan is not allowed for this scan");
+                    return FormValidation.error(Messages.error_scan_id_validation_rescan_allowed());
                 } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
                     return FormValidation.error(Messages.error_invalid_scan_id_application());
                 }

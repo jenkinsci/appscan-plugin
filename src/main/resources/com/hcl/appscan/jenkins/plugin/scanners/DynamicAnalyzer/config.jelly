@@ -6,12 +6,12 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 
-    <f:optionalBlock title="${%label.rescan}" name="rescan" field="rescan" checked="${instance.isRescan()}" help="/plugin/appscan/help/rescan.html" inline="true">
+    <f:optionalBlock title="${%label.rescan}" name="rescanDast" field="rescan" checked="${instance.getRescanDast()}" help="/plugin/appscan/help/rescan.html" inline="true">
         <f:entry title="${%label.scan.id}" field="scanId" help="/plugin/appscan/help/scanId.html">
             <f:textbox />
         </f:entry>
 
-        <f:optionalBlock title="${%label.incremental.scan}" field="incrementalScan" help="/plugin/appscan/help/rescan.html" inline="true">
+        <f:optionalBlock title="${%label.incremental.scan}" field="incrementalScan" inline="true">
             <f:entry title="${%label.execution.id}" field="executionId">
                 <f:select />
             </f:entry>
@@ -22,7 +22,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 		<f:textbox name="target"/>
 	</f:entry>
 
-	<f:optionalBlock title="${%label.additional.options}" name="hasOptionsDast" field="hasOptions" inline="true">
+	<f:optionalBlock title="${%label.additional.options}" name="hasOptions" field="hasOptions" inline="true">
 		
 		<f:entry title="${%label.scan.optimization}" field="optimization"> 
 			<f:select />
@@ -63,9 +63,9 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 
     <script type="text/javascript">
         // Attach event listener to the rescan checkbox
-        document.getElementsByName('rescan')[0].addEventListener('change', toggleVisibilityBasedOnRescanDAST);
+        document.getElementsByName('rescanDast')[0].addEventListener('change', toggleVisibilityBasedOnRescanDAST);
         document.getElementsByName('target')[0].addEventListener('change', toggleVisibilityBasedOnRescanDAST);
-        document.getElementsByName('hasOptionsDast')[0]?.addEventListener('change', toggleVisibilityBasedOnRescanDAST);
+        document.getElementsByName('hasOptions')[0]?.addEventListener('change', toggleVisibilityBasedOnRescanDAST);
 
         window.addEventListener('load', toggleVisibilityBasedOnRescanDAST);
 

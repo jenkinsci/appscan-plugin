@@ -42,14 +42,18 @@ public class StaticAnalyzer extends Scanner {
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
         private String m_scanSpeed;
+        private boolean m_rescan;
+        private String m_scanId;
         
         @Deprecated
         public StaticAnalyzer(String target) {
-            this(target, true, false, "");
+            this(target, true);
         }
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
-            super(target, hasOptions, rescan, scanId);
+            super(target, hasOptions);
+            m_rescan = rescan;
+            m_scanId = scanId;
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
@@ -60,8 +64,10 @@ public class StaticAnalyzer extends Scanner {
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions, boolean rescan, String scanId) {
-            super(target, hasOptions, rescan, scanId);
+	public StaticAnalyzer(String target,boolean hasOptions) {
+            super(target, hasOptions);
+            m_rescan=false;
+            m_scanId=EMPTY;
             m_openSourceOnly=false;
             m_sourceCodeOnly=false;
             m_scanMethod=CoreConstants.CREATE_IRX;
@@ -93,6 +99,23 @@ public class StaticAnalyzer extends Scanner {
             	return m_scanSpeed.equalsIgnoreCase(scanSpeed) ? "true" : "false";
         		}
         	return null;
+    	}
+
+    	@DataBoundSetter
+    	public void setRescan(boolean rescan) {
+        	m_rescan = rescan;
+    	}
+
+    	public boolean getRescan() {
+        	return m_rescan;
+    	}
+
+    	@DataBoundSetter
+    	public void setScanId(String scanId) {
+        	m_scanId = scanId;
+    	}
+    	public String getScanId() {
+        	return m_scanId;
     	}
 
         @DataBoundSetter
@@ -192,7 +215,7 @@ public class StaticAnalyzer extends Scanner {
                 throw new AbortException(Messages.error_active_subscription_validation(getType()));
             }
           
-           if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
+           if(getRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
                 throw new AbortException(Messages.error_empty_scan_id());
             } else if(properties.containsKey(CoreConstants.SCAN_ID)) {
                properties.remove(CoreConstants.INCLUDE_SCA);
@@ -212,7 +235,7 @@ public class StaticAnalyzer extends Scanner {
             }
 
             if(!properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !(new File(properties.get(TARGET)).isDirectory())) {
-                throw new AbortException("Please specify an directory for IRX generation");
+                throw new AbortException(Messages.error_target_wrong_input());
             }
 
             //includeSCA is only available if the user upload an IRX file.
@@ -240,7 +263,7 @@ public class StaticAnalyzer extends Scanner {
             if(isNullOrEmpty(m_scanSpeed) && getHasOptions()) {
                 properties.put(SCAN_SPEED, m_scanSpeed);
             }
-            if(isRescan() && isNullOrEmpty(getScanId()) ){
+            if(getRescan() && isNullOrEmpty(getScanId()) ){
                 properties.put(CoreConstants.SCAN_ID,getScanId());
             }
             return properties;
@@ -269,10 +292,8 @@ public class StaticAnalyzer extends Scanner {
                 JSONObject scanDetails = ServiceUtil.scanSpecificDetails(STATIC_ANALYZER, scanId, provider);
                 if(scanDetails == null) {
                     return FormValidation.error(Messages.error_invalid_scan_id());
-                } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(STATIC_ANALYZER))) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_scan_type());
                 } else if (!scanDetails.get("RescanAllowed").equals(true)) {
-                    return FormValidation.error("Rescan is not allowed for this scan");
+                    return FormValidation.error(Messages.error_scan_id_validation_rescan_allowed());
                 } else if (scanDetails.get("GitRepoPlatform")!=null) {
                     return FormValidation.error(Messages.error_invalid_scan_id_git_repo());
                 } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
@@ -296,7 +317,7 @@ public class StaticAnalyzer extends Scanner {
                     return FormValidation.error(Messages.error_active_subscription_validation_ui());
             }
             if(!scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && target!=null && !target.isEmpty() && !(new File(target).isDirectory())) {
-                return FormValidation.error("Please specify an directory for IRX generation");
+                return FormValidation.error(Messages.error_target_wrong_input());
             }
             return FormValidation.ok();
         }
