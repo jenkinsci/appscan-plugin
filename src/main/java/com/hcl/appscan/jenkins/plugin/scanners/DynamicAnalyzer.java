@@ -50,8 +50,8 @@ public class DynamicAnalyzer extends Scanner {
 	private static final String DYNAMIC_ANALYZER = "Dynamic Analyzer"; //$NON-NLS-1$
 
 	private boolean m_incrementalScan;
-    private String m_executionId;
-    private String m_presenceId;
+	private String m_executionId;
+	private String m_presenceId;
 	private String m_scanFile;
 	private String m_scanType;
 	private String m_optimization;
@@ -139,22 +139,22 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	@DataBoundSetter
-    public void setIncrementalScan(boolean incrementalScan) {
-        m_incrementalScan = incrementalScan;
-    }
+	public void setIncrementalScan(boolean incrementalScan) {
+		m_incrementalScan = incrementalScan;
+	}
 
-    public boolean getIncrementalScan() {
-        return m_incrementalScan;
-    }
+	public boolean getIncrementalScan() {
+		return m_incrementalScan;
+	}
 
-    @DataBoundSetter
-    public void setExecutionId(String executionId) {
-        m_executionId = m_incrementalScan ? executionId : EMPTY;
-    }
+	@DataBoundSetter
+	public void setExecutionId(String executionId) {
+		m_executionId = m_incrementalScan ? executionId : EMPTY;
+	}
 
-    public String getExecutionId() {
-        return m_executionId;
-    }
+	public String getExecutionId() {
+		return m_executionId;
+	}
 
     @DataBoundSetter
 	public void setPresenceId(String presenceId) {
@@ -251,10 +251,13 @@ public class DynamicAnalyzer extends Scanner {
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}
+		if(getRescanDast() && !properties.containsKey(CoreConstants.SCAN_ID)) {
+			throw new AbortException(Messages.error_empty_scan_id());
+		}
 		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
 			throw new AbortException(Messages.error_presence_AppScan360());
 		}
-        if (!getRescanDast() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+		if (!getRescanDast() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
 	}
@@ -312,13 +315,13 @@ public class DynamicAnalyzer extends Scanner {
 		if (!m_presenceId.equals(EMPTY)) {
 				properties.put(PRESENCE_ID, m_presenceId);
 		}
-        if(getRescanDast() && isNullOrEmpty(getScanId()) ){
-            properties.put(CoreConstants.SCAN_ID,getScanId());
-            if(m_incrementalScan) {
-                properties.put("IncrementalBaseJobId", m_executionId);
-                properties.put("IsIncrementalRetest", "true");
-            }
-        }
+		if(getRescanDast() && isNullOrEmpty(getScanId()) ){
+			properties.put(CoreConstants.SCAN_ID,getScanId());
+			if(m_incrementalScan) {
+				properties.put("IncrementalBaseJobId", m_executionId);
+				properties.put("IsIncrementalRetest", "true");
+			}
+		}
 		return properties;
 	}
 
@@ -345,21 +348,21 @@ public class DynamicAnalyzer extends Scanner {
 			return "Dynamic Analysis (DAST)";
 		}
 
-        public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
-            IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
-            JSONArray executionDetails = ServiceUtil.getExecutionDetails(scanId, authProvider);
-            ListBoxModel model = new ListBoxModel();
+		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
+			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+			JSONArray executionDetails = ServiceUtil.getExecutionDetails(scanId, authProvider);
+			ListBoxModel model = new ListBoxModel();
 
-            if(executionDetails != null) {
-                for(int i = 0; i < executionDetails.length(); i++) {
-                    JSONObject value = executionDetails.getJSONObject(i);
-                    ZonedDateTime zdt = ZonedDateTime.parse((String) value.get("CreatedAt")).withZoneSameInstant(ZoneId.systemDefault());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a, z");
-                    model.add(zdt.format(formatter), (String) value.get("Id"));
-                }
-            }
-            return model;
-        }
+			if(executionDetails != null) {
+				for(int i = 0; i < executionDetails.length(); i++) {
+					JSONObject value = executionDetails.getJSONObject(i);
+					ZonedDateTime zdt = ZonedDateTime.parse((String) value.get("CreatedAt")).withZoneSameInstant(ZoneId.systemDefault());
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a, z");
+					model.add(zdt.format(formatter), (String) value.get("Id"));
+				}
+			}
+			return model;
+		}
 
 		public ListBoxModel doFillScanTypeItems() {
 			ListBoxModel model = new ListBoxModel();
@@ -419,31 +422,31 @@ public class DynamicAnalyzer extends Scanner {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}
 
-            if(!rescanDast) {
-                return FormValidation.validateRequired(target);
-            }
+			if(!rescanDast) {
+				return FormValidation.validateRequired(target);
+			}
 
-            return FormValidation.ok();
+			return FormValidation.ok();
 		}
 
-        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
-            JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
-            if(scanId!=null && !scanId.isEmpty()) {
-                JSONObject scanDetails = ServiceUtil.scanSpecificDetails(DYNAMIC_ANALYZER, scanId, provider);
-                if(scanDetails == null) {
-                    return FormValidation.error(Messages.error_invalid_scan_id());
-                } else if (!scanDetails.get("RescanAllowed").equals(true)) {
-                    return FormValidation.error(Messages.error_scan_id_validation_rescan_allowed());
-                } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_application());
-                }
-            }
-            return FormValidation.validateRequired(scanId);
-        }
+		public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
+			JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
+			if(scanId!=null && !scanId.isEmpty()) {
+				JSONObject scanDetails = ServiceUtil.scanSpecificDetails(DYNAMIC_ANALYZER, scanId, provider);
+				if(scanDetails == null) {
+					return FormValidation.error(Messages.error_invalid_scan_id_ui());
+				} else if (!scanDetails.get("RescanAllowed").equals(true)) {
+					return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
+				} else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
+					return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
+				}
+			}
+			return FormValidation.validateRequired(scanId);
+		}
 
-        public FormValidation doCheckExecutionId(@QueryParameter String executionId) {
-            return FormValidation.validateRequired(executionId);
-        }
+		public FormValidation doCheckExecutionId(@QueryParameter String executionId) {
+			return FormValidation.validateRequired(executionId);
+		}
 
 		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);

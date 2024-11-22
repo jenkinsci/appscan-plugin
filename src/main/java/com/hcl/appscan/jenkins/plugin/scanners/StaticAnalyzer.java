@@ -9,7 +9,6 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -291,13 +290,13 @@ public class StaticAnalyzer extends Scanner {
             if(scanId!=null && !scanId.isEmpty()) {
                 JSONObject scanDetails = ServiceUtil.scanSpecificDetails(STATIC_ANALYZER, scanId, provider);
                 if(scanDetails == null) {
-                    return FormValidation.error(Messages.error_invalid_scan_id());
+                    return FormValidation.error(Messages.error_invalid_scan_id_ui());
                 } else if (!scanDetails.get("RescanAllowed").equals(true)) {
-                    return FormValidation.error(Messages.error_scan_id_validation_rescan_allowed());
+                    return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
                 } else if (scanDetails.get("GitRepoPlatform")!=null) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_git_repo());
+                    return FormValidation.error(Messages.error_invalid_scan_id_git_repo_ui());
                 } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_application());
+                    return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
                 }
             }
             return FormValidation.validateRequired(scanId);

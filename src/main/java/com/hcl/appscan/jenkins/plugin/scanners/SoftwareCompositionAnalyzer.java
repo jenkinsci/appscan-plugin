@@ -106,11 +106,11 @@ public class SoftwareCompositionAnalyzer extends Scanner {
             if(scanId!=null && !scanId.isEmpty()) {
                 JSONObject scanDetails = ServiceUtil.scanSpecificDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId, provider);
                 if(scanDetails == null) {
-                    return FormValidation.error(Messages.error_invalid_scan_id());
+                    return FormValidation.error(Messages.error_invalid_scan_id_ui());
                 } else if (!scanDetails.get("RescanAllowed").equals(true)) {
-                    return FormValidation.error(Messages.error_scan_id_validation_rescan_allowed());
+                    return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
                 } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_application());
+                    return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
                 }
             }
             return FormValidation.validateRequired(scanId);
