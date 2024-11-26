@@ -291,9 +291,9 @@ public class StaticAnalyzer extends Scanner {
                 JSONObject scanDetails = ServiceUtil.scanSpecificDetails(STATIC_ANALYZER, scanId, provider);
                 if(scanDetails == null) {
                     return FormValidation.error(Messages.error_invalid_scan_id_ui());
-                } else if (!scanDetails.get("RescanAllowed").equals(true)) {
+                } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
                     return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
-                } else if (scanDetails.get("GitRepoPlatform")!=null) {
+                } else if (scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
                     return FormValidation.error(Messages.error_invalid_scan_id_git_repo_ui());
                 } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
                     return FormValidation.error(Messages.error_invalid_scan_id_application_ui());

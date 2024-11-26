@@ -5,7 +5,7 @@
 LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 -->
 
-    <f:optionalBlock title="${%label.rescan}" field="rescan" name="rescan" checked="${instance.getRescan()}" help="/plugin/appscan/help/rescan.html" inline="true">
+    <f:optionalBlock title="${%label.rescan}" field="rescan" checked="${instance.getRescan()}" help="/plugin/appscan/help/rescan.html" inline="true">
         <f:entry title="${%label.scan.id}" field="scanId" help="/plugin/appscan/help/scanId.html">
             <f:textbox />
         </f:entry>

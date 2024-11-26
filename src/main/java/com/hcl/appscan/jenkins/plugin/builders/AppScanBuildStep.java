@@ -341,9 +341,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         JSONObject scanDetails = ServiceUtil.scanSpecificDetails(properties.get(CoreConstants.SCANNER_TYPE), properties.get(CoreConstants.SCAN_ID), m_authProvider);
         if(scanDetails == null) {
             throw new AbortException(Messages.error_invalid_scan_id());
-        } else if (!scanDetails.get("RescanAllowed").equals(true)) {
+        } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
             throw new AbortException(Messages.error_scan_id_validation_rescan_allowed());
-        } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && scanDetails.get("GitRepoPlatform")!=null) {
+        } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
             throw new AbortException(Messages.error_invalid_scan_id_git_repo());
         } else if (!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
             throw new AbortException(Messages.error_invalid_scan_id_application());
