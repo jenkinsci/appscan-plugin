@@ -263,9 +263,6 @@ public class DynamicAnalyzer extends Scanner {
                 }
             }
         }
-		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
-			throw new AbortException(Messages.error_presence_AppScan360());
-		}
 		if (!getRescanDast() && !authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
@@ -427,15 +424,18 @@ public class DynamicAnalyzer extends Scanner {
 			if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 				return FormValidation.error(Messages.error_active_subscription_validation_ui());
 			}
-			if(!rescanDast && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+			if(!rescanDast && !authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}
-
-			if(!rescanDast) {
-				return FormValidation.validateRequired(target);
+			if (authProvider.isAppScan360() && (ServiceUtil.getA360Version(authProvider).compareTo("1.4.0") != 0)) {
+				if (!target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+						return FormValidation.error(Messages.error_url_validation_ui());
+				}
 			}
-
-			return FormValidation.ok();
+			if(rescanDast) {
+				return FormValidation.ok();
+			}
+			return FormValidation.validateRequired(target);
 		}
 
 		public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
