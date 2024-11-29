@@ -107,10 +107,15 @@ public class SoftwareCompositionAnalyzer extends Scanner {
                 JSONObject scanDetails = ServiceUtil.scanSpecificDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId, provider);
                 if(scanDetails == null) {
                     return FormValidation.error(Messages.error_invalid_scan_id_ui());
-                } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
-                } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
+                } else {
+                    String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
+                    if (!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
+                        return FormValidation.error("Rescan is not allowed as the parent scan is not completed yet");
+                    } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
+                        return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
+                    } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
+                        return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
+                    }
                 }
             }
             return FormValidation.validateRequired(scanId);

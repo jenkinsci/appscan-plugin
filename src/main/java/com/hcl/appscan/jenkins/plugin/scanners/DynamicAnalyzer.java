@@ -254,10 +254,19 @@ public class DynamicAnalyzer extends Scanner {
 		if(getRescanDast() && !properties.containsKey(CoreConstants.SCAN_ID)) {
 			throw new AbortException(Messages.error_empty_scan_id());
 		}
+        if (authProvider.isAppScan360()) {
+            if (properties.containsKey(Scanner.PRESENCE_ID)) {
+                throw new AbortException(Messages.error_presence_AppScan360());
+            } else if ((ServiceUtil.getA360Version(authProvider).compareTo("1.4.0") != 0)) {
+                if (!ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+                    throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
+                }
+            }
+        }
 		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
 			throw new AbortException(Messages.error_presence_AppScan360());
 		}
-		if (!getRescanDast() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+		if (!getRescanDast() && !authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
 	}
@@ -433,12 +442,17 @@ public class DynamicAnalyzer extends Scanner {
 			JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
 			if(scanId!=null && !scanId.isEmpty()) {
 				JSONObject scanDetails = ServiceUtil.scanSpecificDetails(DYNAMIC_ANALYZER, scanId, provider);
-				if(scanDetails == null) {
-					return FormValidation.error(Messages.error_invalid_scan_id_ui());
-				} else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
-					return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
-				} else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
-					return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
+				if (scanDetails == null) {
+				    return FormValidation.error(Messages.error_invalid_scan_id_ui());
+				} else {
+				    String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
+				    if (!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
+						return FormValidation.error("Rescan is not allowed as the parent scan is not completed yet");
+				    } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
+						return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
+				    } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
+						return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
+				    }
 				}
 			}
 			return FormValidation.validateRequired(scanId);
