@@ -156,7 +156,7 @@ public class DynamicAnalyzer extends Scanner {
 		return m_executionId;
 	}
 
-    @DataBoundSetter
+	@DataBoundSetter
 	public void setPresenceId(String presenceId) {
 		m_presenceId = presenceId;
 	}
@@ -251,13 +251,17 @@ public class DynamicAnalyzer extends Scanner {
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}
-		if(getRescanDast() && !properties.containsKey(CoreConstants.SCAN_ID)) {
-			throw new AbortException(Messages.error_empty_scan_id());
+		if(getRescanDast()) {
+            if(!properties.containsKey(CoreConstants.SCAN_ID)) {
+                throw new AbortException(Messages.error_empty_scan_id());
+            } else if (m_incrementalScan && !properties.containsKey("IncrementalBaseJobId")) {
+                throw new AbortException(Messages.error_empty_execution_id());
+            }
 		}
         if (authProvider.isAppScan360()) {
             if (properties.containsKey(Scanner.PRESENCE_ID)) {
                 throw new AbortException(Messages.error_presence_AppScan360());
-            } else if ((ServiceUtil.getA360Version(authProvider).compareTo("1.4.0") != 0)) {
+            } else if (ServiceUtil.getA360Version(authProvider).substring(0,5).compareTo("1.4.0") != -1) {
                 if (!ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
                     throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
                 }
@@ -323,7 +327,7 @@ public class DynamicAnalyzer extends Scanner {
 		}
 		if(getRescanDast() && isNullOrEmpty(getScanId()) ){
 			properties.put(CoreConstants.SCAN_ID,getScanId());
-			if(m_incrementalScan) {
+			if(m_incrementalScan && isNullOrEmpty(m_executionId)) {
 				properties.put("IncrementalBaseJobId", m_executionId);
 				properties.put("IsIncrementalRetest", "true");
 			}
@@ -427,7 +431,7 @@ public class DynamicAnalyzer extends Scanner {
 			if(!rescanDast && !authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}
-			if (authProvider.isAppScan360() && (ServiceUtil.getA360Version(authProvider).compareTo("1.4.0") != 0)) {
+			if (authProvider.isAppScan360() && (ServiceUtil.getA360Version(authProvider).substring(0,5).compareTo("1.4.0") != -1)) {
 				if (!target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 						return FormValidation.error(Messages.error_url_validation_ui());
 				}
@@ -447,7 +451,7 @@ public class DynamicAnalyzer extends Scanner {
 				} else {
 				    String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
 				    if (!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
-						return FormValidation.error("Rescan is not allowed as the parent scan is not completed yet");
+						return FormValidation.error(Messages.error_scan_id_validation_status());
 				    } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
 						return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
 				    } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {

@@ -110,7 +110,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
                 } else {
                     String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
                     if (!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
-                        return FormValidation.error("Rescan is not allowed as the parent scan is not completed yet");
+                        return FormValidation.error(Messages.error_scan_id_validation_status());
                     } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
                         return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
                     } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {

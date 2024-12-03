@@ -344,7 +344,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         } else {
             String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
             if(!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
-                throw new AbortException("Rescan is not allowed as the parent scan is not completed yet");
+                throw new AbortException(Messages.error_scan_id_validation_status());
             } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
                 throw new AbortException(Messages.error_scan_id_validation_rescan_allowed());
             } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
