@@ -328,7 +328,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             if(properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_personal_scan_rescan()));
             }
-
             try {
                 scanIdValidation(properties,progress);
             } catch (JSONException e) {
@@ -338,7 +337,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     }
 
     private void scanIdValidation(Map<String, String> properties, IProgress progress) throws JSONException, IOException {
-        JSONObject scanDetails = ServiceUtil.scanSpecificDetails(properties.get(CoreConstants.SCANNER_TYPE), properties.get(CoreConstants.SCAN_ID), m_authProvider);
+        JSONObject scanDetails = ServiceUtil.getScanDetails(properties.get(CoreConstants.SCANNER_TYPE), properties.get(CoreConstants.SCAN_ID), m_authProvider);
         if(scanDetails == null) {
             throw new AbortException(Messages.error_invalid_scan_id());
         } else {

@@ -104,7 +104,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
             if(scanId!=null && !scanId.isEmpty()) {
-                JSONObject scanDetails = ServiceUtil.scanSpecificDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId, provider);
+                JSONObject scanDetails = ServiceUtil.getScanDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId, provider);
                 if(scanDetails == null) {
                     return FormValidation.error(Messages.error_invalid_scan_id_ui());
                 } else {

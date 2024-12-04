@@ -261,7 +261,7 @@ public class DynamicAnalyzer extends Scanner {
         if (authProvider.isAppScan360()) {
             if (properties.containsKey(Scanner.PRESENCE_ID)) {
                 throw new AbortException(Messages.error_presence_AppScan360());
-            } else if (ServiceUtil.getA360Version(authProvider).substring(0,5).compareTo("1.4.0") != -1) {
+            } else if (ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1) {
                 if (!ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
                     throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
                 }
@@ -360,7 +360,7 @@ public class DynamicAnalyzer extends Scanner {
 
 		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
-			JSONArray executionDetails = ServiceUtil.getExecutionDetails(scanId, authProvider);
+			JSONArray executionDetails = ServiceUtil.getBaseScanDetails(scanId, authProvider);
 			ListBoxModel model = new ListBoxModel();
 
 			if(executionDetails != null) {
@@ -431,7 +431,7 @@ public class DynamicAnalyzer extends Scanner {
 			if(!rescanDast && !authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}
-			if (authProvider.isAppScan360() && (ServiceUtil.getA360Version(authProvider).substring(0,5).compareTo("1.4.0") != -1)) {
+			if (authProvider.isAppScan360() && (ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1)) {
 				if (!target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 						return FormValidation.error(Messages.error_url_validation_ui());
 				}
@@ -445,7 +445,7 @@ public class DynamicAnalyzer extends Scanner {
 		public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
 			JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
 			if(scanId!=null && !scanId.isEmpty()) {
-				JSONObject scanDetails = ServiceUtil.scanSpecificDetails(DYNAMIC_ANALYZER, scanId, provider);
+				JSONObject scanDetails = ServiceUtil.getScanDetails(DYNAMIC_ANALYZER, scanId, provider);
 				if (scanDetails == null) {
 				    return FormValidation.error(Messages.error_invalid_scan_id_ui());
 				} else {
