@@ -210,7 +210,7 @@ public class StaticAnalyzer extends Scanner {
             return m_scanMethod.equals(scanMethod);
         }
 
-        public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException {
+        public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                 throw new AbortException(Messages.error_active_subscription_validation(getType()));
             }
@@ -242,7 +242,18 @@ public class StaticAnalyzer extends Scanner {
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
-            validations(authProvider,properties,progress);
+            validateGeneralSettings(authProvider, properties, progress, isAppScan360);
+            if(properties.containsKey(CoreConstants.SCAN_ID)) {
+                try {
+                    JSONObject scanDetails = ServiceUtil.getScanDetails(STATIC_ANALYZER, properties.get(CoreConstants.SCAN_ID), authProvider);
+                    if(scanDetails!=null && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
+                        throw  new AbortException(Messages.error_invalid_scan_id_git_repo());
+                    }
+                    scanIdValidation(scanDetails, properties);
+                } catch (JSONException e) {
+                    //Ignore and move on.
+                }
+            }
         }
 
         @Override

@@ -273,7 +273,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			Map<String, String> properties = m_scanner.getProperties(resolver);
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
-			properties.put(CoreConstants.SCAN_NAME, (resolver == null ? m_name : Util.replaceMacro(m_name, resolver)) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
+			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
 			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 			properties.put(CoreConstants.PERSONAL_SCAN, Boolean.toString(m_personalScan));
 			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
@@ -308,22 +308,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
 	    }
 	}
-
-    private void validateGeneralSettings(boolean isAppScan360, Map<String, String> properties, IProgress progress) throws IOException {
-        if (isAppScan360) {
-            if (m_intervention) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
-            }
-        } else if (m_authProvider.getacceptInvalidCerts()) {
-            progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
-        }
-
-        if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
-            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.TARGET));
-            properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
-        }
-    }
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
     	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
@@ -332,8 +316,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         Map<String, String> properties = getScanProperties(build,listener);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
-        m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress);
-        validateGeneralSettings(isAppScan360,properties,progress);
+        m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress, isAppScan360);
+
+        if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
+            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.TARGET));
+            properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
+        }
 
 
         final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);

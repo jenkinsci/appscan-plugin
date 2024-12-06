@@ -74,14 +74,22 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         return m_scanId;
     }
 
-    public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException {
+    public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
         if(!ServiceUtil.hasScaEntitlement(authProvider)) {
             throw new AbortException(Messages.error_active_subscription_validation(getType()));
         }
         if (authProvider.isAppScan360()) {
             throw new AbortException(Messages.error_sca_AppScan360());
         }
-        validations(authProvider, properties, progress);
+        validateGeneralSettings(authProvider, properties, progress, isAppScan360);
+        if(properties.containsKey(CoreConstants.SCAN_ID)) {
+            try {
+                JSONObject scanDetails = ServiceUtil.getScanDetails(SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.SCAN_ID), authProvider);
+                scanIdValidation(scanDetails, properties);
+            } catch (JSONException e) {
+                //Ignore and move on.
+            }
+        }
     }
 
     public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {

@@ -46,7 +46,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 
-	public abstract void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException;
+	public abstract void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException;
 
 	public abstract String getType();
 
@@ -66,21 +66,23 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 
 		return path;
 	}
-    protected void validations(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException {
+    protected void validateGeneralSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+        if (isAppScan360) {
+            if (!properties.get("FullyAutomatic").equals("true")) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
+            }
+        } else if (authProvider.getacceptInvalidCerts()) {
+            progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
+        }
+
         if(properties.containsKey(CoreConstants.SCAN_ID)) {
             if(properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_personal_scan_rescan()));
             }
-            try {
-                scanIdValidation(authProvider, properties,progress);
-            } catch (JSONException e) {
-                //Ignore and move on.
-            }
         }
     }
 
-    protected void scanIdValidation(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws JSONException, IOException {
-        JSONObject scanDetails = ServiceUtil.getScanDetails(properties.get(CoreConstants.SCANNER_TYPE), properties.get(CoreConstants.SCAN_ID), authProvider);
+    protected void scanIdValidation(JSONObject scanDetails, Map<String, String> properties) throws JSONException, IOException {
         if(scanDetails == null) {
             throw new AbortException(Messages.error_invalid_scan_id());
         } else {
@@ -89,8 +91,6 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
                 throw new AbortException(Messages.error_scan_id_validation_status(status));
             } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
                 throw new AbortException(Messages.error_scan_id_validation_rescan_allowed());
-            } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
-                throw new AbortException(Messages.error_invalid_scan_id_git_repo());
             } else if (!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
                 throw new AbortException(Messages.error_invalid_scan_id_application());
             }

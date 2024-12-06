@@ -14,10 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.hcl.appscan.sdk.CoreConstants;
-import com.hcl.appscan.sdk.app.CloudApplicationProvider;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
-import com.hcl.appscan.sdk.scan.IScanServiceProvider;
 import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.JSONObject;
@@ -250,17 +248,17 @@ public class DynamicAnalyzer extends Scanner {
 		}
 	}
 
-	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException {
+	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}
-		if(getRescanDast()) {
+        if(getRescanDast()) {
             if(!properties.containsKey(CoreConstants.SCAN_ID)) {
                 throw new AbortException(Messages.error_empty_scan_id());
             } else if (m_incrementalScan && !properties.containsKey("IncrementalBaseJobId")) {
                 throw new AbortException(Messages.error_empty_execution_id());
             }
-		}
+        }
         if (authProvider.isAppScan360()) {
             if (properties.containsKey(Scanner.PRESENCE_ID)) {
                 throw new AbortException(Messages.error_presence_AppScan360());
@@ -273,8 +271,16 @@ public class DynamicAnalyzer extends Scanner {
 		if (!getRescanDast() && !authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
-        validations(authProvider, properties, progress);
-	}
+        validateGeneralSettings(authProvider, properties, progress, isAppScan360);
+        if(properties.containsKey(CoreConstants.SCAN_ID)) {
+            try {
+                JSONObject scanDetails = ServiceUtil.getScanDetails(DYNAMIC_ANALYZER, properties.get(CoreConstants.SCAN_ID), authProvider);
+                scanIdValidation(scanDetails, properties);
+            } catch (JSONException e) {
+                //Ignore and move on.
+            }
+        }
+    }
 
 	@Override
 	public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
@@ -364,9 +370,8 @@ public class DynamicAnalyzer extends Scanner {
 
 		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
-            JSONArray executionDetails = new CloudScanServiceProvider(null, authProvider).getBaseScanDetails(scanId, authProvider);
+            JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId, authProvider);
 			ListBoxModel model = new ListBoxModel();
-
 			if(executionDetails != null) {
 				for(int i = 0; i < executionDetails.length(); i++) {
 					JSONObject value = executionDetails.getJSONObject(i);
