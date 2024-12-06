@@ -310,7 +310,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
 
     private void validateGeneralSettings(boolean isAppScan360, Map<String, String> properties, IProgress progress) throws IOException {
-        if(isAppScan360) {
+        if (isAppScan360) {
             if (m_intervention) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
             }
@@ -318,39 +318,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
-        if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+        if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
             progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
             m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.TARGET));
             properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
-        }
-
-        if(properties.containsKey(CoreConstants.SCAN_ID)) {
-            if(properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_personal_scan_rescan()));
-            }
-            try {
-                scanIdValidation(properties,progress);
-            } catch (JSONException e) {
-                //Ignore and move on.
-            }
-        }
-    }
-
-    private void scanIdValidation(Map<String, String> properties, IProgress progress) throws JSONException, IOException {
-        JSONObject scanDetails = ServiceUtil.getScanDetails(properties.get(CoreConstants.SCANNER_TYPE), properties.get(CoreConstants.SCAN_ID), m_authProvider);
-        if(scanDetails == null) {
-            throw new AbortException(Messages.error_invalid_scan_id());
-        } else {
-            String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
-            if(!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
-                throw new AbortException(Messages.error_scan_id_validation_status());
-            } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
-                throw new AbortException(Messages.error_scan_id_validation_rescan_allowed());
-            } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
-                throw new AbortException(Messages.error_invalid_scan_id_git_repo());
-            } else if (!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
-                throw new AbortException(Messages.error_invalid_scan_id_application());
-            }
         }
     }
     

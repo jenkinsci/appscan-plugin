@@ -6,13 +6,20 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
+import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.logging.Message;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.Util;
 import hudson.model.AbstractDescribableImpl;
 import hudson.util.VariableResolver;
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.JSONObject;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -39,7 +46,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 
-	public abstract void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException;
+	public abstract void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException;
 
 	public abstract String getType();
 
@@ -59,4 +66,36 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 
 		return path;
 	}
+    protected void validations(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException {
+        if(properties.containsKey(CoreConstants.SCAN_ID)) {
+            if(properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_personal_scan_rescan()));
+            }
+            try {
+                scanIdValidation(authProvider, properties,progress);
+            } catch (JSONException e) {
+                //Ignore and move on.
+            }
+        }
+    }
+
+    protected void scanIdValidation(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws JSONException, IOException {
+        JSONObject scanDetails = ServiceUtil.getScanDetails(properties.get(CoreConstants.SCANNER_TYPE), properties.get(CoreConstants.SCAN_ID), authProvider);
+        if(scanDetails == null) {
+            throw new AbortException(Messages.error_invalid_scan_id());
+        } else {
+            String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
+            if(!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
+                throw new AbortException(Messages.error_scan_id_validation_status(status));
+            } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
+                throw new AbortException(Messages.error_scan_id_validation_rescan_allowed());
+            } else if (properties.get(CoreConstants.SCANNER_TYPE).equals(Scanner.STATIC_ANALYZER) && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
+                throw new AbortException(Messages.error_invalid_scan_id_git_repo());
+            } else if (!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
+                throw new AbortException(Messages.error_invalid_scan_id_application());
+            }
+        }
+    }
+
+
 }

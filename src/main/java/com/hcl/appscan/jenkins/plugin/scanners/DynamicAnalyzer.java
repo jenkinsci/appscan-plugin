@@ -6,6 +6,7 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +16,8 @@ import java.util.Map;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.app.CloudApplicationProvider;
 import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
+import com.hcl.appscan.sdk.scan.IScanServiceProvider;
 import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.JSONObject;
@@ -247,7 +250,7 @@ public class DynamicAnalyzer extends Scanner {
 		}
 	}
 
-	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException {
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}
@@ -270,6 +273,7 @@ public class DynamicAnalyzer extends Scanner {
 		if (!getRescanDast() && !authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
+        validations(authProvider, properties, progress);
 	}
 
 	@Override
@@ -360,7 +364,7 @@ public class DynamicAnalyzer extends Scanner {
 
 		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
-			JSONArray executionDetails = ServiceUtil.getBaseScanDetails(scanId, authProvider);
+            JSONArray executionDetails = new CloudScanServiceProvider(null, authProvider).getBaseScanDetails(scanId, authProvider);
 			ListBoxModel model = new ListBoxModel();
 
 			if(executionDetails != null) {
@@ -446,18 +450,7 @@ public class DynamicAnalyzer extends Scanner {
 			JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
 			if(scanId!=null && !scanId.isEmpty()) {
 				JSONObject scanDetails = ServiceUtil.getScanDetails(DYNAMIC_ANALYZER, scanId, provider);
-				if (scanDetails == null) {
-				    return FormValidation.error(Messages.error_invalid_scan_id_ui());
-				} else {
-				    String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
-				    if (!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
-						return FormValidation.error(Messages.error_scan_id_validation_status());
-				    } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
-						return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
-				    } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
-						return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
-				    }
-				}
+				return scanIdValidation(scanDetails, application);
 			}
 			return FormValidation.validateRequired(scanId);
 		}

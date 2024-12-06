@@ -10,6 +10,7 @@ import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import com.hcl.appscan.sdk.logging.IProgress;
@@ -209,7 +210,7 @@ public class StaticAnalyzer extends Scanner {
             return m_scanMethod.equals(scanMethod);
         }
 
-        public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+        public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException {
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                 throw new AbortException(Messages.error_active_subscription_validation(getType()));
             }
@@ -241,6 +242,7 @@ public class StaticAnalyzer extends Scanner {
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
+            validations(authProvider,properties,progress);
         }
 
         @Override
@@ -289,20 +291,10 @@ public class StaticAnalyzer extends Scanner {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
             if(scanId!=null && !scanId.isEmpty()) {
                 JSONObject scanDetails = ServiceUtil.getScanDetails(STATIC_ANALYZER, scanId, provider);
-                if(scanDetails == null) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_ui());
-                } else {
-                String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
-                if (!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
-                    return FormValidation.error(Messages.error_scan_id_validation_status());
-                } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
-                } else if (scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
+                if(scanDetails!=null && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
                     return FormValidation.error(Messages.error_invalid_scan_id_git_repo_ui());
-                } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
                 }
-            }
+                return scanIdValidation(scanDetails, application);
         }
             return FormValidation.validateRequired(scanId);
 		}

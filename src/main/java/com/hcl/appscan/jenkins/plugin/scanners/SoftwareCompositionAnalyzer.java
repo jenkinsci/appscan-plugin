@@ -24,6 +24,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,14 +74,14 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         return m_scanId;
     }
 
-    public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+    public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws IOException {
         if(!ServiceUtil.hasScaEntitlement(authProvider)) {
             throw new AbortException(Messages.error_active_subscription_validation(getType()));
         }
-
         if (authProvider.isAppScan360()) {
             throw new AbortException(Messages.error_sca_AppScan360());
         }
+        validations(authProvider, properties, progress);
     }
 
     public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
@@ -105,18 +106,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
             if(scanId!=null && !scanId.isEmpty()) {
                 JSONObject scanDetails = ServiceUtil.getScanDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId, provider);
-                if(scanDetails == null) {
-                    return FormValidation.error(Messages.error_invalid_scan_id_ui());
-                } else {
-                    String status = scanDetails.getJSONObject("LatestExecution").getString("Status");
-                    if (!(status.equals("Ready") || status.equals("Paused") || status.equals("Failed"))) {
-                        return FormValidation.error(Messages.error_scan_id_validation_status());
-                    } else if (!scanDetails.get("RescanAllowed").equals(true) && scanDetails.get("ParsedFromUploadedFile").equals(true)) {
-                        return FormValidation.error(Messages.error_invalid_scan_id_rescan_allowed_ui());
-                    } else if (!scanDetails.get(CoreConstants.APP_ID).equals(application)) {
-                        return FormValidation.error(Messages.error_invalid_scan_id_application_ui());
-                    }
-                }
+                return scanIdValidation(scanDetails, application);
             }
             return FormValidation.validateRequired(scanId);
         }
