@@ -460,8 +460,14 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.validateRequired(scanId);
 		}
 
-		public FormValidation doCheckExecutionId(@QueryParameter String executionId) {
-			return FormValidation.validateRequired(executionId);
+		public FormValidation doCheckExecutionId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId, @QueryParameter String executionId) {
+			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+			JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId, authProvider);
+			if(executionDetails == null) {
+				return FormValidation.error(Messages.error_base_scan_empty_ui());
+			} else {
+				return FormValidation.validateRequired(executionId);
+			}
 		}
 
 		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
