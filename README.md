@@ -51,6 +51,10 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
     -   **Test Type:** Select the type of scan to run from the available
         options.
         -   **Dynamic Analysis (DAST):**
+     	    - **Rescan**:  Select this option to rescan the same application, updating and overwriting the previous scan results with the latest findings.<br>
+              - **Scan ID**: Enter the Scan ID of the parent scan based on the application and technology you selected earlier. You can retrieve Scan ID from the AppScan on Cloud/AppScan 360° Server.<br>
+              - **Incremental Scan**: An incremental scan saves time by examining only the changed parts of your application. It uses a base scan for comparison and scans only the new data. [ Learn more](https://help.hcl-software.com/appscan/ASoC/Incremental.html).<br>
+	        	- **Base Scan**: Select a base scan from the dropdown. Scans are imported from ASoC and listed with their date and time.
             -   **Starting URL**: Enter the URL from where you want the
                 scan to start exploring the site.
             -   **Additional Options**: If selected, the following
@@ -216,12 +220,6 @@ The Mobile Scan functionality
 has been removed from Jenkins since version 1.0.10. The existing jobs that 
 have Mobile Scan configurations must therefore be updated accordingly.
 - If you are unable to view the scan report on the Jenkins, first verify that the "Test Name" field. Test Name can't contain any of the following characters: \/:*?"<>|
-- Scans created using the "Scan GitHub repository" feature in the AppScan on Cloud web interface are not supported for rescan in the Jenkins Plugin. The error noticed will be as below:<br>
-	_Updated the scan job parameters._<br>
-	_ERROR: File is not allowed when scanning a git repository_<br>
-	_Running security analysis..._<br>
-	_Finished: SUCCESS_<br>
-  Though the scan parameters will be updated in ASoC, Jenkins build will not fail and display the results from parent scan. This issue will be fixed in the upcoming release.
 
 ## Additional Resources
 - [HCL AppScan Enterprise: Jenkins Integration](https://www.youtube.com/watch?v=XctRBAd0HQc)
