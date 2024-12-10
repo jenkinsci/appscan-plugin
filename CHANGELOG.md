@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+1.6.0 (December, 2024)
+------
+- Support for Rescan of DAST Scans in both HCL AppScan on Cloud and HCL AppScan 360°.
+- Bug fixes.
+
 1.5.0 (September, 2024)
 ------
 - Support for Rescan of SAST Scans in both HCL AppScan on Cloud and HCL AppScan 360°.
