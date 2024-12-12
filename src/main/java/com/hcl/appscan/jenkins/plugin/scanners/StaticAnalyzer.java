@@ -301,7 +301,7 @@ public class StaticAnalyzer extends Scanner {
         public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
             if(scanId!=null && !scanId.isEmpty()) {
-                JSONObject scanDetails = new CloudScanServiceProvider(provider).getScanDetails(STATIC_ANALYZER, scanId);;
+                JSONObject scanDetails = new CloudScanServiceProvider(provider).getScanDetails(STATIC_ANALYZER, scanId);
                 if(scanDetails!=null && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
                     return FormValidation.error(Messages.error_invalid_scan_id_git_repo_ui());
                 }

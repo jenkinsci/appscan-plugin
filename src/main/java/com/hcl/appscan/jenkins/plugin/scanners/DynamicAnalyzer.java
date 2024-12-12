@@ -361,7 +361,7 @@ public class DynamicAnalyzer extends Scanner {
 
 		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
-            JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId);
+			JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId);
 			ListBoxModel model = new ListBoxModel();
 			if(executionDetails != null) {
 				for(int i = 0; i < executionDetails.length(); i++) {

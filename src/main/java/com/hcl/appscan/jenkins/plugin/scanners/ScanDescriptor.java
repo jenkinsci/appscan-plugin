@@ -2,7 +2,6 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.sdk.CoreConstants;
-import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import org.apache.wink.json4j.JSONException;

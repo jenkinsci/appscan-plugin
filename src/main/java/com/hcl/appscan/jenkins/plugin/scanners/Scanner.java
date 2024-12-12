@@ -12,7 +12,6 @@ import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
-import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.Util;
 import hudson.model.AbstractDescribableImpl;
