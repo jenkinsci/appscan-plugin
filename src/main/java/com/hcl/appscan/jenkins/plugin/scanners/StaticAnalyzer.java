@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
+import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
 import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.RelativePath;
@@ -210,7 +211,7 @@ public class StaticAnalyzer extends Scanner {
             return m_scanMethod.equals(scanMethod);
         }
 
-        public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+        public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                 throw new AbortException(Messages.error_active_subscription_validation(getType()));
             }
@@ -242,14 +243,13 @@ public class StaticAnalyzer extends Scanner {
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
             }
-            validateGeneralSettings(authProvider, properties, progress, isAppScan360);
+
             if(properties.containsKey(CoreConstants.SCAN_ID)) {
                 try {
-                    JSONObject scanDetails = ServiceUtil.getScanDetails(STATIC_ANALYZER, properties.get(CoreConstants.SCAN_ID), authProvider);
+                    JSONObject scanDetails = new CloudScanServiceProvider(authProvider).getScanDetails(STATIC_ANALYZER, properties.get(CoreConstants.SCAN_ID));;
                     if(scanDetails!=null && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
-                        throw  new AbortException(Messages.error_invalid_scan_id_git_repo());
+                        throw new AbortException(Messages.error_invalid_scan_id_git_repo());
                     }
-                    scanIdValidation(scanDetails, properties);
                 } catch (JSONException e) {
                     //Ignore and move on.
                 }
@@ -301,7 +301,7 @@ public class StaticAnalyzer extends Scanner {
         public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
             if(scanId!=null && !scanId.isEmpty()) {
-                JSONObject scanDetails = ServiceUtil.getScanDetails(STATIC_ANALYZER, scanId, provider);
+                JSONObject scanDetails = new CloudScanServiceProvider(provider).getScanDetails(STATIC_ANALYZER, scanId);;
                 if(scanDetails!=null && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
                     return FormValidation.error(Messages.error_invalid_scan_id_git_repo_ui());
                 }

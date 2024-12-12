@@ -9,6 +9,7 @@ import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
 import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.Extension;
@@ -74,21 +75,12 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         return m_scanId;
     }
 
-    public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+    public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
         if(!ServiceUtil.hasScaEntitlement(authProvider)) {
             throw new AbortException(Messages.error_active_subscription_validation(getType()));
         }
         if (authProvider.isAppScan360()) {
             throw new AbortException(Messages.error_sca_AppScan360());
-        }
-        validateGeneralSettings(authProvider, properties, progress, isAppScan360);
-        if(properties.containsKey(CoreConstants.SCAN_ID)) {
-            try {
-                JSONObject scanDetails = ServiceUtil.getScanDetails(SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.SCAN_ID), authProvider);
-                scanIdValidation(scanDetails, properties);
-            } catch (JSONException e) {
-                //Ignore and move on.
-            }
         }
     }
 
@@ -113,7 +105,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
             if(scanId!=null && !scanId.isEmpty()) {
-                JSONObject scanDetails = ServiceUtil.getScanDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId, provider);
+                JSONObject scanDetails = new CloudScanServiceProvider(provider).getScanDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId);;
                 return scanIdValidation(scanDetails, application);
             }
             return FormValidation.validateRequired(scanId);

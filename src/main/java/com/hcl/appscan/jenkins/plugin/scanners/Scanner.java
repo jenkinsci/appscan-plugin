@@ -11,6 +11,7 @@ import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
+import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
 import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.Util;
@@ -46,7 +47,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 
-	public abstract void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException;
+	public abstract void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException;
 
 	public abstract String getType();
 
@@ -66,7 +67,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 
 		return path;
 	}
-    protected void validateGeneralSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+    public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
         if (isAppScan360) {
             if (!properties.get("FullyAutomatic").equals("true")) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
@@ -75,14 +76,22 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
 
+        validateScannerSettings(authProvider, properties, progress, isAppScan360);
+
         if(properties.containsKey(CoreConstants.SCAN_ID)) {
-            if(properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
+            if (properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_personal_scan_rescan()));
+            }
+            try {
+                validateScanID(properties, authProvider);
+            } catch (JSONException e) {
+                //Ignore and move on.
             }
         }
     }
 
-    protected void scanIdValidation(JSONObject scanDetails, Map<String, String> properties) throws JSONException, IOException {
+    private void validateScanID(Map<String, String> properties, JenkinsAuthenticationProvider authProvider) throws JSONException, IOException {
+        JSONObject scanDetails = new CloudScanServiceProvider(authProvider).getScanDetails(properties.get(CoreConstants.SCANNER_TYPE), properties.get(CoreConstants.SCAN_ID));;
         if(scanDetails == null) {
             throw new AbortException(Messages.error_invalid_scan_id());
         } else {
@@ -96,6 +105,4 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
             }
         }
     }
-
-
 }
