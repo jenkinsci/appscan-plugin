@@ -22,7 +22,7 @@ LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
 		<f:textbox name="target"/>
 	</f:entry>
 
-	<f:optionalBlock title="${%label.additional.options}" field="hasOptions" inline="true">
+	<f:optionalBlock title="${%label.additional.options}" name="hasOptions" field="hasOptions" inline="true">
 		
 		<f:entry title="${%label.scan.optimization}" field="optimization"> 
 			<f:select />
