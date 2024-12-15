@@ -431,7 +431,7 @@ public class DynamicAnalyzer extends Scanner {
 			if(!rescanDast && !authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}
-			if (authProvider.isAppScan360() && (ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1)) {
+			if (!rescanDast && authProvider.isAppScan360() && (ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1)) {
 				if (!target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 						return FormValidation.error(Messages.error_url_validation_ui());
 				}
