@@ -46,7 +46,7 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 
-	public abstract void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException;
+	public abstract void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws AbortException;
 
 	public abstract String getType();
 

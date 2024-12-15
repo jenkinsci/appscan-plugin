@@ -75,7 +75,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         return m_scanId;
     }
 
-    public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+    public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws AbortException {
         if(!ServiceUtil.hasScaEntitlement(authProvider)) {
             throw new AbortException(Messages.error_active_subscription_validation(getType()));
         }
@@ -84,7 +84,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         }
     }
 
-    public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
+    public Map<String, String> getProperties(VariableResolver<String> resolver) {
         Map<String, String> properties = new HashMap<String, String>();
         properties.put(TARGET, resolver == null ? getTarget() : resolvePath(getTarget(), resolver));
         if(getRescan() && isNullOrEmpty(getScanId())) {

@@ -248,7 +248,7 @@ public class DynamicAnalyzer extends Scanner {
 		}
 	}
 
-	public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+	public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws AbortException {
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}
@@ -262,10 +262,8 @@ public class DynamicAnalyzer extends Scanner {
         if (authProvider.isAppScan360()) {
             if (properties.containsKey(Scanner.PRESENCE_ID)) {
                 throw new AbortException(Messages.error_presence_AppScan360());
-            } else if (ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1) {
-                if (!ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
-                    throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
-                }
+            } else if (!getRescanDast() && ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1 && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+                throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
             }
         }
 		if (!getRescanDast() && !authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
