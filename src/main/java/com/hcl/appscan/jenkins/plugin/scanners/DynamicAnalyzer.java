@@ -75,7 +75,7 @@ public class DynamicAnalyzer extends Scanner {
 		m_rescanDast = rescanDast;
 		m_scanId = scanId;
 		m_incrementalScan = incrementalScan;
-		m_executionId = incrementalScan ? executionId : EMPTY;
+		m_executionId = executionId;
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
@@ -93,6 +93,8 @@ public class DynamicAnalyzer extends Scanner {
 		super(target, hasOptions);
 		m_rescanDast = false;
 		m_scanId = EMPTY;
+		m_incrementalScan = false;
+		m_executionId = EMPTY;
 		m_presenceId = EMPTY;
 		m_scanFile = EMPTY;
 		m_scanType = EMPTY;
@@ -150,7 +152,7 @@ public class DynamicAnalyzer extends Scanner {
 
 	@DataBoundSetter
 	public void setExecutionId(String executionId) {
-		m_executionId = m_incrementalScan ? executionId : EMPTY;
+		m_executionId = executionId;
 	}
 
 	public String getExecutionId() {
