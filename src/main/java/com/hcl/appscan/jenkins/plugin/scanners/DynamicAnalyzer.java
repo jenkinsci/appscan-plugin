@@ -6,7 +6,6 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +14,7 @@ import java.util.Map;
 
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
 import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
@@ -257,8 +257,8 @@ public class DynamicAnalyzer extends Scanner {
         if(getRescanDast()) {
             if(!properties.containsKey(CoreConstants.SCAN_ID)) {
                 throw new AbortException(Messages.error_empty_scan_id());
-            } else if (m_incrementalScan && !properties.containsKey("IncrementalBaseJobId")) {
-                throw new AbortException(Messages.error_empty_execution_id());
+            } else if (m_incrementalScan && !isNullOrEmpty(m_executionId)) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_empty_execution_id()));
             }
         }
         if (authProvider.isAppScan360()) {
