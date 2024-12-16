@@ -6,10 +6,19 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.logging.Message;
+import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
+import org.apache.wink.json4j.JSONArray;
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -41,6 +50,8 @@ public class DynamicAnalyzer extends Scanner {
 
 	private static final String DYNAMIC_ANALYZER = "Dynamic Analyzer"; //$NON-NLS-1$
 
+	private boolean m_incrementalScan;
+	private String m_executionId;
 	private String m_presenceId;
 	private String m_scanFile;
 	private String m_scanType;
@@ -50,15 +61,21 @@ public class DynamicAnalyzer extends Scanner {
 	private String m_loginUser;
 	private Secret m_loginPassword;
 	private String m_trafficFile;
+	private boolean m_rescanDast;
+	private String m_scanId;
 
 	@Deprecated
 	public DynamicAnalyzer(String target) {
-		this(target, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
+		this(target, false, false, EMPTY, false, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY);
 	}
 
 	@Deprecated
-	public DynamicAnalyzer(String target, boolean hasOptions, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
+	public DynamicAnalyzer(String target, boolean hasOptions, boolean rescanDast, String scanId, boolean incrementalScan, String executionId, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
 		super(target, hasOptions);
+		m_rescanDast = rescanDast;
+		m_scanId = scanId;
+		m_incrementalScan = incrementalScan;
+		m_executionId = executionId;
 		m_presenceId = presenceId;
 		m_scanFile = scanFile;
 		m_scanType = scanFile != null && !scanFile.equals(EMPTY) ? CUSTOM : scanType;
@@ -74,6 +91,10 @@ public class DynamicAnalyzer extends Scanner {
 
 	public DynamicAnalyzer(String target, boolean hasOptions) {
 		super(target, hasOptions);
+		m_rescanDast = false;
+		m_scanId = EMPTY;
+		m_incrementalScan = false;
+		m_executionId = EMPTY;
 		m_presenceId = EMPTY;
 		m_scanFile = EMPTY;
 		m_scanType = EMPTY;
@@ -101,6 +122,41 @@ public class DynamicAnalyzer extends Scanner {
 
 	public String getLoginPassword() {
 		return Secret.toString(m_loginPassword);
+	}
+
+	@DataBoundSetter
+	public void setRescanDast(boolean rescanDast) {
+		m_rescanDast = rescanDast;
+	}
+
+	public boolean getRescanDast() {
+		return m_rescanDast;
+	}
+
+	@DataBoundSetter
+	public void setScanId(String scanId) {
+		m_scanId = scanId;
+	}
+	public String getScanId() {
+		return m_scanId;
+	}
+
+	@DataBoundSetter
+	public void setIncrementalScan(boolean incrementalScan) {
+		m_incrementalScan = incrementalScan;
+	}
+
+	public boolean getIncrementalScan() {
+		return m_incrementalScan;
+	}
+
+	@DataBoundSetter
+	public void setExecutionId(String executionId) {
+		m_executionId = executionId;
+	}
+
+	public String getExecutionId() {
+		return m_executionId;
 	}
 
 	@DataBoundSetter
@@ -194,17 +250,28 @@ public class DynamicAnalyzer extends Scanner {
 		}
 	}
 
-	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+	public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws AbortException {
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}
-		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
-			throw new AbortException(Messages.error_presence_AppScan360());
-		}
-        if (!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+        if(getRescanDast()) {
+            if(!properties.containsKey(CoreConstants.SCAN_ID)) {
+                throw new AbortException(Messages.error_empty_scan_id());
+            } else if (m_incrementalScan && !isNullOrEmpty(m_executionId)) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_empty_execution_id()));
+            }
+        }
+        if (authProvider.isAppScan360()) {
+            if (properties.containsKey(Scanner.PRESENCE_ID)) {
+                throw new AbortException(Messages.error_presence_AppScan360());
+            } else if (!getRescanDast() && ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1 && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
+                throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
+            }
+        }
+		if (!getRescanDast() && !authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
 			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
 		}
-	}
+    }
 
 	@Override
 	public Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException {
@@ -259,7 +326,13 @@ public class DynamicAnalyzer extends Scanner {
 		if (!m_presenceId.equals(EMPTY)) {
 				properties.put(PRESENCE_ID, m_presenceId);
 		}
-
+		if(getRescanDast() && isNullOrEmpty(getScanId()) ){
+			properties.put(CoreConstants.SCAN_ID,getScanId());
+			if(m_incrementalScan && isNullOrEmpty(m_executionId)) {
+				properties.put("IncrementalBaseJobId", m_executionId);
+				properties.put("IsIncrementalRetest", "true");
+			}
+		}
 		return properties;
 	}
 
@@ -284,6 +357,21 @@ public class DynamicAnalyzer extends Scanner {
 		@Override
 		public String getDisplayName() {
 			return "Dynamic Analysis (DAST)";
+		}
+
+		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
+			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+			JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId);
+			ListBoxModel model = new ListBoxModel();
+			if(executionDetails != null) {
+				for(int i = 0; i < executionDetails.length(); i++) {
+					JSONObject value = executionDetails.getJSONObject(i);
+					ZonedDateTime zdt = ZonedDateTime.parse((String) value.get("CreatedAt")).withZoneSameInstant(ZoneId.systemDefault());
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy, hh:mm a, z");
+					model.add(zdt.format(formatter), (String) value.get("Id"));
+				}
+			}
+			return model;
 		}
 
 		public ListBoxModel doFillScanTypeItems() {
@@ -335,15 +423,42 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.ok();
 		}
 
-		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
+		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
 			if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 				return FormValidation.error(Messages.error_active_subscription_validation_ui());
 			}
-			if(!authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+			if(!rescanDast && !authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
 				return FormValidation.error(Messages.error_url_validation_ui());
 			}
+			if (!rescanDast && authProvider.isAppScan360() && (ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1)) {
+				if (!target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
+						return FormValidation.error(Messages.error_url_validation_ui());
+				}
+			}
+			if(rescanDast) {
+				return FormValidation.ok();
+			}
 			return FormValidation.validateRequired(target);
+		}
+
+		public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
+			JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
+            if(scanId!=null && !scanId.isEmpty()) {
+				JSONObject scanDetails = new CloudScanServiceProvider(provider).getScanDetails(DYNAMIC_ANALYZER, scanId);
+				return scanIdValidation(scanDetails, application);
+			}
+			return FormValidation.validateRequired(scanId);
+		}
+
+		public FormValidation doCheckExecutionId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId, @QueryParameter String executionId) {
+			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+			JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId);
+			if(executionDetails == null) {
+				return FormValidation.error(Messages.error_base_scan_empty_ui());
+			} else {
+				return FormValidation.ok();
+			}
 		}
 
 		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
