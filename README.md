@@ -52,6 +52,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
         options.
         -   **Dynamic Analysis (DAST):**
      	    - **Rescan**:  Select this option to rescan the same application, updating and overwriting the previous scan results with the latest findings.<br>
+	      **Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud/AppScan 360° organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/appseccloud_scanning_rescan_cm.html).
               - **Scan ID**: Enter the Scan ID of the parent scan based on the application and technology you selected earlier. You can retrieve Scan ID from the AppScan on Cloud/AppScan 360° Server.<br>
               - **Incremental Scan**: An incremental scan saves time by examining only the changed parts of your application. It uses a base scan for comparison and scans only the new data. [ Learn more](https://help.hcl-software.com/appscan/ASoC/Incremental.html).<br>
 	        	- **Base Scan**: Select a base scan from the dropdown. Scans are imported from ASoC and listed with their date and time.
@@ -91,7 +92,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
 						-   **Login Sequence File**: Provide a path to the login sequence file data. Supported file type is .CONFIG.
         -   **Software Composition Analysis (SCA)**
             -	**Rescan**: Select this option to rescan the same application, updating and overwriting the previous scan results with the latest findings.<br>
-              	**Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud/AppScan 360° organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/appseccloud_scanning_rescan_cm.html).
+              	**Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/appseccloud_scanning_rescan_cm.html).
              	- **Scan ID**: Enter the Scan ID of the parent scan based on the application and technology you selected earlier. You can retrieve Scan ID from the AppScan on Cloud/AppScan 360° Server.
             -   **Target**: Enter the complete path to the directory containing the files to scan, or provide the full path to an existing .irx file. Leave this field empty to scan all supported files within the workspace directory.
         -   **Static Analysis (SAST)**
