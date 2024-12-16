@@ -235,10 +235,6 @@ public class StaticAnalyzer extends Scanner {
                 properties.remove(CoreConstants.INCLUDE_SCA);
             }
 
-            if(!properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !(new File(properties.get(TARGET)).isDirectory())) {
-                throw new AbortException(Messages.error_target_wrong_input());
-            }
-
             //includeSCA is only available if the user upload an IRX file.
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
@@ -318,13 +314,10 @@ public class StaticAnalyzer extends Scanner {
             return FormValidation.ok();
         }
 
-        public FormValidation doCheckTarget(@QueryParameter String target, @QueryParameter String scanMethod, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                     return FormValidation.error(Messages.error_active_subscription_validation_ui());
-            }
-            if(!scanMethod.equals(CoreConstants.UPLOAD_DIRECT) && target!=null && !target.isEmpty() && !(new File(target).isDirectory())) {
-                return FormValidation.error(Messages.error_target_wrong_input());
             }
             return FormValidation.ok();
         }
