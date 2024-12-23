@@ -369,34 +369,35 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
-			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
-			  if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
-				  message += ", " + provider.getMessage();
-			  }
-			  build.setDescription(message);
-			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, ("Scan Name: " + m_name)));
-		  }
-        else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
+            String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
+            if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+                message += ", " + provider.getMessage();
+            }
+            build.setDescription(message);
+            throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, ("Scan Name: " + m_name)));
+    	} else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
             progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));
             build.setDescription(Messages.error_server_unavailable());
             build.setResult(Result.UNSTABLE);
-        }
-        else {
-      provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-      VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
-    	String asocAppUrl = m_authProvider.getServer() + "/main/myapps/" + m_application + "/scans/" + scan.getScanId();
-        String label;
-        if(isAppScan360){
-            label = Messages.label_appscan360_homepage();
         } else {
-            label = Messages.label_asoc_homepage();
+            provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+            VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+            String asocAppUrl = m_authProvider.getServer() + "/main/myapps/" + m_application + "/scans/" + scan.getScanId();
+            String label;
+            if(isAppScan360) {
+                label = Messages.label_appscan360_homepage();
+            } else {
+                label = Messages.label_asoc_homepage();
+            }
+
+            build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
+
+            if(m_scanStatus.equalsIgnoreCase("Unstable")) {
+                throw new AbortException("One scan execution gets failed. Refer to build summary page to see the result of successful scan.");
+            }
+            if(m_wait)
+                shouldFailBuild(provider,build);
         }
-
-        build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
-
-        if(m_wait)
-            shouldFailBuild(provider,build);	
-    }
     }
     
     private void setInstallDir() {
