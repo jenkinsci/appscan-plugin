@@ -392,7 +392,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
             build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
 
-            if(m_scanStatus.equalsIgnoreCase("Unstable")) {
+            if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase("Unstable")) {
                 throw new AbortException("One scan execution gets failed. Refer to build summary page to see the result of successful scan.");
             }
             if(m_wait)
