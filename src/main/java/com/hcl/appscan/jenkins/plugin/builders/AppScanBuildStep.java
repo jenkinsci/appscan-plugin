@@ -287,12 +287,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		}
 	}
 
-    private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
+    private void shouldFailBuild(IResultsProvider provider,Run<?,?> build, IProgress progress) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
     		return ;
         String failureMessage=Messages.error_threshold_exceeded();
 		try {
                     List<FailureCondition> failureConditions=m_failureConditions;
+                    progress.setStatus(new Message(Message.INFO, "Checking for build failure based on scan configuration..."));
                     if (m_failBuildNonCompliance){
                         failureConditions =new ArrayList<>();
                         FailureCondition nonCompliantCondition = new FailureCondition("total", 0);
@@ -392,11 +393,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
             build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
 
+            if(m_wait)
+                shouldFailBuild(provider,build, progress);
+
             if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase("Unstable")) {
                 throw new AbortException("One scan execution gets failed. Refer to build summary page to see the result of successful scan.");
             }
-            if(m_wait)
-                shouldFailBuild(provider,build);
         }
     }
     
