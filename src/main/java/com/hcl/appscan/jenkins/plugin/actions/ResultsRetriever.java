@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019, 2020.
+ * @ Copyright HCL Technologies Ltd. 2019, 2020, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -146,14 +146,14 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 		return results;
 	}
 
-    private void createCombinedBuildSummary(Run<?,?> rTemp) {
-            if (m_provider.getResultProvider1() != null && m_provider.getResultProvider1().getStatus().equals(CoreConstants.READY)) {
-                rTemp.addAction(new ScanResults(m_build, m_provider.getResultProvider1(),ServiceUtil.scanTypeShortForm(m_provider.getResultProvider1().getType()).toUpperCase()+"_"+m_name, m_provider.getResultProvider1().getStatus(), m_provider.getResultProvider1().getFindingsCount(), m_provider.getResultProvider1().getCriticalCount(), m_provider.getResultProvider1().getHighCount(), m_provider.getResultProvider1().getMediumCount(), m_provider.getResultProvider1().getLowCount(), m_provider.getResultProvider1().getInfoCount(), m_scanServerUrl, m_label));
-            }
-            if (m_provider.getResultProvider2() != null && m_provider.getResultProvider2().getStatus().equals(CoreConstants.READY)) {
-                rTemp.addAction(new ScanResults(m_build, m_provider.getResultProvider2(),ServiceUtil.scanTypeShortForm(m_provider.getResultProvider2().getType()).toUpperCase()+"_"+m_name, m_provider.getResultProvider2().getStatus(), m_provider.getResultProvider2().getFindingsCount(), m_provider.getResultProvider2().getCriticalCount(), m_provider.getResultProvider2().getHighCount(), m_provider.getResultProvider2().getMediumCount(), m_provider.getResultProvider2().getLowCount(), m_provider.getResultProvider2().getInfoCount(), m_scanServerUrl, m_label));
-            }
-    }
+	private void createCombinedBuildSummary(Run<?,?> rTemp) {
+		if (m_provider.getResultProvider1() != null && m_provider.getResultProvider1().getStatus().equals(CoreConstants.READY)) {
+			rTemp.addAction(new ScanResults(m_build, m_provider.getResultProvider1(),ServiceUtil.scanTypeShortForm(m_provider.getResultProvider1().getType()).toUpperCase()+"_"+m_name, m_provider.getResultProvider1().getStatus(), m_provider.getResultProvider1().getFindingsCount(), m_provider.getResultProvider1().getCriticalCount(), m_provider.getResultProvider1().getHighCount(), m_provider.getResultProvider1().getMediumCount(), m_provider.getResultProvider1().getLowCount(), m_provider.getResultProvider1().getInfoCount(), m_scanServerUrl, m_label));
+		}
+		if (m_provider.getResultProvider2() != null && m_provider.getResultProvider2().getStatus().equals(CoreConstants.READY)) {
+			rTemp.addAction(new ScanResults(m_build, m_provider.getResultProvider2(),ServiceUtil.scanTypeShortForm(m_provider.getResultProvider2().getType()).toUpperCase()+"_"+m_name, m_provider.getResultProvider2().getStatus(), m_provider.getResultProvider2().getFindingsCount(), m_provider.getResultProvider2().getCriticalCount(), m_provider.getResultProvider2().getHighCount(), m_provider.getResultProvider2().getMediumCount(), m_provider.getResultProvider2().getLowCount(), m_provider.getResultProvider2().getInfoCount(), m_scanServerUrl, m_label));
+		}
+	}
 
 	private ScanResults createResults() {
 		return new ScanResults(
