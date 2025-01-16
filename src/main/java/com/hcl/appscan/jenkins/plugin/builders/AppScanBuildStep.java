@@ -293,7 +293,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         String failureMessage=Messages.error_threshold_exceeded();
 		try {
                     List<FailureCondition> failureConditions=m_failureConditions;
-                    progress.setStatus(new Message(Message.INFO, "Checking for build failure based on scan configuration..."));
+                    progress.setStatus(new Message(Message.INFO, Messages.fail_build_check()));
                     if (m_failBuildNonCompliance){
                         failureConditions =new ArrayList<>();
                         FailureCondition nonCompliantCondition = new FailureCondition("total", 0);
@@ -396,8 +396,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             if(m_wait)
                 shouldFailBuild(provider,build, progress);
 
-            if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase("Unstable")) {
-                throw new AbortException("One scan execution gets failed. Refer to build summary page to see the result of successful scan.");
+            if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase(CoreConstants.UNSTABLE)) {
+                throw new AbortException(Messages.error_scan_status_unstable());
             }
         }
     }
