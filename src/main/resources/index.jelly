@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+   This plugin allows you to execute security scans with HCL AppScan
+</div>
