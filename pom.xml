@@ -33,8 +33,8 @@
 
   <properties>
         <slf4jVersion>1.7.26</slf4jVersion>
-        <jenkins.baseline>2.361</jenkins.baseline>
-        <jenkins.version>${jenkins.baseline}.1</jenkins.version>
+        <jenkins.baseline>2.414</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <findbugs.failOnError>false</findbugs.failOnError>
         <spotbugs.failOnError>false</spotbugs.failOnError>
   </properties>
@@ -49,7 +49,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>2102.v854b_fec19c92</version>
+                <version>2718.v7e8a_d43b_3f0b_</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -102,7 +102,7 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
-            <version>2.6.1.1</version>
+            <version>1319.v7eb_51b_3a_c97b_</version>
         </dependency>
   </dependencies>
   
