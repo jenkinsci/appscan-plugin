@@ -63,6 +63,10 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		m_scanServerUrl = scanServerUrl;
                 getReport();
 	}
+
+	public ScanResults(Run<?,?> build, IResultsProvider provider, String name, String serverUrl, String label) {
+		this(build, provider, name, provider.getStatus(), provider.getFindingsCount(), provider.getCriticalCount(), provider.getHighCount(), provider.getMediumCount(), provider.getLowCount(), provider.getInfoCount(), serverUrl, label);
+	}
 	
 	@Override
 	public String getUrlName() {
