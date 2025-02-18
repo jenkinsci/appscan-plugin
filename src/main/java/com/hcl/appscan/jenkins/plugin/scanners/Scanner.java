@@ -67,6 +67,10 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		return path;
 	}
     public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+        if(authProvider.isTokenExpired()) {
+            throw new AbortException(Messages.error_token_authentication());
+        }
+
         if (isAppScan360) {
             if (!properties.get("FullyAutomatic").equals("true")) {
                 progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));

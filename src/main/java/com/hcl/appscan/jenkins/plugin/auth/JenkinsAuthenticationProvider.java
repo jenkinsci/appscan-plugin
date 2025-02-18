@@ -49,7 +49,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		try {
 			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated,JenkinsUtil.getClientType());
 		} catch (IOException | JSONException e) {
-			isExpired = false;
+			isExpired = true;
 		}
 		return isExpired;
 	}
