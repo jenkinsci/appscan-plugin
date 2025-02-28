@@ -62,7 +62,6 @@ public class DynamicAnalyzer extends Scanner {
 	private Secret m_loginPassword;
 	private String m_trafficFile;
 	private boolean m_rescanDast;
-	private String m_scanId;
 
 	@Deprecated
 	public DynamicAnalyzer(String target) {
@@ -71,9 +70,7 @@ public class DynamicAnalyzer extends Scanner {
 
 	@Deprecated
 	public DynamicAnalyzer(String target, boolean hasOptions, boolean rescanDast, String scanId, boolean incrementalScan, String executionId, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
-		super(target, hasOptions);
-		m_rescanDast = rescanDast;
-		m_scanId = scanId;
+		super(target, hasOptions, rescanDast, scanId);
 		m_incrementalScan = incrementalScan;
 		m_executionId = executionId;
 		m_presenceId = presenceId;
@@ -90,9 +87,7 @@ public class DynamicAnalyzer extends Scanner {
 	@DataBoundConstructor
 
 	public DynamicAnalyzer(String target, boolean hasOptions) {
-		super(target, hasOptions);
-		m_rescanDast = false;
-		m_scanId = EMPTY;
+		super(target, hasOptions, false, EMPTY);
 		m_incrementalScan = false;
 		m_executionId = EMPTY;
 		m_presenceId = EMPTY;
@@ -131,14 +126,6 @@ public class DynamicAnalyzer extends Scanner {
 
 	public boolean getRescanDast() {
 		return m_rescanDast;
-	}
-
-	@DataBoundSetter
-	public void setScanId(String scanId) {
-		m_scanId = scanId;
-	}
-	public String getScanId() {
-		return m_scanId;
 	}
 
 	@DataBoundSetter

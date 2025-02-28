@@ -43,8 +43,6 @@ public class StaticAnalyzer extends Scanner {
         private boolean m_sourceCodeOnly;
         private String m_scanMethod;
         private String m_scanSpeed;
-        private boolean m_rescan;
-        private String m_scanId;
         
         @Deprecated
         public StaticAnalyzer(String target) {
@@ -52,9 +50,7 @@ public class StaticAnalyzer extends Scanner {
         }
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
-            super(target, hasOptions);
-            m_rescan = rescan;
-            m_scanId = scanId;
+            super(target, hasOptions,rescan,scanId);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;
@@ -66,9 +62,7 @@ public class StaticAnalyzer extends Scanner {
         
 	@DataBoundConstructor
 	public StaticAnalyzer(String target,boolean hasOptions) {
-            super(target, hasOptions);
-            m_rescan=false;
-            m_scanId=EMPTY;
+            super(target, hasOptions, false, EMPTY);
             m_openSourceOnly=false;
             m_sourceCodeOnly=false;
             m_scanMethod=CoreConstants.CREATE_IRX;
@@ -100,23 +94,6 @@ public class StaticAnalyzer extends Scanner {
             	return m_scanSpeed.equalsIgnoreCase(scanSpeed) ? "true" : "false";
         		}
         	return null;
-    	}
-
-    	@DataBoundSetter
-    	public void setRescan(boolean rescan) {
-        	m_rescan = rescan;
-    	}
-
-    	public boolean getRescan() {
-        	return m_rescan;
-    	}
-
-    	@DataBoundSetter
-    	public void setScanId(String scanId) {
-        	m_scanId = scanId;
-    	}
-    	public String getScanId() {
-        	return m_scanId;
     	}
 
         @DataBoundSetter

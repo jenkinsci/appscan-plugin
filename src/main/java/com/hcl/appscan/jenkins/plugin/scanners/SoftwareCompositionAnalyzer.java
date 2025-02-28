@@ -40,16 +40,12 @@ public class SoftwareCompositionAnalyzer extends Scanner {
     }
 
     public SoftwareCompositionAnalyzer(String target, boolean rescan, String scanId) {
-        super(target, false);
-        m_rescan = rescan;
-        m_scanId = scanId;
+        super(target, false, rescan, scanId);
     }
 
     @DataBoundConstructor
     public SoftwareCompositionAnalyzer(String target, boolean hasOptions){
-        super(target, hasOptions);
-        m_rescan = false;
-        m_scanId = EMPTY;
+        super(target, hasOptions, false, EMPTY);
     }
 
 
