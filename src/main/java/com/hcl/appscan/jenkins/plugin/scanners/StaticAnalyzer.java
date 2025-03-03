@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019, 2024.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019, 2024, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -50,7 +50,7 @@ public class StaticAnalyzer extends Scanner {
         }
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
-            super(target, hasOptions,rescan,scanId);
+            super(target, hasOptions, rescan, scanId);
             m_openSourceOnly=openSourceOnly;
             m_sourceCodeOnly=sourceCodeOnly;
             m_scanMethod= scanMethod;

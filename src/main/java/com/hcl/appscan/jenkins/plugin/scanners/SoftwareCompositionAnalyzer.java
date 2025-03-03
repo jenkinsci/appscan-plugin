@@ -1,5 +1,5 @@
 /**
- * @ Copyright HCL Technologies Ltd. 2023, 2024.
+ * @ Copyright HCL Technologies Ltd. 2023, 2024, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -31,9 +31,6 @@ import java.util.Map;
 
 public class SoftwareCompositionAnalyzer extends Scanner {
 
-    private boolean m_rescan;
-    private String m_scanId;
-
     @Deprecated
     public SoftwareCompositionAnalyzer(String target){
         super(target, false);
@@ -52,23 +49,6 @@ public class SoftwareCompositionAnalyzer extends Scanner {
     @Override
     public String getType() {
         return SOFTWARE_COMPOSITION_ANALYZER;
-    }
-
-    @DataBoundSetter
-    public void setRescan(boolean rescan) {
-        m_rescan = rescan;
-    }
-
-    public boolean getRescan() {
-        return m_rescan;
-    }
-
-    @DataBoundSetter
-    public void setScanId(String scanId) {
-        m_scanId = scanId;
-    }
-    public String getScanId() {
-        return m_scanId;
     }
 
     public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws AbortException {
