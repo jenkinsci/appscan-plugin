@@ -50,6 +50,7 @@ public class DynamicAnalyzer extends Scanner {
 
 	private static final String DYNAMIC_ANALYZER = "Dynamic Analyzer"; //$NON-NLS-1$
 
+	private boolean m_rescanDast;
 	private boolean m_incrementalScan;
 	private String m_executionId;
 	private String m_presenceId;
@@ -61,7 +62,6 @@ public class DynamicAnalyzer extends Scanner {
 	private String m_loginUser;
 	private Secret m_loginPassword;
 	private String m_trafficFile;
-	private boolean m_rescanDast;
 
 	@Deprecated
 	public DynamicAnalyzer(String target) {
@@ -70,7 +70,8 @@ public class DynamicAnalyzer extends Scanner {
 
 	@Deprecated
 	public DynamicAnalyzer(String target, boolean hasOptions, boolean rescanDast, String scanId, boolean incrementalScan, String executionId, String presenceId, String scanFile, String scanType, String optimization, String extraField, String loginUser, String loginPassword, String trafficFile, String loginType) {
-		super(target, hasOptions, rescanDast, scanId);
+		super(target, hasOptions, false, scanId);
+		m_rescanDast = rescanDast;
 		m_incrementalScan = incrementalScan;
 		m_executionId = executionId;
 		m_presenceId = presenceId;
@@ -85,7 +86,6 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	@DataBoundConstructor
-
 	public DynamicAnalyzer(String target, boolean hasOptions) {
 		super(target, hasOptions, false, EMPTY);
 		m_incrementalScan = false;
@@ -143,7 +143,10 @@ public class DynamicAnalyzer extends Scanner {
 	}
 
 	public String getExecutionId() {
-		return m_executionId;
+		if(m_incrementalScan) {
+			return m_executionId;
+		}
+		return "";
 	}
 
 	@DataBoundSetter
@@ -438,7 +441,7 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.validateRequired(scanId);
 		}
 
-		public FormValidation doCheckExecutionId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId, @QueryParameter String executionId) {
+		public FormValidation doCheckExecutionId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) {
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
 			JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId);
 			if(executionDetails == null) {

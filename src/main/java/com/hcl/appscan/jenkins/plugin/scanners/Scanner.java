@@ -18,6 +18,7 @@ import hudson.model.AbstractDescribableImpl;
 import hudson.util.VariableResolver;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.JSONObject;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -53,8 +54,18 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 		return m_target;
 	}
 
+	@DataBoundSetter
+	public void setRescan(boolean rescan) {
+		m_rescan = rescan;
+	}
+
 	public boolean getRescan() {
 		return m_rescan;
+	}
+
+	@DataBoundSetter
+	public void setScanId(String scanId) {
+		m_scanId = scanId;
 	}
 
 	public String getScanId() {
