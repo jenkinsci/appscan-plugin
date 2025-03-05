@@ -1,3 +1,8 @@
+/**
+ * © Copyright HCL Technologies Ltd. 2025.
+ * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+ */
+
 package com.hcl.appscan.jenkins.plugin.actions;
 
 import com.hcl.appscan.sdk.results.IResultsProvider;
