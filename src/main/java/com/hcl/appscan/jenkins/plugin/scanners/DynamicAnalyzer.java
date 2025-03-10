@@ -6,6 +6,7 @@
 
 package com.hcl.appscan.jenkins.plugin.scanners;
 
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -240,7 +241,9 @@ public class DynamicAnalyzer extends Scanner {
 		}
 	}
 
-	public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws AbortException {
+	@Override
+	public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+		super.validateSettings(authProvider, properties, progress, isAppScan360);
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}

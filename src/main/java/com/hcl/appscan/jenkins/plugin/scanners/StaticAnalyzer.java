@@ -188,7 +188,9 @@ public class StaticAnalyzer extends Scanner {
             return m_scanMethod.equals(scanMethod);
         }
 
-        public void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws AbortException {
+        @Override
+        public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+            super.validateSettings(authProvider, properties, progress, isAppScan360);
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                 throw new AbortException(Messages.error_active_subscription_validation(getType()));
             }

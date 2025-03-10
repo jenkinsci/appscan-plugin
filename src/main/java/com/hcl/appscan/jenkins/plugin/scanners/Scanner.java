@@ -74,8 +74,6 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
 	
 	public abstract Map<String, String> getProperties(VariableResolver<String> resolver) throws AbortException;
 
-	public abstract void validateScannerSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws AbortException;
-
 	public abstract String getType();
 
 	public boolean isNullOrEmpty(String string) { return string != null && !string.trim().isEmpty(); }
@@ -106,8 +104,6 @@ public abstract class Scanner extends AbstractDescribableImpl<Scanner> implement
         } else if (authProvider.getacceptInvalidCerts()) {
             progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
         }
-
-        validateScannerSettings(authProvider, properties, progress, isAppScan360);
 
         if(properties.containsKey(CoreConstants.SCAN_ID)) {
             if (properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
