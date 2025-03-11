@@ -417,21 +417,25 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
-			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
-			if(!ServiceUtil.hasDastEntitlement(authProvider)) {
+			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+
+			// Check if the user has a valid entitlement
+			if (!ServiceUtil.hasDastEntitlement(authProvider)) {
 				return FormValidation.error(Messages.error_active_subscription_validation_ui());
 			}
-			if(!rescanDast && !authProvider.isAppScan360() && presenceId != null && presenceId.equals(EMPTY) && !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
-				return FormValidation.error(Messages.error_url_validation_ui());
-			}
-			if (!rescanDast && authProvider.isAppScan360() && (ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1)) {
-				if (!target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy())) {
-						return FormValidation.error(Messages.error_url_validation_ui());
-				}
-			}
-			if(rescanDast) {
+
+			// If rescanDast is true, return FormValidation.ok()
+			if (rescanDast) {
 				return FormValidation.ok();
 			}
+
+			// Validate the URL if conditions are met & for AppScan360, check the version and validate the URL
+			boolean isUrlInvalid = !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
+			if ((presenceId != null && presenceId.equals(EMPTY) && !authProvider.isAppScan360() ||
+					(authProvider.isAppScan360() && ServiceUtil.getServiceVersion(authProvider).substring(0, 5).compareTo("1.4.0") < 0)) && isUrlInvalid) {
+				return FormValidation.error(Messages.error_url_validation_ui());
+			}
+			
 			return FormValidation.validateRequired(target);
 		}
 
