@@ -33,7 +33,7 @@
 
   <properties>
         <slf4jVersion>1.7.26</slf4jVersion>
-        <jenkins.baseline>2.414</jenkins.baseline>
+        <jenkins.baseline>2.426</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <findbugs.failOnError>false</findbugs.failOnError>
         <spotbugs.failOnError>false</spotbugs.failOnError>
