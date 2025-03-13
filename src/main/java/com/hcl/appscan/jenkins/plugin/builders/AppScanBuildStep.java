@@ -396,7 +396,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             if(m_wait)
                 shouldFailBuild(provider,build, progress);
 
-            if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase(CoreConstants.INCOMPLETE)) {
+            if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase(CoreConstants.PARTIAL_SUCCESS)) {
                 throw new AbortException(Messages.error_scan_status_unstable());
             }
         }
