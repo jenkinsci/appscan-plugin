@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2019, 2024.
+ * @ Copyright HCL Technologies Ltd. 2017, 2019, 2024, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,14 +9,19 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
+import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
 import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.AbortException;
 import hudson.RelativePath;
 import hudson.model.ItemGroup;
+import org.apache.wink.json4j.JSONException;
+import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -41,7 +46,7 @@ public class StaticAnalyzer extends Scanner {
         
         @Deprecated
         public StaticAnalyzer(String target) {
-            this(target, true, false, "");
+            this(target, true);
         }
         
         public StaticAnalyzer(String target, boolean hasOptions, boolean rescan, String scanId, boolean openSourceOnly, boolean sourceCodeOnly, String scanMethod, String scanSpeed, String includeSCAGenerateIRX, boolean hasOptionsUploadDirect, String includeSCAUploadDirect){
@@ -56,8 +61,8 @@ public class StaticAnalyzer extends Scanner {
         }
         
 	@DataBoundConstructor
-	public StaticAnalyzer(String target,boolean hasOptions, boolean rescan, String scanId) {
-            super(target, hasOptions, rescan, scanId);
+	public StaticAnalyzer(String target,boolean hasOptions) {
+            super(target, hasOptions, false, EMPTY);
             m_openSourceOnly=false;
             m_sourceCodeOnly=false;
             m_scanMethod=CoreConstants.CREATE_IRX;
@@ -183,33 +188,51 @@ public class StaticAnalyzer extends Scanner {
             return m_scanMethod.equals(scanMethod);
         }
 
-        public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress) throws AbortException {
+        @Override
+        public void validateSettings(JenkinsAuthenticationProvider authProvider, Map<String, String> properties, IProgress progress, boolean isAppScan360) throws IOException {
+            super.validateSettings(authProvider, properties, progress, isAppScan360);
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                 throw new AbortException(Messages.error_active_subscription_validation(getType()));
             }
           
-           if(isRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
+           if(getRescan() && !properties.containsKey(CoreConstants.SCAN_ID)) {
                 throw new AbortException(Messages.error_empty_scan_id());
             } else if(properties.containsKey(CoreConstants.SCAN_ID)) {
                properties.remove(CoreConstants.INCLUDE_SCA);
            }
 
+            // Handle AppScan360-specific validation
             if (authProvider.isAppScan360()) {
                 if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
                     throw new AbortException(Messages.error_sca_AppScan360());
                 }
+                // Remove INCLUDE_SCA and show warning if present in AppScan360 context
                 if (properties.containsKey(CoreConstants.INCLUDE_SCA)) {
                     progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
                     properties.remove(CoreConstants.INCLUDE_SCA);
                 }
-            } else if(properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
-                properties.remove(CoreConstants.INCLUDE_SCA);
+            } else {
+                // Handle SCA entitlement validation and removal of INCLUDE_SCA if no entitlement
+                if (properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
+                    progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
+                    properties.remove(CoreConstants.INCLUDE_SCA);
+                }
             }
 
-            //includeSCA is only available if the user upload an IRX file.
+            //includeSCA is only available if the user upload an IRX file for upload files & folders scan method .
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
                 throw new AbortException(Messages.error_invalid_format_include_sca());
+            }
+
+            if(properties.containsKey(CoreConstants.SCAN_ID)) {
+                try {
+                    JSONObject scanDetails = new CloudScanServiceProvider(authProvider).getScanDetails(STATIC_ANALYZER, properties.get(CoreConstants.SCAN_ID));;
+                    if(scanDetails!=null && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform")!=null) {
+                        throw new AbortException(Messages.error_invalid_scan_id_git_repo());
+                    }
+                } catch (JSONException e) {
+                    //Ignore and move on.
+                }
             }
         }
 
@@ -232,7 +255,7 @@ public class StaticAnalyzer extends Scanner {
             if(isNullOrEmpty(m_scanSpeed) && getHasOptions()) {
                 properties.put(SCAN_SPEED, m_scanSpeed);
             }
-            if(isRescan() && isNullOrEmpty(getScanId()) ){
+            if(getRescan() && isNullOrEmpty(getScanId()) ){
                 properties.put(CoreConstants.SCAN_ID,getScanId());
             }
             return properties;
@@ -254,16 +277,40 @@ public class StaticAnalyzer extends Scanner {
             }
             return FormValidation.ok();
         }
-        
-        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
-            if(scanId!=null && !scanId.isEmpty() && !ServiceUtil.isScanId(scanId,application,STATIC_ANALYZER,provider)) {
-                return FormValidation.error(Messages.error_invalid_scan_id_ui());
-            }
-            return FormValidation.validateRequired(scanId);
-		}
 
-        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @QueryParameter String target, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+            if (scanId == null || scanId.isEmpty()) {
+                    return FormValidation.validateRequired(scanId);
+            }
+
+            JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
+            JSONObject scanDetails = new CloudScanServiceProvider(provider).getScanDetails(STATIC_ANALYZER, scanId);
+
+            if (isGitRepoPlatform(scanDetails)) {
+                    return FormValidation.error(Messages.error_invalid_scan_id_git_repo_ui());
+            }
+
+            try {
+                    return scanIdValidation(scanDetails, application);
+            } catch (JSONException e) {
+                    // Ignore and move on
+            }
+
+            return FormValidation.ok();
+        }
+
+        // Helper method to check if the scan details contain a GitRepoPlatform
+        private boolean isGitRepoPlatform(JSONObject scanDetails) {
+            try {
+                    return scanDetails != null && scanDetails.containsKey("GitRepoPlatform") && scanDetails.get("GitRepoPlatform") != null;
+            } catch (JSONException e) {
+                    // Ignore and move on
+            }
+            return false;
+        }
+
+
+        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
             if (Boolean.parseBoolean(includeSCAUploadDirect) && checkAppScan360Connection.isAppScan360()) {
                     return FormValidation.error(Messages.error_include_sca_ui());
