@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019, 2024.
+ * @ Copyright HCL Technologies Ltd. 2019, 2024, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -62,6 +62,10 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		m_label = label;
 		m_scanServerUrl = scanServerUrl;
                 getReport();
+	}
+
+	public ScanResults(Run<?,?> build, IResultsProvider provider, String name, String serverUrl, String label) {
+		this(build, provider, name, provider.getStatus(), provider.getFindingsCount(), provider.getCriticalCount(), provider.getHighCount(), provider.getMediumCount(), provider.getLowCount(), provider.getInfoCount(), serverUrl, label);
 	}
 	
 	@Override
