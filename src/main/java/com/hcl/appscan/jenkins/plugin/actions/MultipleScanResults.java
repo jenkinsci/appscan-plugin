@@ -19,7 +19,11 @@ public class MultipleScanResults {
     }
 
     public void createMultipleResults(Run<?,?> rTemp, Run<?, ?> build, String name, String serverUrl, String label) {
-        rTemp.addAction(new ScanResults(build, m_provider1, ServiceUtil.scanTypeShortForm(m_provider1.getType()).toUpperCase()+"_"+name, serverUrl+ServiceUtil.scanTypeShortForm(m_provider1.getType()).toLowerCase(), label));
-        rTemp.addAction(new ScanResults(build, m_provider2, ServiceUtil.scanTypeShortForm(m_provider2.getType()).toUpperCase()+"_"+name, serverUrl+ServiceUtil.scanTypeShortForm(m_provider2.getType()).toLowerCase(), label));
+        if(m_provider1.hasResults()) {
+            rTemp.addAction(new ScanResults(build, m_provider1, ServiceUtil.scanTypeShortForm(m_provider1.getType()).toUpperCase()+"_"+name, serverUrl+ServiceUtil.scanTypeShortForm(m_provider1.getType()).toLowerCase(), label));
+        }
+        if(m_provider2.hasResults()) {
+            rTemp.addAction(new ScanResults(build, m_provider2, ServiceUtil.scanTypeShortForm(m_provider2.getType()).toUpperCase()+"_"+name, serverUrl+ServiceUtil.scanTypeShortForm(m_provider2.getType()).toLowerCase(), label));
+        }
     }
 }
