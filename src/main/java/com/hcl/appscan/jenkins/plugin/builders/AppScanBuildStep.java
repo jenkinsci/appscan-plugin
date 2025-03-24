@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022, 2024.
+ * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022, 2024, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -287,12 +287,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		}
 	}
 
-    private void shouldFailBuild(IResultsProvider provider,Run<?,?> build) throws AbortException, IOException{
+    private void shouldFailBuild(IResultsProvider provider,Run<?,?> build, IProgress progress) throws AbortException, IOException{
     	if(!m_failBuild && !m_failBuildNonCompliance)
     		return ;
         String failureMessage=Messages.error_threshold_exceeded();
 		try {
                     List<FailureCondition> failureConditions=m_failureConditions;
+                    progress.setStatus(new Message(Message.INFO, Messages.fail_build_check()));
                     if (m_failBuildNonCompliance){
                         failureConditions =new ArrayList<>();
                         FailureCondition nonCompliantCondition = new FailureCondition("total", 0);
@@ -308,46 +309,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
 	    }
 	}
-
-    private void validateGeneralSettings(boolean isAppScan360, Map<String, String> properties, IProgress progress) throws IOException {
-        if(isAppScan360) {
-            if (m_intervention) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_allow_intervention_AppScan360()));
-            }
-        } else if (m_authProvider.getacceptInvalidCerts()) {
-            progress.setStatus(new Message(Message.WARNING, Messages.warning_asoc_certificates()));
-        }
-
-        if(properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
-            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.TARGET));
-            properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
-        }
-
-        if(properties.containsKey(CoreConstants.SCAN_ID)) {
-            if(properties.get(CoreConstants.PERSONAL_SCAN).equals("true")) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_personal_scan_rescan()));
-            }
-
-            try {
-                scanIdValidation(properties,progress);
-            } catch (JSONException e) {
-                //Ignore and move on.
-            }
-        }
-    }
-
-    private void scanIdValidation(Map<String, String> properties, IProgress progress) throws JSONException, IOException {
-        IScanServiceProvider scanServiceProvider = new CloudScanServiceProvider(progress, m_authProvider);
-        JSONObject scanDetails = scanServiceProvider.getScanDetails(properties.get(CoreConstants.SCAN_ID));
-        if(scanDetails == null) {
-            throw new AbortException(Messages.error_invalid_scan_id());
-        } else if (!scanDetails.get(CoreConstants.APP_ID).equals(properties.get(CoreConstants.APP_ID))) {
-            throw new AbortException(Messages.error_invalid_scan_id_application());
-        } else if (!scanDetails.get("Technology").equals(ServiceUtil.updatedScanType(properties.get(CoreConstants.SCANNER_TYPE)))) {
-            throw new AbortException(Messages.error_invalid_scan_id_scan_type());
-        }
-    }
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
     	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
@@ -356,8 +317,13 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         Map<String, String> properties = getScanProperties(build,listener);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
-        m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress);
-        validateGeneralSettings(isAppScan360,properties,progress);
+        m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress, isAppScan360);
+
+        if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
+            progress.setStatus(new Message(Message.WARNING, Messages.warning_sca()));
+            m_scanner = ScannerFactory.getScanner(Scanner.SOFTWARE_COMPOSITION_ANALYZER, properties.get(CoreConstants.TARGET));
+            properties.put(CoreConstants.SCANNER_TYPE, CoreConstants.SOFTWARE_COMPOSITION_ANALYZER);
+        }
 
 
         final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
@@ -404,34 +370,36 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             m_scanStatus = provider.getStatus();
 
     	if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
-			  String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
-			  if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
-				  message += ", " + provider.getMessage();
-			  }
-			  build.setDescription(message);
-			  throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, ("Scan Name: " + m_name)));
-		  }
-        else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
+            String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + m_name);
+            if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
+                message += ", " + provider.getMessage();
+            }
+            build.setDescription(message);
+            throw new AbortException(com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, ("Scan Name: " + m_name)));
+    	} else if (CoreConstants.UNKNOWN.equalsIgnoreCase(m_scanStatus)) { // In case of internet disconnect Status is set to unstable.
             progress.setStatus(new Message(Message.ERROR, Messages.error_server_unavailable() + " "+ Messages.check_server(m_authProvider.getServer())));
             build.setDescription(Messages.error_server_unavailable());
             build.setResult(Result.UNSTABLE);
-        }
-        else {
-      provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
-      VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
-    	String asocAppUrl = m_authProvider.getServer() + "/main/myapps/" + m_application + "/scans/" + scan.getScanId();
-        String label;
-        if(isAppScan360){
-            label = Messages.label_appscan360_homepage();
         } else {
-            label = Messages.label_asoc_homepage();
+            provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+            VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
+            String asocAppUrl = m_authProvider.getServer() + "/main/myapps/" + m_application + "/scans/";
+            String label;
+            if(isAppScan360) {
+                label = Messages.label_appscan360_homepage();
+            } else {
+                label = Messages.label_asoc_homepage();
+            }
+
+            build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
+
+            if(m_wait)
+                shouldFailBuild(provider,build, progress);
+
+            if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase(CoreConstants.PARTIAL_SUCCESS)) {
+                throw new AbortException(Messages.error_scan_status_unstable());
+            }
         }
-
-        build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
-
-        if(m_wait)
-            shouldFailBuild(provider,build);	
-    }
     }
     
     private void setInstallDir() {

@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019, 2020.
+ * @ Copyright HCL Technologies Ltd. 2019, 2020, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,6 +9,7 @@ package com.hcl.appscan.jenkins.plugin.actions;
 import com.hcl.appscan.jenkins.plugin.util.ExecutorUtil;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
+import com.hcl.appscan.sdk.utils.ServiceUtil;
 import hudson.model.Action;
 import hudson.model.Run;
 
@@ -118,7 +119,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 						return true;
 					} else if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
 						rTemp.getActions().remove(ResultsRetriever.this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
-						rTemp.addAction(createResults());
+						ScanResultsFactory.createResult(rTemp, m_build, m_provider, m_name, m_scanServerUrl, m_label);
 						try {
 							rTemp.save();
 						} catch (IOException e) {
@@ -139,21 +140,5 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 		}
 
 		return results;
-	}
-
-	private ScanResults createResults() {
-		return new ScanResults(
-				m_build,
-				m_provider,
-				m_name,
-				m_provider.getStatus(),
-				m_provider.getFindingsCount(),
-                		m_provider.getCriticalCount(),
-                		m_provider.getHighCount(),
-				m_provider.getMediumCount(),
-				m_provider.getLowCount(),
-				m_provider.getInfoCount(),
-				m_scanServerUrl,
-				m_label);
 	}
 }

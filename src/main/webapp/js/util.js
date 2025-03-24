@@ -71,34 +71,36 @@ function waitClicked(e) {
 }
 
 function toggleVisibilityBasedOnRescan() {
-     var rescanChecked = document.getElementsByName('rescan')[0].checked;
-      
-    var isCreateIRXSelected = document.querySelector('input[type="radio"][value="createIRX"]').checked;
-    var hasOptionsChecked = document.getElementsByName('hasOptions')[0].checked;
+    var rescanChecked = document.getElementsByName('rescan')[0].checked;
     var includeSCACheckbox = document.getElementById('includeSCAGenerateIRX');
-
-    var isUploadDirectSelected = document.querySelector('input[type="radio"][value="uploadDirect"]').checked;
     var hasOptionsUploadDirectElement = document.getElementsByName('hasOptionsUploadDirect')[0];
     var includeSCADirectCheckbox = document.getElementById('includeSCAUploadDirect');
 
      if (rescanChecked) {
-        if (hasOptionsChecked) {
             includeSCACheckbox.disabled = true;
-        }
-        if (isUploadDirectSelected) {
             hasOptionsUploadDirectElement.disabled = true;
             includeSCADirectCheckbox.disabled = true;
-        }
     } else {
-        if (isCreateIRXSelected) {
-            if (hasOptionsChecked) {
-                includeSCACheckbox.disabled = false;
-            }
-        } 
-        if (isUploadDirectSelected) {
+            includeSCACheckbox.disabled = false;
             hasOptionsUploadDirectElement.disabled = false;
             includeSCADirectCheckbox.disabled = false;
-        }
+    }
+}
+
+function toggleVisibilityBasedOnRescanDAST() {
+    var rescanChecked = document.getElementsByName('rescanDast')[0].checked;
+    var startingURL = document.getElementsByName('target')[0];
+    var hasOptions = document.getElementsByName('hasOptions')[0];
+
+     if (rescanChecked) {
+        startingURL.classList.add('disabled');
+        startingURL.disabled = true;
+        hasOptions.checked = false;
+        hasOptions.disabled = true;
+    } else {
+        startingURL.classList.remove('disabled');
+        startingURL.disabled = false;
+        hasOptions.disabled = false;
     }
 }
 
