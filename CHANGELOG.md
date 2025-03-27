@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+1.6.0 (March, 2025)
+------
+- Support for Rescan of DAST Scans in both HCL AppScan on Cloud and HCL AppScan 360°.
+- Enhancement to display separate build summaries during SAST execution when SCA is included.
+- Bug fixes.
+
 1.5.1 (October, 2024)
 ------
 - Bug fixes.
