@@ -108,13 +108,28 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_trafficFile;
 	private String m_userName;
 	private Secret m_password;
+	private String m_loginTypeFullAutoScan;
+	private String m_loginTypeTestScan;
+	private String m_trafficFileFullAutoScan;
+	private String m_userNameFullAutoScan;
+	private Secret m_passwordFullAutoScan;
+	private String m_exploreDataFullAutoScan;
+	private String m_trafficFileTestScan;
+	private String m_userNameTestScan;
+	private Secret m_passwordTestScan;
+	private String m_exploreDataTestScan;
 	
 	private String m_scanType;
 
 	private String m_testOptimization;
 	private String m_scanStatus;
-    	private String m_description;
-    	private String m_contact;
+	private String m_description;
+	private String m_contact;
+	private String m_postmanCollectionFile;
+	private String m_additionalDomains;
+	private String m_environmentalVariablesFile;
+	private String m_globalVariablesFile;
+	private String m_additionalFiles;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -134,22 +149,30 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// template name to template id before saving it in
 		// job configuration file.
 		m_template = getDescriptor().getTemplateId(template);
-		m_exploreData = "";
 		m_agent = "";
 		m_jobName = (jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_email = false;
 		m_wait = false;
 		m_failBuild = false;
-		
-		m_loginType = "";
-		m_trafficFile = "";
-		m_userName = "";
-		m_password = Secret.fromString("");
-		
+		m_loginTypeFullAutoScan = "";
+		m_loginTypeTestScan = "";
+		m_trafficFileFullAutoScan = "";
+		m_trafficFileTestScan = "";
+		m_userNameFullAutoScan = "";
+		m_userNameTestScan = "";
+		m_passwordFullAutoScan = Secret.fromString("");
+		m_passwordTestScan = Secret.fromString("");
+		m_exploreDataFullAutoScan = "";
+		m_exploreDataTestScan = "";
 		m_scanType = "";
 		m_testOptimization = "";
-        	m_description = "";
-        	m_contact = "";
+		m_description = "";
+		m_contact = "";
+		m_postmanCollectionFile = "";
+		m_additionalDomains = "";
+		m_environmentalVariablesFile = "";
+		m_globalVariablesFile = "";
+		m_additionalFiles = "";
 	}
 	
 	public String getCredentials() {
@@ -238,7 +261,31 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	public String getLoginType() {
-		return m_loginType;
+		if(isNullOrEmpty(m_loginTypeFullAutoScan) && m_scanType.equals("1")) {
+			return m_loginTypeFullAutoScan;
+		} else if (isNullOrEmpty(m_loginTypeTestScan) && m_scanType.equals("3")) {
+			return m_loginTypeTestScan;
+		} else {
+			return m_loginType;
+		}
+	}
+
+	@DataBoundSetter
+	public void setLoginTypeFullAutoScan(String loginTypeFullAutoScan) {
+		m_loginTypeFullAutoScan = loginTypeFullAutoScan;
+	}
+
+	public String getLoginTypeFullAutoScan() {
+		return m_loginTypeFullAutoScan;
+	}
+
+	@DataBoundSetter
+	public void setLoginTypeTestScan(String loginTypeTestScan) {
+		m_loginTypeTestScan = loginTypeTestScan;
+	}
+
+	public String getLoginTypeTestScan() {
+		return m_loginTypeTestScan;
 	}
 	
 	@DataBoundSetter
@@ -248,25 +295,117 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 	
 	public String getTrafficFile() {
-		return m_trafficFile;
+		if(isNullOrEmpty(m_trafficFileFullAutoScan) && m_scanType.equals("1")) {
+			return m_trafficFileFullAutoScan;
+		} else if (isNullOrEmpty(m_trafficFileTestScan) && m_scanType.equals("3")) {
+			return m_trafficFileTestScan;
+		} else {
+			return m_trafficFile;
+		}
+	}
+
+	@DataBoundSetter
+	public void setTrafficFileFullAutoScan(String trafficFileFullAutoScan) {
+		if("Manual".equals(m_loginTypeFullAutoScan))
+			m_trafficFileFullAutoScan = trafficFileFullAutoScan;
+	}
+
+	public String getTrafficFileFullAutoScan() {
+		if(isNullOrEmpty(m_trafficFile) && m_scanType.equals("1")) {
+			return m_trafficFile;
+		}
+		return m_trafficFileFullAutoScan;
+	}
+
+	@DataBoundSetter
+	public void setTrafficFileTestScan(String trafficFileTestScan) {
+		if("Manual".equals(m_loginTypeTestScan))
+			m_trafficFileTestScan = trafficFileTestScan;
+	}
+
+	public String getTrafficFileTestScan() {
+		if(isNullOrEmpty(m_trafficFile) && m_scanType.equals("3")) {
+			return m_trafficFile;
+		}
+		return m_trafficFileTestScan;
 	}
 	
 	@DataBoundSetter
-    public void setAccessId(String userName) {	
+	public void setAccessId(String userName) {
 		m_userName = userName;
-    }
+	}
  
 	public String getAccessId() {
-		return m_userName;
+		if(isNullOrEmpty(m_userNameFullAutoScan) && m_scanType.equals("1")) {
+			return m_userNameFullAutoScan;
+		} else if (isNullOrEmpty(m_userNameTestScan) && m_scanType.equals("3")) {
+			return m_userNameTestScan;
+		} else {
+			return m_userName;
+		}
+	}
+
+	@DataBoundSetter
+	public void setAccessIdFullAutoScan(String userNameFullAutoScan) {
+		m_userNameFullAutoScan = userNameFullAutoScan;
+	}
+
+	public String getAccessIdFullAutoScan() {
+		if(isNullOrEmpty(m_userName) && m_scanType.equals("1")) {
+			return m_userName;
+		}
+		return m_userNameFullAutoScan;
+	}
+
+	@DataBoundSetter
+	public void setAccessIdTestScan(String userNameTestScan) {
+		m_userNameTestScan = userNameTestScan;
+	}
+
+	public String getAccessIdTestScan() {
+		if(isNullOrEmpty(m_userName) && m_scanType.equals("3")) {
+			return m_userName;
+		}
+		return m_userNameTestScan;
 	}
 
 	@DataBoundSetter
     public void setSecretKey(String password) {
-		m_password = Secret.fromString(password);
+			m_password = Secret.fromString(password);
     }
 	
 	public String getSecretKey() {
-		return Secret.toString(m_password);
+		if(m_passwordFullAutoScan != null && !m_passwordFullAutoScan.toString().isEmpty() && m_scanType.equals("1")) {
+			return Secret.toString(m_passwordFullAutoScan);
+		} else if ((m_passwordTestScan != null) && !m_passwordTestScan.toString().isEmpty() && m_scanType.equals("3")) {
+			return Secret.toString(m_passwordTestScan);
+		} else {
+			return Secret.toString(m_password);
+		}
+	}
+
+	@DataBoundSetter
+	public void setSecretKeyFullAutoScan(String passwordFullAutoScan) {
+		m_password = Secret.fromString(passwordFullAutoScan);
+	}
+
+	public String getSecretKeyFullAutoScan() {
+		if(isNullOrEmpty(m_password.toString()) && m_scanType.equals("1")) {
+			return Secret.toString(m_password);
+		}
+		return Secret.toString(m_passwordFullAutoScan);
+	}
+
+	@DataBoundSetter
+	public void setSecretKeyTestScan(String passwordTestScan) {
+		m_passwordTestScan = Secret.fromString(passwordTestScan);
+	}
+
+	public String getSecretKeyTestScan() {
+		if(isNullOrEmpty(m_password.toString()) && m_scanType.equals("3")) {
+			return Secret.toString(m_password);
+		}
+		return Secret.toString(m_passwordTestScan);
 	}
 	
 	@DataBoundSetter
@@ -280,11 +419,44 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	@DataBoundSetter
 	public void setExploreData(String exploreData) {
-		m_exploreData = exploreData;
+			m_exploreData = exploreData;
 	}
 
 	public String getExploreData() {
-		return m_exploreData;
+		if(m_exploreData == null) {
+			if(m_exploreDataFullAutoScan != null && !m_exploreDataFullAutoScan.isEmpty() && m_scanType.equals("1")) {
+				return m_exploreDataFullAutoScan;
+			} else if (m_exploreDataTestScan != null && !m_exploreDataTestScan.isEmpty() && m_scanType.equals("3")) {
+				return m_exploreDataTestScan;
+			}
+		} else {
+			return m_exploreData;
+		}
+		return "";
+	}
+
+	@DataBoundSetter
+	public void setExploreDataFullAutoScan(String exploreDataFullAutoScan) {
+		m_exploreDataFullAutoScan = exploreDataFullAutoScan;
+	}
+
+	public String getExploreDataFullAutoScan() {
+		if(isNullOrEmpty(m_exploreData) && m_scanType.equals("1")) {
+			return m_exploreData;
+		}
+		return m_exploreDataFullAutoScan;
+	}
+
+	@DataBoundSetter
+	public void setExploreDataTestScan(String exploreDataTestScan) {
+		m_exploreDataTestScan = exploreDataTestScan;
+	}
+
+	public String getExploreDataTestScan() {
+		if(isNullOrEmpty(m_exploreData) && m_scanType.equals("3")) {
+			return m_exploreData;
+		}
+		return m_exploreDataTestScan;
 	}
 
 	@DataBoundSetter
@@ -332,23 +504,68 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_failBuild;
 	}
 
-    	@DataBoundSetter
-    	public void setDescription(String description) {
-        	m_description = description;
-    	}
+	@DataBoundSetter
+	public void setDescription(String description) {
+		m_description = description;
+	}
 
-    	public String getDescription() {
-        	return m_description;
-    	}
+	public String getDescription() {
+		return m_description;
+	}
 
-    	@DataBoundSetter
-    	public void setContact(String contact) {
-        	m_contact = contact;
-    	}
+	@DataBoundSetter
+	public void setContact(String contact) {
+		m_contact = contact;
+	}
 
-    	public String getContact() {
-        	return m_contact;
-    	}
+	public String getContact() {
+		return m_contact;
+	}
+
+	@DataBoundSetter
+	public void setPostmanCollectionFile(String postmanCollectionFile) {
+		m_postmanCollectionFile = postmanCollectionFile;
+	}
+
+	public String getPostmanCollectionFile() {
+		return m_postmanCollectionFile;
+	}
+
+	@DataBoundSetter
+	public void setAdditionalDomains(String additionalDomains) {
+		m_additionalDomains = additionalDomains;
+	}
+
+	public String getAdditionalDomains() {
+		return m_additionalDomains;
+	}
+
+	@DataBoundSetter
+	public void setEnvironmentalVariablesFile(String environmentalVariablesFile) {
+		m_environmentalVariablesFile = environmentalVariablesFile;
+	}
+
+	public String getEnvironmentalVariablesFile() {
+		return m_environmentalVariablesFile;
+	}
+
+	@DataBoundSetter
+	public void setGlobalVariablesFile(String globalVariablesFile) {
+		m_globalVariablesFile = globalVariablesFile;
+	}
+
+	public String getGlobalVariablesFile() {
+		return m_globalVariablesFile;
+	}
+
+	@DataBoundSetter
+	public void setAdditionalFiles(String additionalFiles) {
+		m_additionalFiles = additionalFiles;
+	}
+
+	public String getAdditionalFiles() {
+		return m_additionalFiles;
+	}
 
 	@DataBoundSetter
 	public void setFailureConditions(List<FailureCondition> failureConditions) {
@@ -384,10 +601,23 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return BuildStepMonitor.NONE;
 	}
 	
-	public String isLoginType(String loginTypeName) {
-		if (m_loginType != null)
-			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
-		else if (loginTypeName.equals("Manual")) { //Default
+	public String isLoginTypeFullAutoScan(String loginTypeName) {
+		if (m_loginTypeFullAutoScan != null)
+			return m_loginTypeFullAutoScan.equalsIgnoreCase(loginTypeName) ? "true" : "";
+		else if (isNullOrEmpty(m_loginType) && m_scanType.equals("1")) {
+			return m_loginType.equals(loginTypeName) ? "true" : "";
+		} else if (loginTypeName.equals("Manual")) { //Default
+			return "true";
+		}
+		return "";
+	}
+
+	public String isLoginTypeTestScan(String loginTypeName) {
+		if (m_loginTypeTestScan != null)
+			return m_loginTypeTestScan.equalsIgnoreCase(loginTypeName) ? "true" : "";
+		else if (isNullOrEmpty(m_loginType) && m_scanType.equals("3")) {
+			return m_loginType.equals(loginTypeName) ? "true" : "";
+		} else if (loginTypeName.equals("Manual")) { //Default
 			return "true";
 		}
 		return "";
@@ -419,7 +649,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 properties.put("credentials", m_credentials);
                 properties.put("testPolicyId", m_testPolicy);
                 properties.put("agentServer", m_agent);
-                properties.put("loginType", m_loginType);
+                properties.put("loginType", m_scanType.equals("1") ? m_loginTypeFullAutoScan : m_scanType.equals("3") ? m_loginTypeTestScan : "");
                 properties.put("scanType", m_scanType);
                 properties.put("testOptimization", m_testOptimization);
                 properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
@@ -429,7 +659,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", m_target);
                     properties.put("folder", m_folder);
                     properties.put("templateId", m_template);
-                    properties.put("exploreData", m_exploreData);
+                    properties.put("exploreData", getExploreData());
                     properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
                     properties.put("description", m_description);
                     properties.put("contact", m_contact);
@@ -439,21 +669,43 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", Util.replaceMacro(m_target, resolver));
                     properties.put("folder", Util.replaceMacro(m_folder, resolver));
                     properties.put("templateId", Util.replaceMacro(m_template, resolver));
-                    properties.put("exploreData", m_exploreData.equals("") ? m_exploreData : resolvePath(m_exploreData, resolver));
+                    properties.put("exploreData", getExploreData().equals("") ? getExploreData() : resolvePath(getExploreData(), resolver));
                     properties.put(CoreConstants.SCAN_NAME, Util.replaceMacro(m_jobName, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
                     properties.put("description", Util.replaceMacro(m_description, resolver));
                     properties.put("contact", Util.replaceMacro(m_contact, resolver));
                 }
 
-		if (m_loginType != null) {
-                    if (m_loginType.equals("Manual")) {
-                        properties.put("trafficFile", (resolver == null || m_trafficFile.equals(""))? m_trafficFile : resolvePath(m_trafficFile, resolver));
-                    } else if (m_loginType.equals("Automatic")) {
-                        properties.put("userName", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
-                        properties.put("password", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
+                if (getLoginType() != null) {
+                    if (getLoginType().equals("Manual")) {
+                        properties.put("trafficFile", (resolver == null || getTrafficFile().equals(""))? getTrafficFile() : resolvePath(getTrafficFile(), resolver));
+                    } else if (getLoginType().equals("Automatic")) {
+                        properties.put("userName", resolver == null ? getAccessId() : Util.replaceMacro(getAccessId(), resolver));
+                        properties.put("password", resolver == null ? getSecretKey() : Util.replaceMacro(getSecretKey(), resolver));
+                    }
+                }
+
+                if (m_scanType.equals("4")) {
+                    if(isNullOrEmpty(m_postmanCollectionFile)) {
+                        properties.put("postmanCollectionFile", resolver == null ? m_postmanCollectionFile : resolvePath(m_postmanCollectionFile, resolver));
+                    }
+                    if (isNullOrEmpty(m_additionalDomains)) {
+                        properties.put("additionalDomains", resolver == null ? m_additionalDomains : Util.replaceMacro(m_additionalDomains, resolver));
+                    }
+                    if(isNullOrEmpty(m_environmentalVariablesFile)) {
+                        properties.put("environmentalVariablesFile", resolver == null ? m_environmentalVariablesFile : resolvePath(m_environmentalVariablesFile, resolver));
+                    }
+                    if(isNullOrEmpty(m_globalVariablesFile)) {
+                        properties.put("globalVariablesFile", resolver == null ? m_globalVariablesFile : resolvePath(m_globalVariablesFile, resolver));
+                    }
+                    if(isNullOrEmpty(m_additionalFiles)) {
+                        properties.put("additionalFiles", resolver == null ? m_additionalFiles : resolvePath(m_additionalFiles, resolver));
                     }
                 }
             return properties;
+	}
+
+	public boolean isNullOrEmpty(String string) {
+		return string != null && !string.trim().isEmpty();
 	}
 
 	private void shouldFailBuild(IResultsProvider provider, Run<?, ?> build) throws AbortException, IOException {
@@ -765,7 +1017,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			if (credentials.trim().equals("")) //$NON-NLS-1$
 				return FormValidation.errorWithMarkup(Messages.error_no_creds_ase("/credentials")); //$NON-NLS-1$
 
-			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+			IAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			if (authProvider.isTokenExpired())
 				return FormValidation.errorWithMarkup(Messages.error_token_expired("/credentials")); //$NON-NLS-1$
 
@@ -786,6 +1038,18 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		
 		public FormValidation doCheckJobName(@QueryParameter String jobName) {
 			return FormValidation.validateRequired(jobName);
+		}
+
+		public FormValidation doCheckExploreDataTestScan(@QueryParameter String exploreDataTestScan) {
+			return FormValidation.validateRequired(exploreDataTestScan);
+		}
+
+		public FormValidation doCheckPostmanCollectionFile(@QueryParameter String postmanCollectionFile) {
+			return FormValidation.validateRequired(postmanCollectionFile);
+		}
+
+		public FormValidation doCheckAdditionalDomains(@QueryParameter String additionalDomains) {
+			return FormValidation.validateRequired(additionalDomains);
 		}
 
 		//This method will initialize Template, folder and application list.

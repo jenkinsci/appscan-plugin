@@ -18,7 +18,7 @@
         <f:select onchange="resetFields(this)"/>
     </f:entry>
     
-    <f:section title="${%label.job.properties}" field="loginTypeOptions">
+    <f:section title="${%label.job.properties}">
 	    <f:entry title="${%label.template}" field="template">
 	        <f:textbox placeholder="${%template.placeholder}"
              data-maxsuggestions="99999"
@@ -60,36 +60,84 @@
 	        <f:textbox />
 	    </f:entry>
      </f:section>
-   
-    <f:section title="${%label.login.management}" field="loginTypeOptions">
-        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true" value="Manual" inline="true">
-            <st:nbsp/>
-            <f:entry title="${%label.traffic.file}" field="trafficFile">
+    
+    <f:section title="${%label.scan}">
+        <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="true" value="1"  help="/plugin/appscan/help/scanFull.html" inline="true">
+        <f:nested>
+            <f:entry title="${%label.login.management}">
+            <f:radioBlock name="loginTypeFullAutoScan" title="${%label.recorded}" checked="true" value="Manual" help="/plugin/appscan/help/loginManual.html" inline="true">
+                <f:entry title="${%label.traffic.file}" field="trafficFileFullAutoScan">
+                    <f:textbox/>
+                </f:entry>
+            </f:radioBlock>
+
+            <f:radioBlock name="loginTypeFullAutoScan" title="${%label.automatic}" checked="${instance.isLoginTypeFullAutoScan('Automatic')}" value="Automatic" help="/plugin/appscan/help/loginAutomatic.html" inline="true">
+                <f:entry title="${%label.user.name}" field="userNameFullAutoScan" help="/plugin/appscan/help/userName.html">
+                    <f:textbox field="accessIdFullAutoScan" />
+                </f:entry>
+                <f:entry title="${%label.password}" field="passwordFullAutoScan" help="/plugin/appscan/help/password.html">
+                    <f:password field="secretKeyFullAutoScan" />
+                </f:entry>
+            </f:radioBlock>
+
+            <f:radioBlock name="loginTypeFullAutoScan" title="${%label.none}" checked="${instance.isLoginTypeFullAutoScan('None')}" value="None" help="/plugin/appscan/help/loginNone.html" inline="true" />
+        </f:entry>
+
+            <f:entry title="${%label.manual.explore}" field="exploreDataFullAutoScan" help="/plugin/appscan/help/manualExploreData.html">
+                    <f:textbox/>
+            </f:entry>
+        </f:nested>
+        </f:radioBlock>
+
+        <f:radioBlock name="scanType" title="${%label.scan.test}"  checked="${instance.isScanType('3')}" value="3"  help="/plugin/appscan/help/scanTest.html" inline="true">
+        <f:nested>
+            <f:entry title="${%label.login.management}">
+            <f:radioBlock name="loginTypeTestScan" title="${%label.recorded}" checked="true" value="Manual" help="/plugin/appscan/help/loginManual.html" inline="true">
+                <st:nbsp/>
+                <f:entry title="${%label.traffic.file}" field="trafficFileTestScan">
+                    <f:textbox/>
+                </f:entry>
+            </f:radioBlock>
+
+            <f:radioBlock name="loginTypeTestScan" title="${%label.automatic}" checked="${instance.isLoginTypeTestScan('Automatic')}" value="Automatic" help="/plugin/appscan/help/loginAutomatic.html" inline="true">
+                <f:entry title="${%label.user.name}" field="userNameTestScan" help="/plugin/appscan/help/userName.html">
+                    <f:textbox field="accessIdTestScan" />
+                </f:entry>
+                <f:entry title="${%label.password}" field="passwordTestScan" help="/plugin/appscan/help/password.html">
+                    <f:password field="secretKeyTestScan" />
+                </f:entry>
+            </f:radioBlock>
+
+            <f:radioBlock name="loginTypeTestScan" title="${%label.none}" checked="${instance.isLoginTypeTestScan('None')}" value="None" help="/plugin/appscan/help/loginNone.html" inline="true" />
+        </f:entry>
+
+            <f:entry title="${%label.manual.explore}" field="exploreDataTestScan" help="/plugin/appscan/help/manualExploreData.html">
+                    <f:textbox />
+            </f:entry>
+        </f:nested>
+        </f:radioBlock>
+
+        <f:radioBlock name="scanType" title="${%label.api.scan}"  checked="${instance.isScanType('4')}" value="4"  help="/plugin/appscan/help/apiScanPostman.html" inline="true">
+            <f:entry title="${%label.postman.collection}" field="postmanCollectionFile">
+                <f:textbox />
+            </f:entry>
+
+            <f:entry title="${%label.additional.domains}" field="additionalDomains">
+                <f:textbox />
+            </f:entry>
+
+            <f:entry title="${%label.environmental.variables.file}" field="environmentalVariablesFile">
+                <f:textbox />
+            </f:entry>
+
+            <f:entry title="${%label.global.variables.file}" field="globalVariablesFile">
+                <f:textbox />
+            </f:entry>
+
+            <f:entry title="${%label.additional.files}" field="additionalFiles">
                 <f:textbox />
             </f:entry>
         </f:radioBlock>
-	
-        <f:radioBlock name="loginType" title="${%label.automatic}" checked="${instance.isLoginType('Automatic')}" value="Automatic" inline="true">
-            <f:entry title="${%label.user.name}" field="userName">
-                <f:textbox field="accessId" />
-            </f:entry>
-            <f:entry title="${%label.password}" field="password">
-                <f:password field="secretKey" />
-            </f:entry>
-        </f:radioBlock>
-	
-        <f:radioBlock name="loginType" title="${%label.none}" checked="${instance.isLoginType('None')}" value="None" inline="true" />
-    </f:section>  
-    
-    <f:section title="${%label.scan}" field="scanTypeOptions">
-        <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="true" value="1"  help="/plugin/appscan/help/scanFull.html" inline="true"/>        
-        <f:radioBlock name="scanType" title="${%label.scan.test}"  checked="${instance.isScanType('3')}" value="3"  help="/plugin/appscan/help/scanTest.html" inline="true"/>
-    </f:section>    
-            
-    <f:section title="${%label.manual.explore}" field="loginTypeOptions">
-	    <f:entry title="${%label.explore.data}" field="exploreData">
-	        <f:textbox />
-	    </f:entry>
     </f:section>
 
     <f:section title="${%label.test.optimization}" field="testOptimizationOptions">
