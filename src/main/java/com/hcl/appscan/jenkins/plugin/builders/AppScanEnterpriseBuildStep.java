@@ -103,17 +103,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private boolean m_failBuild;
 	private List<FailureCondition> m_failureConditions;
 
-	//LoginMangement
+	//LoginManagement
 	private String m_loginType;
 	private String m_trafficFile;
 	private String m_userName;
 	private Secret m_password;
-	private String m_loginTypeFullAutoScan;
 	private String m_loginTypeTestScan;
-	private String m_trafficFileFullAutoScan;
-	private String m_userNameFullAutoScan;
-	private Secret m_passwordFullAutoScan;
-	private String m_exploreDataFullAutoScan;
 	private String m_trafficFileTestScan;
 	private String m_userNameTestScan;
 	private Secret m_passwordTestScan;
@@ -148,21 +143,21 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// Post autocomplete feature, we need to explicitly map 
 		// template name to template id before saving it in
 		// job configuration file.
+		m_loginType = "";
+		m_trafficFile = "";
+		m_exploreData = "";
+		m_userName = "";
+		m_password = Secret.fromString("");
 		m_template = getDescriptor().getTemplateId(template);
 		m_agent = "";
 		m_jobName = (jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_email = false;
 		m_wait = false;
 		m_failBuild = false;
-		m_loginTypeFullAutoScan = "";
 		m_loginTypeTestScan = "";
-		m_trafficFileFullAutoScan = "";
 		m_trafficFileTestScan = "";
-		m_userNameFullAutoScan = "";
 		m_userNameTestScan = "";
-		m_passwordFullAutoScan = Secret.fromString("");
 		m_passwordTestScan = Secret.fromString("");
-		m_exploreDataFullAutoScan = "";
 		m_exploreDataTestScan = "";
 		m_scanType = "";
 		m_testOptimization = "";
@@ -257,74 +252,48 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	
 	@DataBoundSetter
 	public void setLoginType(String loginType) {
-		m_loginType = loginType;
+		if(m_scanType.equals("1")) {
+			m_loginType = loginType;
+		}
 	}
 	
 	public String getLoginType() {
-		if(isNullOrEmpty(m_loginTypeFullAutoScan) && m_scanType.equals("1")) {
-			return m_loginTypeFullAutoScan;
-		} else if (isNullOrEmpty(m_loginTypeTestScan) && m_scanType.equals("3")) {
-			return m_loginTypeTestScan;
-		} else {
 			return m_loginType;
-		}
-	}
-
-	@DataBoundSetter
-	public void setLoginTypeFullAutoScan(String loginTypeFullAutoScan) {
-		m_loginTypeFullAutoScan = loginTypeFullAutoScan;
-	}
-
-	public String getLoginTypeFullAutoScan() {
-		return m_loginTypeFullAutoScan;
 	}
 
 	@DataBoundSetter
 	public void setLoginTypeTestScan(String loginTypeTestScan) {
-		m_loginTypeTestScan = loginTypeTestScan;
+		if(m_scanType.equals("3")) {
+			m_loginTypeTestScan = loginTypeTestScan;
+		}
 	}
 
 	public String getLoginTypeTestScan() {
-		return m_loginTypeTestScan;
+		if(m_loginTypeTestScan == null && m_scanType.equals("3")) {
+			return m_loginType;
+		}
+			return m_loginTypeTestScan;
 	}
 	
 	@DataBoundSetter
 	public void setTrafficFile(String trafficFile) {
-		if("Manual".equals(m_loginType))
+		if("Manual".equals(m_loginType) && m_scanType.equals("1"))
 			m_trafficFile = trafficFile;
 	}
 	
 	public String getTrafficFile() {
-		if(isNullOrEmpty(m_trafficFileFullAutoScan) && m_scanType.equals("1")) {
-			return m_trafficFileFullAutoScan;
-		} else if (isNullOrEmpty(m_trafficFileTestScan) && m_scanType.equals("3")) {
-			return m_trafficFileTestScan;
-		} else {
 			return m_trafficFile;
-		}
-	}
-
-	@DataBoundSetter
-	public void setTrafficFileFullAutoScan(String trafficFileFullAutoScan) {
-		if("Manual".equals(m_loginTypeFullAutoScan))
-			m_trafficFileFullAutoScan = trafficFileFullAutoScan;
-	}
-
-	public String getTrafficFileFullAutoScan() {
-		if(isNullOrEmpty(m_trafficFile) && m_scanType.equals("1")) {
-			return m_trafficFile;
-		}
-		return m_trafficFileFullAutoScan;
 	}
 
 	@DataBoundSetter
 	public void setTrafficFileTestScan(String trafficFileTestScan) {
-		if("Manual".equals(m_loginTypeTestScan))
+		if("Manual".equals(m_loginTypeTestScan) && m_scanType.equals("3")) {
 			m_trafficFileTestScan = trafficFileTestScan;
+		}
 	}
 
 	public String getTrafficFileTestScan() {
-		if(isNullOrEmpty(m_trafficFile) && m_scanType.equals("3")) {
+		if(m_trafficFileTestScan == null && m_scanType.equals("3")) {
 			return m_trafficFile;
 		}
 		return m_trafficFileTestScan;
@@ -332,80 +301,52 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	
 	@DataBoundSetter
 	public void setAccessId(String userName) {
-		m_userName = userName;
+		if(m_scanType.equals("1") && "Automatic".equals(m_loginType)) {
+			m_userName = userName;
+		}
 	}
  
 	public String getAccessId() {
-		if(isNullOrEmpty(m_userNameFullAutoScan) && m_scanType.equals("1")) {
-			return m_userNameFullAutoScan;
-		} else if (isNullOrEmpty(m_userNameTestScan) && m_scanType.equals("3")) {
-			return m_userNameTestScan;
-		} else {
 			return m_userName;
-		}
-	}
-
-	@DataBoundSetter
-	public void setAccessIdFullAutoScan(String userNameFullAutoScan) {
-		m_userNameFullAutoScan = userNameFullAutoScan;
-	}
-
-	public String getAccessIdFullAutoScan() {
-		if(isNullOrEmpty(m_userName) && m_scanType.equals("1")) {
-			return m_userName;
-		}
-		return m_userNameFullAutoScan;
 	}
 
 	@DataBoundSetter
 	public void setAccessIdTestScan(String userNameTestScan) {
-		m_userNameTestScan = userNameTestScan;
+		if(m_scanType.equals("3") && "Automatic".equals(m_loginTypeTestScan)) {
+			m_userNameTestScan = userNameTestScan;
+		}
 	}
 
 	public String getAccessIdTestScan() {
-		if(isNullOrEmpty(m_userName) && m_scanType.equals("3")) {
+		if(m_userNameTestScan == null && m_scanType.equals("3")) {
 			return m_userName;
 		}
-		return m_userNameTestScan;
+			return m_userNameTestScan;
 	}
 
 	@DataBoundSetter
     public void setSecretKey(String password) {
+		if(m_scanType.equals("1") && "Automatic".equals(m_loginType)) {
 			m_password = Secret.fromString(password);
+		}
     }
 	
 	public String getSecretKey() {
-		if(m_passwordFullAutoScan != null && !m_passwordFullAutoScan.toString().isEmpty() && m_scanType.equals("1")) {
-			return Secret.toString(m_passwordFullAutoScan);
-		} else if ((m_passwordTestScan != null) && !m_passwordTestScan.toString().isEmpty() && m_scanType.equals("3")) {
-			return Secret.toString(m_passwordTestScan);
-		} else {
 			return Secret.toString(m_password);
-		}
-	}
-
-	@DataBoundSetter
-	public void setSecretKeyFullAutoScan(String passwordFullAutoScan) {
-		m_password = Secret.fromString(passwordFullAutoScan);
-	}
-
-	public String getSecretKeyFullAutoScan() {
-		if(isNullOrEmpty(m_password.toString()) && m_scanType.equals("1")) {
-			return Secret.toString(m_password);
-		}
-		return Secret.toString(m_passwordFullAutoScan);
 	}
 
 	@DataBoundSetter
 	public void setSecretKeyTestScan(String passwordTestScan) {
-		m_passwordTestScan = Secret.fromString(passwordTestScan);
+		if(m_scanType.equals("3") && "Automatic".equals(m_loginTypeTestScan)) {
+			m_passwordTestScan = Secret.fromString(passwordTestScan);
+		}
 	}
 
 	public String getSecretKeyTestScan() {
-		if(isNullOrEmpty(m_password.toString()) && m_scanType.equals("3")) {
+		if(m_passwordTestScan == null && m_scanType.equals("3")) {
 			return Secret.toString(m_password);
 		}
-		return Secret.toString(m_passwordTestScan);
+			return Secret.toString(m_passwordTestScan);
 	}
 	
 	@DataBoundSetter
@@ -419,41 +360,23 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	@DataBoundSetter
 	public void setExploreData(String exploreData) {
+		if(m_scanType.equals("1"))
 			m_exploreData = exploreData;
 	}
 
 	public String getExploreData() {
-		if(m_exploreData == null) {
-			if(m_exploreDataFullAutoScan != null && !m_exploreDataFullAutoScan.isEmpty() && m_scanType.equals("1")) {
-				return m_exploreDataFullAutoScan;
-			} else if (m_exploreDataTestScan != null && !m_exploreDataTestScan.isEmpty() && m_scanType.equals("3")) {
-				return m_exploreDataTestScan;
-			}
-		} else {
-			return m_exploreData;
-		}
-		return "";
-	}
-
-	@DataBoundSetter
-	public void setExploreDataFullAutoScan(String exploreDataFullAutoScan) {
-		m_exploreDataFullAutoScan = exploreDataFullAutoScan;
-	}
-
-	public String getExploreDataFullAutoScan() {
-		if(isNullOrEmpty(m_exploreData) && m_scanType.equals("1")) {
-			return m_exploreData;
-		}
-		return m_exploreDataFullAutoScan;
+		return m_exploreData;
 	}
 
 	@DataBoundSetter
 	public void setExploreDataTestScan(String exploreDataTestScan) {
-		m_exploreDataTestScan = exploreDataTestScan;
+		if(m_scanType.equals("3")) {
+			m_exploreDataTestScan = exploreDataTestScan;
+		}
 	}
 
 	public String getExploreDataTestScan() {
-		if(isNullOrEmpty(m_exploreData) && m_scanType.equals("3")) {
+		if(m_exploreDataTestScan == null && m_scanType.equals("3")) {
 			return m_exploreData;
 		}
 		return m_exploreDataTestScan;
@@ -601,12 +524,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return BuildStepMonitor.NONE;
 	}
 	
-	public String isLoginTypeFullAutoScan(String loginTypeName) {
-		if (m_loginTypeFullAutoScan != null)
-			return m_loginTypeFullAutoScan.equalsIgnoreCase(loginTypeName) ? "true" : "";
-		else if (isNullOrEmpty(m_loginType) && m_scanType.equals("1")) {
-			return m_loginType.equals(loginTypeName) ? "true" : "";
-		} else if (loginTypeName.equals("Manual")) { //Default
+	public String isLoginType(String loginTypeName) {
+		if (m_loginType != null)
+			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
+		else if (loginTypeName.equals("Manual")) { //Default
 			return "true";
 		}
 		return "";
@@ -649,7 +570,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 properties.put("credentials", m_credentials);
                 properties.put("testPolicyId", m_testPolicy);
                 properties.put("agentServer", m_agent);
-                properties.put("loginType", m_scanType.equals("1") ? m_loginTypeFullAutoScan : m_scanType.equals("3") ? m_loginTypeTestScan : "");
+                properties.put("loginType", m_scanType.equals("1") ? m_loginType : m_scanType.equals("3") ? m_loginTypeTestScan : "");
                 properties.put("scanType", m_scanType);
                 properties.put("testOptimization", m_testOptimization);
                 properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
@@ -659,7 +580,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", m_target);
                     properties.put("folder", m_folder);
                     properties.put("templateId", m_template);
-                    properties.put("exploreData", getExploreData());
+                    properties.put("exploreData", m_scanType.equals("1") ? m_exploreData : m_scanType.equals("3") ? m_exploreDataTestScan : "");
                     properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
                     properties.put("description", m_description);
                     properties.put("contact", m_contact);
@@ -669,18 +590,27 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", Util.replaceMacro(m_target, resolver));
                     properties.put("folder", Util.replaceMacro(m_folder, resolver));
                     properties.put("templateId", Util.replaceMacro(m_template, resolver));
-                    properties.put("exploreData", getExploreData().equals("") ? getExploreData() : resolvePath(getExploreData(), resolver));
+                    properties.put("exploreData", m_scanType.equals("1") ? resolvePath(m_exploreData, resolver) : m_scanType.equals("3") ? resolvePath(m_exploreDataTestScan, resolver) : "");
                     properties.put(CoreConstants.SCAN_NAME, Util.replaceMacro(m_jobName, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
                     properties.put("description", Util.replaceMacro(m_description, resolver));
                     properties.put("contact", Util.replaceMacro(m_contact, resolver));
                 }
 
-                if (getLoginType() != null) {
-                    if (getLoginType().equals("Manual")) {
-                        properties.put("trafficFile", (resolver == null || getTrafficFile().equals(""))? getTrafficFile() : resolvePath(getTrafficFile(), resolver));
-                    } else if (getLoginType().equals("Automatic")) {
-                        properties.put("userName", resolver == null ? getAccessId() : Util.replaceMacro(getAccessId(), resolver));
-                        properties.put("password", resolver == null ? getSecretKey() : Util.replaceMacro(getSecretKey(), resolver));
+                if (m_loginType != null || m_loginTypeTestScan != null) {
+                    if (m_loginType.equals("Manual") || m_loginTypeTestScan.equals("Manual")) {
+						if(resolver == null) {
+							properties.put("trafficFile", m_scanType.equals("1") ? m_trafficFile : m_scanType.equals("3") ? m_trafficFileTestScan : "");
+						} else {
+							properties.put("trafficFile", m_scanType.equals("1") ? resolvePath(m_trafficFile, resolver) : m_scanType.equals("3") ? resolvePath(m_trafficFileTestScan, resolver) : "");
+						}
+                    } else if (m_loginType.equals("Automatic") || m_loginTypeTestScan.equals("Automatic")) {
+						if(resolver == null) {
+							properties.put("userName", m_scanType.equals("1") ? m_userName : m_scanType.equals("3") ? m_userNameTestScan : "");
+							properties.put("password", m_scanType.equals("1") ? Secret.toString(m_password) : m_scanType.equals("3") ? Secret.toString(m_passwordTestScan) : "");
+						} else {
+							properties.put("userName", m_scanType.equals("1") ? Util.replaceMacro(m_userName, resolver) : m_scanType.equals("3") ? Util.replaceMacro(m_userNameTestScan, resolver) : "");
+							properties.put("password", m_scanType.equals("1") ? Util.replaceMacro(Secret.toString(m_password), resolver) : m_scanType.equals("3") ? Util.replaceMacro(Secret.toString(m_passwordTestScan), resolver) : "");
+						}
                     }
                 }
 
@@ -858,7 +788,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return file.getAbsolutePath();
 	}
 
-	@Symbol("appscanenterprise") //$NON-NLS-1$
+	@Symbol("appscanEnterprise") //$NON-NLS-1$
     @Extension
 	public static class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
