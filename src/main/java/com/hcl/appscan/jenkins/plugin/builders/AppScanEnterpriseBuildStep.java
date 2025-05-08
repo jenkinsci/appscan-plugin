@@ -151,7 +151,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_wait = false;
 		m_failBuild = false;
 		m_loginType = "";
-		m_exploreData = "";
+		m_trafficFile = "";
 		m_userName = "";
 		m_password = Secret.fromString("");
 		m_loginTypeTestScan = "";
