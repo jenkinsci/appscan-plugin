@@ -577,7 +577,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 
                 if(resolver == null) {
                     properties.put("application", m_application);
-                    properties.put("startingURL", m_target);
+                    properties.put("startingURL", m_scanType.equals("4") ? "" : m_target);
                     properties.put("folder", m_folder);
                     properties.put("templateId", m_template);
                     properties.put("exploreData", m_scanType.equals("1") ? m_exploreData : m_scanType.equals("3") ? m_exploreDataTestScan : "");
@@ -587,7 +587,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 }
                 else {
                     properties.put("application", Util.replaceMacro(m_application, resolver));
-                    properties.put("startingURL", Util.replaceMacro(m_target, resolver));
+                    properties.put("startingURL", m_scanType.equals("4") ? "" : Util.replaceMacro(m_target, resolver));
                     properties.put("folder", Util.replaceMacro(m_folder, resolver));
                     properties.put("templateId", Util.replaceMacro(m_template, resolver));
                     properties.put("exploreData", m_scanType.equals("1") ? resolvePath(m_exploreData, resolver) : m_scanType.equals("3") ? resolvePath(m_exploreDataTestScan, resolver) : "");
