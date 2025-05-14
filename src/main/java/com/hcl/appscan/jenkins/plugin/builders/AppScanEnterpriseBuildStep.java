@@ -975,11 +975,43 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 
 		public FormValidation doCheckPostmanCollectionFile(@QueryParameter String postmanCollectionFile) {
+			if(postmanCollectionFile != null && !postmanCollectionFile.isEmpty()) {
+				if (!postmanCollectionFile.endsWith(".json")) {
+					return FormValidation.error(Messages.error_file_type_invalid_json());
+				}
+			}
 			return FormValidation.validateRequired(postmanCollectionFile);
 		}
 
 		public FormValidation doCheckAdditionalDomains(@QueryParameter String additionalDomains) {
 			return FormValidation.validateRequired(additionalDomains);
+		}
+
+		public FormValidation doCheckEnvironmentalVariablesFile(@QueryParameter String environmentalVariablesFile) {
+			if(environmentalVariablesFile != null && !environmentalVariablesFile.isEmpty()) {
+				if (!environmentalVariablesFile.endsWith(".json")) {
+					return FormValidation.error(Messages.error_file_type_invalid_json());
+				}
+			}
+			return FormValidation.ok();
+		}
+
+		public FormValidation doCheckGlobalVariablesFile(@QueryParameter String globalVariablesFile) {
+			if(globalVariablesFile != null && !globalVariablesFile.isEmpty()) {
+				if (!globalVariablesFile.endsWith(".json")) {
+					return FormValidation.error(Messages.error_file_type_invalid_json());
+				}
+			}
+			return FormValidation.ok();
+		}
+
+		public FormValidation doCheckAdditionalFiles(@QueryParameter String additionalFiles) {
+			if(additionalFiles != null && !additionalFiles.isEmpty()) {
+				if (!additionalFiles.endsWith(".zip")) {
+					return FormValidation.error(Messages.error_file_type_invalid_zip());
+				}
+			}
+			return FormValidation.ok();
 		}
 
 		//This method will initialize Template, folder and application list.
