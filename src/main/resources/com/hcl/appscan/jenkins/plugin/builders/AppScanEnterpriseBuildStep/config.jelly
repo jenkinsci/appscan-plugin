@@ -64,7 +64,7 @@
     <f:section title="${%label.scan}">
         <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="true" value="1"  help="/plugin/appscan/help/scanFull.html" inline="true">
         <f:nested>
-            <f:entry title="${%label.login.management}" field="loginType">
+            <f:entry title="${%label.login.management}" field="loginTypeOptions">
             <f:radioBlock name="loginType" title="${%label.recorded}" checked="true" value="Manual" help="/plugin/appscan/help/loginManual.html" inline="true">
                 <f:entry title="${%label.traffic.file}" field="trafficFile">
                     <f:textbox/>

@@ -20,6 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.Set;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -254,6 +255,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public void setLoginType(String loginType) {
 		if(m_scanType.equals("1")) {
 			m_loginType = loginType;
+		} else {
+			m_loginType = "";
 		}
 	}
 	
@@ -265,6 +268,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public void setLoginTypeTestScan(String loginTypeTestScan) {
 		if(m_scanType.equals("3")) {
 			m_loginTypeTestScan = loginTypeTestScan;
+		} else {
+			m_loginTypeTestScan = "";
 		}
 	}
 
@@ -570,7 +575,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 properties.put("credentials", m_credentials);
                 properties.put("testPolicyId", m_testPolicy);
                 properties.put("agentServer", m_agent);
-                properties.put("loginType", m_scanType.equals("1") ? m_loginType : m_scanType.equals("3") ? m_loginTypeTestScan : "");
+                properties.put("loginType", m_scanType.equals("1") || m_loginTypeTestScan == null ? m_loginType : m_scanType.equals("3") ? m_loginTypeTestScan : "");
                 properties.put("scanType", m_scanType);
                 properties.put("testOptimization", m_testOptimization);
                 properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
@@ -580,7 +585,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", m_scanType.equals("4") ? "" : m_target);
                     properties.put("folder", m_folder);
                     properties.put("templateId", m_template);
-                    properties.put("exploreData", m_scanType.equals("1") ? m_exploreData : m_scanType.equals("3") ? m_exploreDataTestScan : "");
+                    properties.put("exploreData", m_scanType.equals("1") || m_exploreDataTestScan == null ? m_exploreData : m_scanType.equals("3") ? m_exploreDataTestScan : "");
                     properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
                     properties.put("description", m_description);
                     properties.put("contact", m_contact);
@@ -590,26 +595,26 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", m_scanType.equals("4") ? "" : Util.replaceMacro(m_target, resolver));
                     properties.put("folder", Util.replaceMacro(m_folder, resolver));
                     properties.put("templateId", Util.replaceMacro(m_template, resolver));
-                    properties.put("exploreData", m_scanType.equals("1") ? resolvePath(m_exploreData, resolver) : m_scanType.equals("3") ? resolvePath(m_exploreDataTestScan, resolver) : "");
+                    properties.put("exploreData", m_scanType.equals("1") || m_exploreDataTestScan == null ? resolvePath(m_exploreData, resolver) : m_scanType.equals("3") ? resolvePath(m_exploreDataTestScan, resolver) : "");
                     properties.put(CoreConstants.SCAN_NAME, Util.replaceMacro(m_jobName, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
                     properties.put("description", Util.replaceMacro(m_description, resolver));
                     properties.put("contact", Util.replaceMacro(m_contact, resolver));
                 }
 
                 if (m_loginType != null || m_loginTypeTestScan != null) {
-                    if (m_loginType.equals("Manual") || m_loginTypeTestScan.equals("Manual")) {
-                        if(resolver == null) {
-                        	properties.put("trafficFile", m_scanType.equals("1") ? m_trafficFile : m_scanType.equals("3") ? m_trafficFileTestScan : "");
+                    if ("Manual".equals(m_loginType) || "Manual".equals(m_loginTypeTestScan)) {
+                        if (resolver == null) {
+                        	properties.put("trafficFile", "1".equals(m_scanType) || m_trafficFileTestScan == null ? m_trafficFile : "3".equals(m_scanType) ? m_trafficFileTestScan : "");
                         } else {
-                        	properties.put("trafficFile", m_scanType.equals("1") ? resolvePath(m_trafficFile, resolver) : m_scanType.equals("3") ? resolvePath(m_trafficFileTestScan, resolver) : "");
+                        	properties.put("trafficFile", "1".equals(m_scanType) || m_trafficFileTestScan == null ? resolvePath(m_trafficFile, resolver) : "3".equals(m_scanType) ? resolvePath(m_trafficFileTestScan, resolver) : "");
                         }
-                    } else if (m_loginType.equals("Automatic") || m_loginTypeTestScan.equals("Automatic")) {
-                        if(resolver == null) {
-                        	properties.put("userName", m_scanType.equals("1") ? m_userName : m_scanType.equals("3") ? m_userNameTestScan : "");
-                        	properties.put("password", m_scanType.equals("1") ? Secret.toString(m_password) : m_scanType.equals("3") ? Secret.toString(m_passwordTestScan) : "");
+                    } else if ("Automatic".equals(m_loginType) || "Automatic".equals(m_loginTypeTestScan)) {
+                        if (resolver == null) {
+                        	properties.put("userName", "1".equals(m_scanType) || m_userNameTestScan == null ? m_userName : "3".equals(m_scanType) ? m_userNameTestScan : "");
+                        	properties.put("password", "1".equals(m_scanType) || m_passwordTestScan == null ? Secret.toString(m_password) : "3".equals(m_scanType) ? Secret.toString(m_passwordTestScan) : "");
                         } else {
-                        	properties.put("userName", m_scanType.equals("1") ? Util.replaceMacro(m_userName, resolver) : m_scanType.equals("3") ? Util.replaceMacro(m_userNameTestScan, resolver) : "");
-                        	properties.put("password", m_scanType.equals("1") ? Util.replaceMacro(Secret.toString(m_password), resolver) : m_scanType.equals("3") ? Util.replaceMacro(Secret.toString(m_passwordTestScan), resolver) : "");
+                        	properties.put("userName", "1".equals(m_scanType) || m_userNameTestScan == null ? Util.replaceMacro(m_userName, resolver) : "3".equals(m_scanType) ? Util.replaceMacro(m_userNameTestScan, resolver) : "");
+                        	properties.put("password", "1".equals(m_scanType) || m_passwordTestScan == null ? Util.replaceMacro(Secret.toString(m_password), resolver) : "3".equals(m_scanType) ? Util.replaceMacro(Secret.toString(m_passwordTestScan), resolver) : "");
                         }
                     }
                 }
@@ -773,19 +778,18 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 	}
         
-        private String resolvePath(String path, VariableResolver<String> resolver) {
+	private String resolvePath(String path, VariableResolver<String> resolver) {
 		//First replace any variables in the path
 		path = Util.replaceMacro(path, resolver);
-		
-		//If the path is not absolute, make it relative to the workspace
-		File file = new File(path);
-		if(!file.isAbsolute()) {
-			String targetPath = "${WORKSPACE}" + File.separator + file.getPath();
-			targetPath = Util.replaceMacro(targetPath, resolver);
-			file = new File(targetPath);
-		}
+		Pattern pattern = Pattern.compile("^(\\\\|/|[a-zA-Z]:\\\\)");
 
-		return file.getAbsolutePath();
+		//If the path is not absolute, make it relative to the workspace
+		if(!pattern.matcher(path).find()){
+			String targetPath = "${WORKSPACE}" + "/" + path ;
+			targetPath = Util.replaceMacro(targetPath, resolver);
+			return targetPath;
+		}
+		return path;
 	}
 
 	@Symbol("appscanenterprise") //$NON-NLS-1$
