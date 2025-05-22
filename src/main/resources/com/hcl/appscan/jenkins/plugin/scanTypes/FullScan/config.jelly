@@ -1,0 +1,31 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <!--
+    © Copyright HCL Technologies Ltd.2025.
+    LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+    -->
+
+    <f:entry title="${%label.login.management}" field="loginTypeOptions">
+        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true" value="Manual" help="/plugin/appscan/help/loginManual.html" inline="true">
+            <f:entry title="${%label.traffic.file}" field="trafficFile">
+                <f:textbox/>
+            </f:entry>
+        </f:radioBlock>
+
+        <f:radioBlock name="loginType" title="${%label.automatic}" checked="${instance.isLoginType('Automatic')}" value="Automatic" help="/plugin/appscan/help/loginAutomatic.html" inline="true">
+            <f:entry title="${%label.user.name}" field="userName" help="/plugin/appscan/help/userName.html">
+                <f:textbox field="accessId" />
+            </f:entry>
+            <f:entry title="${%label.password}" field="password" help="/plugin/appscan/help/password.html">
+                <f:password field="secretKey" />
+            </f:entry>
+        </f:radioBlock>
+
+        <f:radioBlock name="loginType" title="${%label.none}" checked="${instance.isLoginType('None')}" value="None" help="/plugin/appscan/help/loginNone.html" inline="true" />
+
+        <f:entry title="${%label.manual.explore}" field="exploreData" help="/plugin/appscan/help/manualExploreData.html">
+            <f:textbox/>
+        </f:entry>
+    </f:entry>
+
+</j:jelly>

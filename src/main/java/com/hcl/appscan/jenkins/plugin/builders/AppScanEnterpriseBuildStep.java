@@ -11,17 +11,12 @@ import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.Set;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import com.hcl.appscan.jenkins.plugin.scanTypes.ScanType;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jenkinsci.Symbol;
@@ -126,6 +121,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_environmentalVariablesFile;
 	private String m_globalVariablesFile;
 	private String m_additionalFiles;
+	private ScanType scanType;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -250,6 +246,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getTarget() {
 		return m_target;
 	}
+
+	@DataBoundSetter
+	public void setScanType(ScanType scanType) {
+		this.scanType = scanType;
+	}
+
+	public ScanType getScanType() {
+		return scanType;
+	}
 	
 	@DataBoundSetter
 	public void setLoginType(String loginType) {
@@ -354,14 +359,14 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			return Secret.toString(m_passwordTestScan);
 	}
 	
-	@DataBoundSetter
+	/*@DataBoundSetter
 	public void setScanType(String scanType) {
 		 m_scanType = scanType;
 	}
 	
 	public String getScanType() {
 		return m_scanType;
-	}
+	}*/
 
 	@DataBoundSetter
 	public void setExploreData(String exploreData) {
@@ -450,7 +455,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_contact;
 	}
 
-	@DataBoundSetter
+	/*@DataBoundSetter
 	public void setPostmanCollectionFile(String postmanCollectionFile) {
 		m_postmanCollectionFile = postmanCollectionFile;
 	}
@@ -493,7 +498,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	public String getAdditionalFiles() {
 		return m_additionalFiles;
-	}
+	}*/
 
 	@DataBoundSetter
 	public void setFailureConditions(List<FailureCondition> failureConditions) {
@@ -681,6 +686,23 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
         	return null;
     	}
 
+	public enum ScanType {
+		FULL("Full Scan"),
+		TEST_ONLY("Test Only"),
+		POSTMAN_COLLECTION("Postman Collection");
+
+		private final String displayName;
+
+		ScanType(String displayName) {
+			this.displayName = displayName;
+		}
+
+		public String getDisplayName() {
+			return displayName;
+		}
+	}
+
+
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
 		Map<String, String> properties = getScanProperties(build, listener);
@@ -807,6 +829,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		public boolean isApplicable(Class<? extends AbstractProject> projectType) {
 			return true;
 		}
+
+		public List<ScanType> getScanTypes() {
+			return Arrays.asList(AppScanEnterpriseBuildStep.ScanType.values());
+		}
+
 
 		@Override
 		public String getDisplayName() {
