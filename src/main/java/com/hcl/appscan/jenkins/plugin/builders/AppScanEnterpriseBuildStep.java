@@ -16,7 +16,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 
-import com.hcl.appscan.jenkins.plugin.scanTypes.ScanType;
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanMode;
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeFactory;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jenkinsci.Symbol;
@@ -49,7 +50,6 @@ import com.hcl.appscan.jenkins.plugin.ScanFactory;
 import com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever;
 import com.hcl.appscan.jenkins.plugin.auth.ASEJenkinsAuthenticationProvider;
 import com.hcl.appscan.jenkins.plugin.auth.ASECredentials;
-import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.jenkins.plugin.results.FailureCondition;
 import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
@@ -91,44 +91,25 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_folder;
 	private String m_testPolicy;
 	private String m_template;
-	private String m_exploreData;
 	private String m_agent;
 	private String m_jobName;
 	private boolean m_email;
 	private boolean m_wait;
 	private boolean m_failBuild;
 	private List<FailureCondition> m_failureConditions;
-
-	//LoginManagement
-	private String m_loginType;
-	private String m_trafficFile;
-	private String m_userName;
-	private Secret m_password;
-	private String m_loginTypeTestScan;
-	private String m_trafficFileTestScan;
-	private String m_userNameTestScan;
-	private Secret m_passwordTestScan;
-	private String m_exploreDataTestScan;
-	
 	private String m_scanType;
-
 	private String m_testOptimization;
 	private String m_scanStatus;
 	private String m_description;
 	private String m_contact;
-	private String m_postmanCollectionFile;
-	private String m_additionalDomains;
-	private String m_environmentalVariablesFile;
-	private String m_globalVariablesFile;
-	private String m_additionalFiles;
-	private ScanType scanType;
+	private ScanMode m_scanMode;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	@DataBoundConstructor
-	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
-		
+	public AppScanEnterpriseBuildStep(ScanMode scanMode, String credentials, String folder, String testPolicy, String template, String jobName) {
+		m_scanMode = scanMode;
 		m_credentials = credentials;
 		m_application = "";
 		m_target = "";
@@ -140,31 +121,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// Post autocomplete feature, we need to explicitly map 
 		// template name to template id before saving it in
 		// job configuration file.
-		m_exploreData = "";
 		m_template = getDescriptor().getTemplateId(template);
 		m_agent = "";
 		m_jobName = (jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_email = false;
 		m_wait = false;
 		m_failBuild = false;
-		m_loginType = "";
-		m_trafficFile = "";
-		m_userName = "";
-		m_password = Secret.fromString("");
-		m_loginTypeTestScan = "";
-		m_trafficFileTestScan = "";
-		m_userNameTestScan = "";
-		m_passwordTestScan = Secret.fromString("");
-		m_exploreDataTestScan = "";
 		m_scanType = "";
 		m_testOptimization = "";
 		m_description = "";
 		m_contact = "";
-		m_postmanCollectionFile = "";
-		m_additionalDomains = "";
-		m_environmentalVariablesFile = "";
-		m_globalVariablesFile = "";
-		m_additionalFiles = "";
 	}
 	
 	public String getCredentials() {
@@ -248,148 +214,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 
 	@DataBoundSetter
-	public void setScanType(ScanType scanType) {
-		this.scanType = scanType;
-	}
-
-	public ScanType getScanType() {
-		return scanType;
-	}
-	
-	@DataBoundSetter
-	public void setLoginType(String loginType) {
-		if(m_scanType.equals("1")) {
-			m_loginType = loginType;
-		} else {
-			m_loginType = "";
-		}
-	}
-	
-	public String getLoginType() {
-		return m_loginType;
-	}
-
-	@DataBoundSetter
-	public void setLoginTypeTestScan(String loginTypeTestScan) {
-		if(m_scanType.equals("3")) {
-			m_loginTypeTestScan = loginTypeTestScan;
-		} else {
-			m_loginTypeTestScan = "";
-		}
-	}
-
-	public String getLoginTypeTestScan() {
-		if(m_loginTypeTestScan == null && m_scanType.equals("3")) {
-			return m_loginType;
-		}
-			return m_loginTypeTestScan;
-	}
-	
-	@DataBoundSetter
-	public void setTrafficFile(String trafficFile) {
-		if("Manual".equals(m_loginType) && m_scanType.equals("1"))
-			m_trafficFile = trafficFile;
-	}
-	
-	public String getTrafficFile() {
-		return m_trafficFile;
-	}
-
-	@DataBoundSetter
-	public void setTrafficFileTestScan(String trafficFileTestScan) {
-		if("Manual".equals(m_loginTypeTestScan) && m_scanType.equals("3")) {
-			m_trafficFileTestScan = trafficFileTestScan;
-		}
-	}
-
-	public String getTrafficFileTestScan() {
-		if(m_trafficFileTestScan == null && m_scanType.equals("3")) {
-			return m_trafficFile;
-		}
-		return m_trafficFileTestScan;
-	}
-	
-	@DataBoundSetter
-	public void setAccessId(String userName) {
-		if(m_scanType.equals("1") && "Automatic".equals(m_loginType)) {
-			m_userName = userName;
-		}
-	}
- 
-	public String getAccessId() {
-		return m_userName;
-	}
-
-	@DataBoundSetter
-	public void setAccessIdTestScan(String userNameTestScan) {
-		if(m_scanType.equals("3") && "Automatic".equals(m_loginTypeTestScan)) {
-			m_userNameTestScan = userNameTestScan;
-		}
-	}
-
-	public String getAccessIdTestScan() {
-		if(m_userNameTestScan == null && m_scanType.equals("3")) {
-			return m_userName;
-		}
-			return m_userNameTestScan;
-	}
-
-	@DataBoundSetter
-    public void setSecretKey(String password) {
-		if(m_scanType.equals("1") && "Automatic".equals(m_loginType)) {
-			m_password = Secret.fromString(password);
-		}
-    }
-	
-	public String getSecretKey() {
-		return Secret.toString(m_password);
-	}
-
-	@DataBoundSetter
-	public void setSecretKeyTestScan(String passwordTestScan) {
-		if(m_scanType.equals("3") && "Automatic".equals(m_loginTypeTestScan)) {
-			m_passwordTestScan = Secret.fromString(passwordTestScan);
-		}
-	}
-
-	public String getSecretKeyTestScan() {
-		if(m_passwordTestScan == null && m_scanType.equals("3")) {
-			return Secret.toString(m_password);
-		}
-			return Secret.toString(m_passwordTestScan);
-	}
-	
-	/*@DataBoundSetter
 	public void setScanType(String scanType) {
-		 m_scanType = scanType;
+		m_scanType = scanType;
 	}
-	
+
 	public String getScanType() {
 		return m_scanType;
-	}*/
-
-	@DataBoundSetter
-	public void setExploreData(String exploreData) {
-		if(m_scanType.equals("1"))
-			m_exploreData = exploreData;
 	}
 
-	public String getExploreData() {
-		return m_exploreData;
-	}
-
-	@DataBoundSetter
-	public void setExploreDataTestScan(String exploreDataTestScan) {
-		if(m_scanType.equals("3")) {
-			m_exploreDataTestScan = exploreDataTestScan;
-		}
-	}
-
-	public String getExploreDataTestScan() {
-		if(m_exploreDataTestScan == null && m_scanType.equals("3")) {
-			return m_exploreData;
-		}
-		return m_exploreDataTestScan;
+	public ScanMode getScanMode() {
+		return m_scanMode;
 	}
 
 	@DataBoundSetter
@@ -455,51 +289,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_contact;
 	}
 
-	/*@DataBoundSetter
-	public void setPostmanCollectionFile(String postmanCollectionFile) {
-		m_postmanCollectionFile = postmanCollectionFile;
-	}
-
-	public String getPostmanCollectionFile() {
-		return m_postmanCollectionFile;
-	}
-
-	@DataBoundSetter
-	public void setAdditionalDomains(String additionalDomains) {
-		m_additionalDomains = additionalDomains;
-	}
-
-	public String getAdditionalDomains() {
-		return m_additionalDomains;
-	}
-
-	@DataBoundSetter
-	public void setEnvironmentalVariablesFile(String environmentalVariablesFile) {
-		m_environmentalVariablesFile = environmentalVariablesFile;
-	}
-
-	public String getEnvironmentalVariablesFile() {
-		return m_environmentalVariablesFile;
-	}
-
-	@DataBoundSetter
-	public void setGlobalVariablesFile(String globalVariablesFile) {
-		m_globalVariablesFile = globalVariablesFile;
-	}
-
-	public String getGlobalVariablesFile() {
-		return m_globalVariablesFile;
-	}
-
-	@DataBoundSetter
-	public void setAdditionalFiles(String additionalFiles) {
-		m_additionalFiles = additionalFiles;
-	}
-
-	public String getAdditionalFiles() {
-		return m_additionalFiles;
-	}*/
-
 	@DataBoundSetter
 	public void setFailureConditions(List<FailureCondition> failureConditions) {
 		m_failureConditions = failureConditions;
@@ -533,35 +322,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public BuildStepMonitor getRequiredMonitorService() {
 		return BuildStepMonitor.NONE;
 	}
-	
-	public String isLoginType(String loginTypeName) {
-		if (m_loginType != null)
-			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
-		else if (loginTypeName.equals("Manual")) { //Default
-			return "true";
-		}
-		return "";
-	}
-
-	public String isLoginTypeTestScan(String loginTypeName) {
-		if (m_loginTypeTestScan != null)
-			return m_loginTypeTestScan.equalsIgnoreCase(loginTypeName) ? "true" : "";
-		else if (isNullOrEmpty(m_loginType) && m_scanType.equals("3")) {
-			return m_loginType.equals(loginTypeName) ? "true" : "";
-		} else if (loginTypeName.equals("Manual")) { //Default
-			return "true";
-		}
-		return "";
-	}
-	
-	public String isScanType(String scanType) {
-		if(m_scanType != null) {
-			return m_scanType.equalsIgnoreCase(scanType) ? "true" : "";
-		} else if (scanType.equals("1")) { //Default
-			return "true";
-		}
-		return "";
-	}
 
 	public String isTestOptimization(String testOptimizationLevel) {
 		if (m_testOptimization != null) {
@@ -572,6 +332,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return "";
 	}
 
+	//To retain backward compatibility
+	protected Object readResolve() {
+		if(m_scanMode == null && m_scanType != null)
+			m_scanMode = ScanModeFactory.getScanTypeImplementation(m_scanType);
+		return this;
+	}
+
 	private Map<String, String> getScanProperties(Run<?, ?> build, TaskListener listener) {
             VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
             
@@ -580,72 +347,31 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 properties.put("credentials", m_credentials);
                 properties.put("testPolicyId", m_testPolicy);
                 properties.put("agentServer", m_agent);
-                properties.put("loginType", m_scanType.equals("1") || m_loginTypeTestScan == null ? m_loginType : m_scanType.equals("3") ? m_loginTypeTestScan : "");
-                properties.put("scanType", m_scanType);
+                properties.put("scanType", String.valueOf(m_scanType));
                 properties.put("testOptimization", m_testOptimization);
                 properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
                 
                 if(resolver == null) {
                     properties.put("application", m_application);
-                    properties.put("startingURL", m_scanType.equals("4") ? "" : m_target);
+                    properties.put("startingURL", m_target);
                     properties.put("folder", m_folder);
                     properties.put("templateId", m_template);
-                    properties.put("exploreData", m_scanType.equals("1") || m_exploreDataTestScan == null ? m_exploreData : m_scanType.equals("3") ? m_exploreDataTestScan : "");
                     properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
                     properties.put("description", m_description);
                     properties.put("contact", m_contact);
                 }
                 else {
                     properties.put("application", Util.replaceMacro(m_application, resolver));
-                    properties.put("startingURL", m_scanType.equals("4") ? "" : Util.replaceMacro(m_target, resolver));
+                    properties.put("startingURL", Util.replaceMacro(m_target, resolver));
                     properties.put("folder", Util.replaceMacro(m_folder, resolver));
                     properties.put("templateId", Util.replaceMacro(m_template, resolver));
-                    properties.put("exploreData", m_scanType.equals("1") || m_exploreDataTestScan == null ? resolvePath(m_exploreData, resolver) : m_scanType.equals("3") ? resolvePath(m_exploreDataTestScan, resolver) : "");
                     properties.put(CoreConstants.SCAN_NAME, Util.replaceMacro(m_jobName, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
                     properties.put("description", Util.replaceMacro(m_description, resolver));
                     properties.put("contact", Util.replaceMacro(m_contact, resolver));
                 }
 
-                if (m_loginType != null || m_loginTypeTestScan != null) {
-                    if ("Manual".equals(m_loginType) || "Manual".equals(m_loginTypeTestScan)) {
-                        if (resolver == null) {
-                        	properties.put("trafficFile", "1".equals(m_scanType) || m_trafficFileTestScan == null ? m_trafficFile : "3".equals(m_scanType) ? m_trafficFileTestScan : "");
-                        } else {
-                        	properties.put("trafficFile", "1".equals(m_scanType) || m_trafficFileTestScan == null ? resolvePath(m_trafficFile, resolver) : "3".equals(m_scanType) ? resolvePath(m_trafficFileTestScan, resolver) : "");
-                        }
-                    } else if ("Automatic".equals(m_loginType) || "Automatic".equals(m_loginTypeTestScan)) {
-                        if (resolver == null) {
-                        	properties.put("userName", "1".equals(m_scanType) || m_userNameTestScan == null ? m_userName : "3".equals(m_scanType) ? m_userNameTestScan : "");
-                        	properties.put("password", "1".equals(m_scanType) || m_passwordTestScan == null ? Secret.toString(m_password) : "3".equals(m_scanType) ? Secret.toString(m_passwordTestScan) : "");
-                        } else {
-                        	properties.put("userName", "1".equals(m_scanType) || m_userNameTestScan == null ? Util.replaceMacro(m_userName, resolver) : "3".equals(m_scanType) ? Util.replaceMacro(m_userNameTestScan, resolver) : "");
-                        	properties.put("password", "1".equals(m_scanType) || m_passwordTestScan == null ? Util.replaceMacro(Secret.toString(m_password), resolver) : "3".equals(m_scanType) ? Util.replaceMacro(Secret.toString(m_passwordTestScan), resolver) : "");
-                        }
-                    }
-                }
-
-                if (m_scanType.equals("4")) {
-                    if(isNullOrEmpty(m_postmanCollectionFile)) {
-                        properties.put("postmanCollectionFile", resolver == null ? m_postmanCollectionFile : resolvePath(m_postmanCollectionFile, resolver));
-                    }
-                    if (isNullOrEmpty(m_additionalDomains)) {
-                        properties.put("additionalDomains", resolver == null ? m_additionalDomains : Util.replaceMacro(m_additionalDomains, resolver));
-                    }
-                    if(isNullOrEmpty(m_environmentalVariablesFile)) {
-                        properties.put("environmentalVariablesFile", resolver == null ? m_environmentalVariablesFile : resolvePath(m_environmentalVariablesFile, resolver));
-                    }
-                    if(isNullOrEmpty(m_globalVariablesFile)) {
-                        properties.put("globalVariablesFile", resolver == null ? m_globalVariablesFile : resolvePath(m_globalVariablesFile, resolver));
-                    }
-                    if(isNullOrEmpty(m_additionalFiles)) {
-                        properties.put("additionalFiles", resolver == null ? m_additionalFiles : resolvePath(m_additionalFiles, resolver));
-                    }
-                }
+				properties = m_scanMode.configureScanProperties(properties, resolver);
             return properties;
-	}
-
-	public boolean isNullOrEmpty(String string) {
-		return string != null && !string.trim().isEmpty();
 	}
 
 	private void shouldFailBuild(IResultsProvider provider, Run<?, ?> build) throws AbortException, IOException {
@@ -686,28 +412,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
         	return null;
     	}
 
-	public enum ScanType {
-		FULL("Full Scan"),
-		TEST_ONLY("Test Only"),
-		POSTMAN_COLLECTION("Postman Collection");
-
-		private final String displayName;
-
-		ScanType(String displayName) {
-			this.displayName = displayName;
-		}
-
-		public String getDisplayName() {
-			return displayName;
-		}
-	}
-
-
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
 		Map<String, String> properties = getScanProperties(build, listener);
 
-        	if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
+		if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
             		throw new AbortException(Messages.error_url_validation(m_target));
         	}
 
@@ -799,20 +508,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, JENKINS_INSTALL_DIR.getPath());
 		}
 	}
-        
-	private String resolvePath(String path, VariableResolver<String> resolver) {
-		//First replace any variables in the path
-		path = Util.replaceMacro(path, resolver);
-		Pattern pattern = Pattern.compile("^(\\\\|/|[a-zA-Z]:\\\\)");
-
-		//If the path is not absolute, make it relative to the workspace
-		if(!pattern.matcher(path).find()){
-			String targetPath = "${WORKSPACE}" + "/" + path ;
-			targetPath = Util.replaceMacro(targetPath, resolver);
-			return targetPath;
-		}
-		return path;
-	}
 
 	@Symbol("appscanenterprise") //$NON-NLS-1$
     @Extension
@@ -828,10 +523,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		@Override
 		public boolean isApplicable(Class<? extends AbstractProject> projectType) {
 			return true;
-		}
-
-		public List<ScanType> getScanTypes() {
-			return Arrays.asList(AppScanEnterpriseBuildStep.ScanType.values());
 		}
 
 
@@ -999,50 +690,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		
 		public FormValidation doCheckJobName(@QueryParameter String jobName) {
 			return FormValidation.validateRequired(jobName);
-		}
-
-		public FormValidation doCheckExploreDataTestScan(@QueryParameter String exploreDataTestScan) {
-			return FormValidation.validateRequired(exploreDataTestScan);
-		}
-
-		public FormValidation doCheckPostmanCollectionFile(@QueryParameter String postmanCollectionFile) {
-			if(postmanCollectionFile != null && !postmanCollectionFile.isEmpty()) {
-				if (!postmanCollectionFile.endsWith(".json")) {
-					return FormValidation.error(Messages.error_file_type_invalid_json());
-				}
-			}
-			return FormValidation.validateRequired(postmanCollectionFile);
-		}
-
-		public FormValidation doCheckAdditionalDomains(@QueryParameter String additionalDomains) {
-			return FormValidation.validateRequired(additionalDomains);
-		}
-
-		public FormValidation doCheckEnvironmentalVariablesFile(@QueryParameter String environmentalVariablesFile) {
-			if(environmentalVariablesFile != null && !environmentalVariablesFile.isEmpty()) {
-				if (!environmentalVariablesFile.endsWith(".json")) {
-					return FormValidation.error(Messages.error_file_type_invalid_json());
-				}
-			}
-			return FormValidation.ok();
-		}
-
-		public FormValidation doCheckGlobalVariablesFile(@QueryParameter String globalVariablesFile) {
-			if(globalVariablesFile != null && !globalVariablesFile.isEmpty()) {
-				if (!globalVariablesFile.endsWith(".json")) {
-					return FormValidation.error(Messages.error_file_type_invalid_json());
-				}
-			}
-			return FormValidation.ok();
-		}
-
-		public FormValidation doCheckAdditionalFiles(@QueryParameter String additionalFiles) {
-			if(additionalFiles != null && !additionalFiles.isEmpty()) {
-				if (!additionalFiles.endsWith(".zip")) {
-					return FormValidation.error(Messages.error_file_type_invalid_zip());
-				}
-			}
-			return FormValidation.ok();
 		}
 
 		//This method will initialize Template, folder and application list.

@@ -1,9 +1,8 @@
-package com.hcl.appscan.jenkins.plugin.scanTypes;
-import com.hcl.appscan.jenkins.plugin.scanTypes.ScanTypeConstants;
+package com.hcl.appscan.jenkins.plugin.scanModes;
 
-public class ScanTypeFactory {
+public class ScanModeFactory {
 
-    public static IScanType getScanTypeImplementation(String scanType) {
+    public static ScanMode getScanTypeImplementation(String scanType) {
         switch (scanType) {
             case "FullScan":
                 return new FullScan();

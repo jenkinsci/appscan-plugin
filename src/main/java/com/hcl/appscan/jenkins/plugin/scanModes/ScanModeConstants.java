@@ -1,6 +1,6 @@
-package com.hcl.appscan.jenkins.plugin.scanTypes;
+package com.hcl.appscan.jenkins.plugin.scanModes;
 
-public class ScanTypeConstants {
+public class ScanModeConstants {
 
 
     String EMPTY					        = "";					            //$NON-NLS-1$
