@@ -14,24 +14,30 @@ public class FullScan extends ScanMode {
 
     private static final String FULL_SCAN = "Full Scan"; //$NON-NLS-1$
 
+    private String m_scanType;
     private String m_loginType;
     private String m_trafficFile;
     private String m_userName;
     private Secret m_password;
     private String m_exploreData;
 
-
     @DataBoundConstructor
-    public FullScan() {
-        this("", "", "", "", "");
-    }
-
-    public FullScan(String loginType, String trafficFile, String userName, String password, String exploreData) {
+    public FullScan(String scanType, String loginType, String userName, String password, String trafficFile, String exploreData) {
+        m_scanType = scanType;
         m_loginType = loginType;
         m_trafficFile = trafficFile;
         m_userName = userName;
         m_password = Secret.fromString(password);
         m_exploreData = exploreData;
+    }
+
+    @DataBoundSetter
+    public void setScanType(String scanType) {
+        m_scanType = scanType;
+    }
+
+    public String getScanType() {
+        return m_scanType;
     }
 
     @DataBoundSetter

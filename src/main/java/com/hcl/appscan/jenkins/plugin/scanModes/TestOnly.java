@@ -16,6 +16,7 @@ public class TestOnly extends ScanMode {
 
     private static final String TEST_ONLY = "Test Only"; //$NON-NLS-1$
 
+    private String m_scanType;
     private String m_loginTypeTestScan;
     private String m_trafficFileTestScan;
     private String m_userNameTestScan;
@@ -23,16 +24,22 @@ public class TestOnly extends ScanMode {
     private String m_exploreDataTestScan;
 
     @DataBoundConstructor
-    public TestOnly() {
-        this("", "", "", "", "");
-    }
-
-    public TestOnly(String loginTypeTestScan, String trafficFileTestScan, String userNameTestScan, String passwordTestScan, String exploreDataTestScan) {
+    public TestOnly(String scanType, String loginTypeTestScan, String trafficFileTestScan, String userNameTestScan, String passwordTestScan, String exploreDataTestScan) {
+        m_scanType = scanType;
         m_loginTypeTestScan = loginTypeTestScan;
         m_trafficFileTestScan = trafficFileTestScan;
         m_userNameTestScan = userNameTestScan;
         m_passwordTestScan = Secret.fromString(passwordTestScan);
         m_exploreDataTestScan = exploreDataTestScan;
+    }
+
+    @DataBoundSetter
+    public void setScanType(String scanType) {
+        m_scanType = scanType;
+    }
+
+    public String getScanType() {
+        return m_scanType;
     }
 
     @DataBoundSetter

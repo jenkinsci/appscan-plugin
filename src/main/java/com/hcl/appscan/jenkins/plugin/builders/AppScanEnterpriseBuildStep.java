@@ -103,6 +103,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private boolean m_wait;
 	private boolean m_failBuild;
 	private List<FailureCondition> m_failureConditions;
+
+	//Login Management
+	private String m_loginType;
+	private String m_trafficFile;
+	private String m_userName;
+	private Secret m_password;
+	private String m_exploreData;
 	private String m_scanType;
 	private String m_testOptimization;
 	private String m_scanStatus;
@@ -114,8 +121,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	@DataBoundConstructor
-	public AppScanEnterpriseBuildStep(ScanMode scanMode, String credentials, String folder, String testPolicy, String template, String jobName) {
-		m_scanMode = scanMode;
+	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
 		m_credentials = credentials;
 		m_application = "";
 		m_target = "";
@@ -133,6 +139,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_email = false;
 		m_wait = false;
 		m_failBuild = false;
+		m_loginType = "";
+		m_trafficFile = "";
+		m_userName = "";
+		m_password = Secret.fromString("");
+		m_exploreData = "";
 		m_scanType = "";
 		m_testOptimization = "";
 		m_description = "";
@@ -228,6 +239,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_scanType;
 	}
 
+	@DataBoundSetter
+	public void setScanMode(ScanMode scanMode) {
+		m_scanMode = scanMode;
+	}
+
 	public ScanMode getScanMode() {
 		return m_scanMode;
 	}
@@ -278,6 +294,56 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 
 	@DataBoundSetter
+	public void setLoginType(String loginType) {
+		m_loginType = loginType;
+	}
+
+	public String getLoginType() {
+		return m_loginType;
+	}
+
+	@DataBoundSetter
+	public void setTrafficFile(String trafficFile) {
+		if("Manual".equals(m_loginType))
+			m_trafficFile = trafficFile;
+	}
+
+	public String getTrafficFile() {
+		return m_trafficFile;
+	}
+
+	@DataBoundSetter
+	public void setAccessId(String userName) {
+		if("Automatic".equals(m_loginType)) {
+			m_userName = userName;
+		}
+	}
+
+	public String getAccessId() {
+		return m_userName;
+	}
+
+	@DataBoundSetter
+	public void setSecretKey(String password) {
+		if("Automatic".equals(m_loginType)) {
+			m_password = Secret.fromString(password);
+		}
+	}
+
+	public String getSecretKey() {
+		return Secret.toString(m_password);
+	}
+
+	@DataBoundSetter
+	public void setExploreData(String exploreData) {
+		m_exploreData = exploreData;
+	}
+
+	public String getExploreData() {
+		return m_exploreData;
+	}
+
+	@DataBoundSetter
 	public void setDescription(String description) {
 		m_description = description;
 	}
@@ -316,16 +382,16 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		if (m_scanMode == null && m_scanType != null) {
 			switch (m_scanType) {
 				case "1":
-					m_scanMode = ScanModeFactory.getScanTypeImplementation("FullScan");
+					m_scanMode = ScanModeFactory.getScanTypeImplementation("FullScan", m_loginType, m_userName, Secret.toString(m_password), m_trafficFile, m_exploreData);
 					break;
 				case "2":
-					m_scanMode = ScanModeFactory.getScanTypeImplementation("TestOnly");
+					m_scanMode = ScanModeFactory.getScanTypeImplementation("TestOnly", m_loginType, m_userName, Secret.toString(m_password), m_trafficFile, m_exploreData);
 					break;
 				case "4":
-					m_scanMode = ScanModeFactory.getScanTypeImplementation("PostmanCollection");
+					m_scanMode = ScanModeFactory.getScanTypeImplementation("PostmanCollection", "","","","",""); // No parameters for PostmanCollection
 					break;
 				default:
-					m_scanMode = ScanModeFactory.getScanTypeImplementation("FullScan"); // fallback
+					m_scanMode = ScanModeFactory.getScanTypeImplementation("FullScan", "","", "", "", ""); // fallback
 			}
 		}
 		return this;
