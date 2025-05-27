@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanMode;
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeFactory;
+import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jenkinsci.Symbol;
@@ -121,7 +122,8 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	@DataBoundConstructor
-	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
+	public AppScanEnterpriseBuildStep(ScanMode scanMode, String credentials, String folder, String testPolicy, String template, String jobName) {
+		m_scanMode = scanMode;
 		m_credentials = credentials;
 		m_application = "";
 		m_target = "";
@@ -237,11 +239,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	public String getScanType() {
 		return m_scanType;
-	}
-
-	@DataBoundSetter
-	public void setScanMode(ScanMode scanMode) {
-		m_scanMode = scanMode;
 	}
 
 	public ScanMode getScanMode() {
@@ -378,22 +375,9 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 
 	//To retain backward compatibility
-	private Object readResolve() throws ObjectStreamException {
-		if (m_scanMode == null && m_scanType != null) {
-			switch (m_scanType) {
-				case "1":
-					m_scanMode = ScanModeFactory.getScanTypeImplementation("FullScan", m_loginType, m_userName, Secret.toString(m_password), m_trafficFile, m_exploreData);
-					break;
-				case "2":
-					m_scanMode = ScanModeFactory.getScanTypeImplementation("TestOnly", m_loginType, m_userName, Secret.toString(m_password), m_trafficFile, m_exploreData);
-					break;
-				case "4":
-					m_scanMode = ScanModeFactory.getScanTypeImplementation("PostmanCollection", "","","","",""); // No parameters for PostmanCollection
-					break;
-				default:
-					m_scanMode = ScanModeFactory.getScanTypeImplementation("FullScan", "","", "", "", ""); // fallback
-			}
-		}
+	protected Object readResolve() {
+		if(m_scanMode == null && m_scanType != null)
+			m_scanMode = ScanModeFactory.getScanTypeImplementation(m_scanType, m_loginType, m_userName, Secret.toString(m_password), m_trafficFile, m_exploreData);
 		return this;
 	}
 
@@ -432,7 +416,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 properties.put("credentials", m_credentials);
                 properties.put("testPolicyId", m_testPolicy);
                 properties.put("agentServer", m_agent);
-                //properties.put("scanType", m_scanType);
                 properties.put("testOptimization", m_testOptimization);
                 properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
                 
@@ -454,7 +437,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("description", Util.replaceMacro(m_description, resolver));
                     properties.put("contact", Util.replaceMacro(m_contact, resolver));
                 }
-
 				properties = m_scanMode.configureScanProperties(properties, resolver);
             return properties;
 	}
@@ -499,6 +481,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
+		readResolve();
 		Map<String, String> properties = getScanProperties(build, listener);
 
 		if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
