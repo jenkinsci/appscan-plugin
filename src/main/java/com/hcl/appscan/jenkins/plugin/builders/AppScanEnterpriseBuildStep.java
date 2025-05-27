@@ -7,14 +7,20 @@ package com.hcl.appscan.jenkins.plugin.builders;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Pattern;
+import java.util.Set;
+import java.util.Comparator;
+import java.util.HashMap;
 
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanMode;
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeFactory;
@@ -305,6 +311,26 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return (DescriptorImpl) super.getDescriptor();
 	}
 
+	//To retain backward compatibility
+	private Object readResolve() throws ObjectStreamException {
+		if (m_scanMode == null && m_scanType != null) {
+			switch (m_scanType) {
+				case "1":
+					m_scanMode = ScanModeFactory.getScanTypeImplementation("FullScan");
+					break;
+				case "2":
+					m_scanMode = ScanModeFactory.getScanTypeImplementation("TestOnly");
+					break;
+				case "4":
+					m_scanMode = ScanModeFactory.getScanTypeImplementation("PostmanCollection");
+					break;
+				default:
+					m_scanMode = ScanModeFactory.getScanTypeImplementation("FullScan"); // fallback
+			}
+		}
+		return this;
+	}
+
 	@Override
 	public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
 			throws IOException, InterruptedException {
@@ -332,13 +358,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return "";
 	}
 
-	//To retain backward compatibility
-	protected Object readResolve() {
-		if(m_scanMode == null && m_scanType != null)
-			m_scanMode = ScanModeFactory.getScanTypeImplementation(m_scanType);
-		return this;
-	}
-
 	private Map<String, String> getScanProperties(Run<?, ?> build, TaskListener listener) {
             VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
             
@@ -347,7 +366,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 properties.put("credentials", m_credentials);
                 properties.put("testPolicyId", m_testPolicy);
                 properties.put("agentServer", m_agent);
-                properties.put("scanType", String.valueOf(m_scanType));
+                //properties.put("scanType", m_scanType);
                 properties.put("testOptimization", m_testOptimization);
                 properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
                 

@@ -145,26 +145,4 @@
     <f:entry field="failureConditions">
         <f:repeatableProperty field="failureConditions" minimum="0" add="${%label.add.condition}"/>
     </f:entry>
-
-    <st:if test="${instance.scanType == 'POSTMAN_COLLECTION'}">
-        <f:entry title="${%label.postman.collection}" field="postmanCollectionFile">
-            <f:textbox />
-        </f:entry>
-
-        <f:entry title="${%label.additional.domains}" field="additionalDomains">
-            <f:textbox />
-        </f:entry>
-
-        <f:entry title="${%label.environmental.variables.file}" field="environmentalVariablesFile">
-            <f:textbox />
-        </f:entry>
-
-        <f:entry title="${%label.global.variables.file}" field="globalVariablesFile">
-            <f:textbox />
-        </f:entry>
-
-        <f:entry title="${%label.additional.files}" field="additionalFiles">
-            <f:textbox />
-        </f:entry>
-    </st:if>
  </j:jelly>

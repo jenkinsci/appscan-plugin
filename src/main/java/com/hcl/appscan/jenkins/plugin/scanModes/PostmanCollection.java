@@ -83,7 +83,7 @@ public class PostmanCollection extends ScanMode {
 
     @Override
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
-        properties.put("scanMode", POSTMAN_COLLECTION);
+        properties.put("scanType", POSTMAN_COLLECTION);
         if(isNullOrEmpty(m_postmanCollectionFile)) {
             properties.put("postmanCollectionFile", resolver == null ? m_postmanCollectionFile : resolvePath(m_postmanCollectionFile, resolver));
         }
@@ -112,10 +112,8 @@ public class PostmanCollection extends ScanMode {
         }
 
         public FormValidation doCheckPostmanCollectionFile(@QueryParameter String postmanCollectionFile) {
-            if(postmanCollectionFile != null && !postmanCollectionFile.isEmpty()) {
-                if (!postmanCollectionFile.endsWith(".json")) {
-                    return FormValidation.error(Messages.error_file_type_invalid_json());
-                }
+            if(postmanCollectionFile != null && !postmanCollectionFile.isEmpty() && !postmanCollectionFile.endsWith(".json")) {
+                return FormValidation.error(Messages.error_file_type_invalid_json());
             }
             return FormValidation.validateRequired(postmanCollectionFile);
         }
@@ -125,28 +123,22 @@ public class PostmanCollection extends ScanMode {
         }
 
         public FormValidation doCheckEnvironmentalVariablesFile(@QueryParameter String environmentalVariablesFile) {
-            if(environmentalVariablesFile != null && !environmentalVariablesFile.isEmpty()) {
-                if (!environmentalVariablesFile.endsWith(".json")) {
-                    return FormValidation.error(Messages.error_file_type_invalid_json());
-                }
+            if(environmentalVariablesFile != null && !environmentalVariablesFile.isEmpty() && !environmentalVariablesFile.endsWith(".json")) {
+                return FormValidation.error(Messages.error_file_type_invalid_json());
             }
             return FormValidation.ok();
         }
 
         public FormValidation doCheckGlobalVariablesFile(@QueryParameter String globalVariablesFile) {
-            if(globalVariablesFile != null && !globalVariablesFile.isEmpty()) {
-                if (!globalVariablesFile.endsWith(".json")) {
-                    return FormValidation.error(Messages.error_file_type_invalid_json());
-                }
+            if(globalVariablesFile != null && !globalVariablesFile.isEmpty() && !globalVariablesFile.endsWith(".json")) {
+                return FormValidation.error(Messages.error_file_type_invalid_json());
             }
             return FormValidation.ok();
         }
 
         public FormValidation doCheckAdditionalFiles(@QueryParameter String additionalFiles) {
-            if(additionalFiles != null && !additionalFiles.isEmpty()) {
-                if (!additionalFiles.endsWith(".zip")) {
-                    return FormValidation.error(Messages.error_file_type_invalid_zip());
-                }
+            if(additionalFiles != null && !additionalFiles.isEmpty() && !additionalFiles.endsWith(".zip")) {
+                return FormValidation.error(Messages.error_file_type_invalid_zip());
             }
             return FormValidation.ok();
         }

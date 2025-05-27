@@ -23,7 +23,7 @@ public class FullScan extends ScanMode {
 
     @DataBoundConstructor
     public FullScan() {
-        this("Manual", "", "", "", "");
+        this("", "", "", "", "");
     }
 
     public FullScan(String loginType, String trafficFile, String userName, String password, String exploreData) {
@@ -95,8 +95,8 @@ public class FullScan extends ScanMode {
 
     @Override
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
+        properties.put("scanType", FULL_SCAN);
         properties.put("loginType", m_loginType);
-        properties.put("scanMode", FULL_SCAN);
         properties.put("exploreData", resolver == null ? m_exploreData : resolvePath(m_exploreData, resolver));
         if ("Manual".equals(m_loginType)) {
             properties.put("trafficFile", resolver == null ? m_trafficFile : resolvePath(m_trafficFile, resolver));

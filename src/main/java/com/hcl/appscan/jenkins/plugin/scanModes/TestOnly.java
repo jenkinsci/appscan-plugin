@@ -24,7 +24,7 @@ public class TestOnly extends ScanMode {
 
     @DataBoundConstructor
     public TestOnly() {
-        this("Manual", "", "", "", "");
+        this("", "", "", "", "");
     }
 
     public TestOnly(String loginTypeTestScan, String trafficFileTestScan, String userNameTestScan, String passwordTestScan, String exploreDataTestScan) {
@@ -97,7 +97,7 @@ public class TestOnly extends ScanMode {
 
     @Override
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
-        properties.put("scanMode", TEST_ONLY);
+        properties.put("scanType", TEST_ONLY);
         properties.put("loginType", m_loginTypeTestScan);
         properties.put("exploreData", resolver == null ? m_exploreDataTestScan : resolvePath(m_exploreDataTestScan, resolver));
         if ("Manual".equals(m_loginTypeTestScan)) {
