@@ -14,7 +14,6 @@ public class FullScan extends ScanMode {
 
     private static final String FULL_SCAN = "Full Scan"; //$NON-NLS-1$
 
-    private String m_scanType;
     private String m_loginType;
     private String m_trafficFile;
     private String m_userName;
@@ -22,22 +21,12 @@ public class FullScan extends ScanMode {
     private String m_exploreData;
 
     @DataBoundConstructor
-    public FullScan(String scanType, String loginType, String userName, String password, String trafficFile, String exploreData) {
-        m_scanType = scanType;
+    public FullScan(String loginType, String accessId, String secretKey, String trafficFile, String exploreData) {
         m_loginType = loginType;
+        m_userName = accessId;
+        m_password = Secret.fromString(secretKey);
         m_trafficFile = trafficFile;
-        m_userName = userName;
-        m_password = Secret.fromString(password);
         m_exploreData = exploreData;
-    }
-
-    @DataBoundSetter
-    public void setScanType(String scanType) {
-        m_scanType = scanType;
-    }
-
-    public String getScanType() {
-        return m_scanType;
     }
 
     @DataBoundSetter
@@ -50,20 +39,8 @@ public class FullScan extends ScanMode {
     }
 
     @DataBoundSetter
-    public void setTrafficFile(String trafficFile) {
-        if("Manual".equals(m_loginType))
-            m_trafficFile = trafficFile;
-    }
-
-    public String getTrafficFile() {
-        return m_trafficFile;
-    }
-
-    @DataBoundSetter
     public void setAccessId(String userName) {
-        if("Automatic".equals(m_loginType)) {
             m_userName = userName;
-        }
     }
 
     public String getAccessId() {
@@ -72,13 +49,20 @@ public class FullScan extends ScanMode {
 
     @DataBoundSetter
     public void setSecretKey(String password) {
-        if("Automatic".equals(m_loginType)) {
             m_password = Secret.fromString(password);
-        }
     }
 
     public String getSecretKey() {
         return Secret.toString(m_password);
+    }
+
+    @DataBoundSetter
+    public void setTrafficFile(String trafficFile) {
+            m_trafficFile = trafficFile;
+    }
+
+    public String getTrafficFile() {
+        return m_trafficFile;
     }
 
     @DataBoundSetter
@@ -107,8 +91,8 @@ public class FullScan extends ScanMode {
         if ("Manual".equals(m_loginType)) {
             properties.put("trafficFile", resolver == null ? m_trafficFile : resolvePath(m_trafficFile, resolver));
         } else if("Automatic".equals(m_loginType)) {
-            properties.put("accessId", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
-            properties.put("secretKey", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
+            properties.put("userName", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
+            properties.put("password", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
         }
         return properties;
     }

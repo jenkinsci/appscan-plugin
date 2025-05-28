@@ -16,7 +16,6 @@ public class TestOnly extends ScanMode {
 
     private static final String TEST_ONLY = "Test Only"; //$NON-NLS-1$
 
-    private String m_scanType;
     private String m_loginTypeTestScan;
     private String m_trafficFileTestScan;
     private String m_userNameTestScan;
@@ -24,22 +23,12 @@ public class TestOnly extends ScanMode {
     private String m_exploreDataTestScan;
 
     @DataBoundConstructor
-    public TestOnly(String scanType, String loginTypeTestScan, String trafficFileTestScan, String userNameTestScan, String passwordTestScan, String exploreDataTestScan) {
-        m_scanType = scanType;
+    public TestOnly(String loginTypeTestScan, String accessIdTestScan, String secretKeyTestScan, String trafficFileTestScan, String exploreDataTestScan) {
         m_loginTypeTestScan = loginTypeTestScan;
         m_trafficFileTestScan = trafficFileTestScan;
-        m_userNameTestScan = userNameTestScan;
-        m_passwordTestScan = Secret.fromString(passwordTestScan);
+        m_userNameTestScan = accessIdTestScan;
+        m_passwordTestScan = Secret.fromString(secretKeyTestScan);
         m_exploreDataTestScan = exploreDataTestScan;
-    }
-
-    @DataBoundSetter
-    public void setScanType(String scanType) {
-        m_scanType = scanType;
-    }
-
-    public String getScanType() {
-        return m_scanType;
     }
 
     @DataBoundSetter
@@ -52,21 +41,8 @@ public class TestOnly extends ScanMode {
     }
 
     @DataBoundSetter
-    public void setTrafficFileTestScan(String trafficFileTestScan) {
-        if("Manual".equals(m_loginTypeTestScan)) {
-            m_trafficFileTestScan = trafficFileTestScan;
-        }
-    }
-
-    public String getTrafficFileTestScan() {
-        return m_trafficFileTestScan;
-    }
-
-    @DataBoundSetter
     public void setAccessIdTestScan(String userNameTestScan) {
-        if("Automatic".equals(m_loginTypeTestScan)) {
             m_userNameTestScan = userNameTestScan;
-        }
     }
 
     public String getAccessIdTestScan() {
@@ -75,13 +51,20 @@ public class TestOnly extends ScanMode {
 
     @DataBoundSetter
     public void setSecretKeyTestScan(String passwordTestScan) {
-        if("Automatic".equals(m_loginTypeTestScan)) {
             m_passwordTestScan = Secret.fromString(passwordTestScan);
-        }
     }
 
     public String getSecretKeyTestScan() {
         return Secret.toString(m_passwordTestScan);
+    }
+
+    @DataBoundSetter
+    public void setTrafficFileTestScan(String trafficFileTestScan) {
+            m_trafficFileTestScan = trafficFileTestScan;
+    }
+
+    public String getTrafficFileTestScan() {
+        return m_trafficFileTestScan;
     }
 
     @DataBoundSetter
@@ -110,8 +93,8 @@ public class TestOnly extends ScanMode {
         if ("Manual".equals(m_loginTypeTestScan)) {
             properties.put("trafficFile", resolver == null ? m_trafficFileTestScan : resolvePath(m_trafficFileTestScan, resolver));
         } else if("Automatic".equals(m_loginTypeTestScan)) {
-            properties.put("accessId", resolver == null ? m_userNameTestScan : Util.replaceMacro(m_userNameTestScan, resolver));
-            properties.put("secretKey", resolver == null ? Secret.toString(m_passwordTestScan) : Util.replaceMacro(Secret.toString(m_passwordTestScan), resolver));
+            properties.put("userName", resolver == null ? m_userNameTestScan : Util.replaceMacro(m_userNameTestScan, resolver));
+            properties.put("password", resolver == null ? Secret.toString(m_passwordTestScan) : Util.replaceMacro(Secret.toString(m_passwordTestScan), resolver));
         }
         return properties;
     }

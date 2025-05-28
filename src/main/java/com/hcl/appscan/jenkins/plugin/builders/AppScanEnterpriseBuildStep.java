@@ -233,6 +233,52 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	}
 
 	@DataBoundSetter
+	public void setLoginType(String loginType) {
+		m_loginType = loginType;
+	}
+
+	public String getLoginType() {
+		return m_loginType;
+	}
+
+	@DataBoundSetter
+	public void setTrafficFile(String trafficFile) {
+		if("Manual".equals(m_loginType))
+			m_trafficFile = trafficFile;
+	}
+
+	public String getTrafficFile() {
+		return m_trafficFile;
+	}
+
+	@DataBoundSetter
+	public void setAccessId(String userName) {
+			m_userName = userName;
+	}
+
+	public String getAccessId() {
+		return m_userName;
+	}
+
+	@DataBoundSetter
+	public void setSecretKey(String password) {
+			m_password = Secret.fromString(password);
+	}
+
+	public String getSecretKey() {
+		return Secret.toString(m_password);
+	}
+
+	@DataBoundSetter
+	public void setExploreData(String exploreData) {
+		m_exploreData = exploreData;
+	}
+
+	public String getExploreData() {
+		return m_exploreData;
+	}
+
+	@DataBoundSetter
 	public void setScanType(String scanType) {
 		m_scanType = scanType;
 	}
@@ -288,56 +334,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	public boolean getFailBuild() {
 		return m_failBuild;
-	}
-
-	@DataBoundSetter
-	public void setLoginType(String loginType) {
-		m_loginType = loginType;
-	}
-
-	public String getLoginType() {
-		return m_loginType;
-	}
-
-	@DataBoundSetter
-	public void setTrafficFile(String trafficFile) {
-		if("Manual".equals(m_loginType))
-			m_trafficFile = trafficFile;
-	}
-
-	public String getTrafficFile() {
-		return m_trafficFile;
-	}
-
-	@DataBoundSetter
-	public void setAccessId(String userName) {
-		if("Automatic".equals(m_loginType)) {
-			m_userName = userName;
-		}
-	}
-
-	public String getAccessId() {
-		return m_userName;
-	}
-
-	@DataBoundSetter
-	public void setSecretKey(String password) {
-		if("Automatic".equals(m_loginType)) {
-			m_password = Secret.fromString(password);
-		}
-	}
-
-	public String getSecretKey() {
-		return Secret.toString(m_password);
-	}
-
-	@DataBoundSetter
-	public void setExploreData(String exploreData) {
-		m_exploreData = exploreData;
-	}
-
-	public String getExploreData() {
-		return m_exploreData;
 	}
 
 	@DataBoundSetter
