@@ -1,3 +1,9 @@
+/**
+ * @ Copyright HCL Technologies Ltd. 2025.
+ * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+ */
+
+
 package com.hcl.appscan.jenkins.plugin.scanModes;
 
 import com.hcl.appscan.jenkins.plugin.Messages;
@@ -83,23 +89,20 @@ public class PostmanCollection extends ScanMode {
 
     @Override
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
-        properties.put("scanType", POSTMAN_COLLECTION);
-        if(isNullOrEmpty(m_postmanCollectionFile)) {
-            properties.put("postmanCollectionFile", resolver == null ? m_postmanCollectionFile : resolvePath(m_postmanCollectionFile, resolver));
-        }
-        if (isNullOrEmpty(m_additionalDomains)) {
-            properties.put("additionalDomains", resolver == null ? m_additionalDomains : Util.replaceMacro(m_additionalDomains, resolver));
-        }
-        if(isNullOrEmpty(m_environmentalVariablesFile)) {
-            properties.put("environmentalVariablesFile", resolver == null ? m_environmentalVariablesFile : resolvePath(m_environmentalVariablesFile, resolver));
-        }
-        if(isNullOrEmpty(m_globalVariablesFile)) {
-            properties.put("globalVariablesFile", resolver == null ? m_globalVariablesFile : resolvePath(m_globalVariablesFile, resolver));
-        }
-        if(isNullOrEmpty(m_additionalFiles)) {
-            properties.put("additionalFiles", resolver == null ? m_additionalFiles : resolvePath(m_additionalFiles, resolver));
-        }
+        properties.put(ScanModeConstants.SCAN_TYPE, POSTMAN_COLLECTION);
+        addResolvedProperty(properties, "postmanCollectionFile", m_postmanCollectionFile, resolver);
+        addResolvedProperty(properties, "additionalDomains", m_additionalDomains, resolver);
+        addResolvedProperty(properties, "environmentalVariablesFile", m_environmentalVariablesFile, resolver);
+        addResolvedProperty(properties, "globalVariablesFile", m_globalVariablesFile, resolver);
+        addResolvedProperty(properties, "additionalFiles", m_additionalFiles, resolver);
         return properties;
+    }
+
+    private void addResolvedProperty(Map<String, String> properties, String key, String value, VariableResolver resolver) {
+        if (!isNullOrEmpty(value)) return;
+        String resolvedValue = (resolver == null) ? value :
+                ("additionalDomains".equals(key) ? Util.replaceMacro(value, resolver) : resolvePath(value, resolver));
+        properties.put(key, resolvedValue);
     }
 
     @Symbol("postman_collection") //$NON-NLS-1$
@@ -108,39 +111,37 @@ public class PostmanCollection extends ScanMode {
 
         @Override
         public String getDisplayName() {
-            return "Postman Collection";
-        }
-
-        public FormValidation doCheckPostmanCollectionFile(@QueryParameter String postmanCollectionFile) {
-            if(postmanCollectionFile != null && !postmanCollectionFile.isEmpty() && !postmanCollectionFile.endsWith(".json")) {
-                return FormValidation.error(Messages.error_file_type_invalid_json());
-            }
-            return FormValidation.validateRequired(postmanCollectionFile);
+            return POSTMAN_COLLECTION;
         }
 
         public FormValidation doCheckAdditionalDomains(@QueryParameter String additionalDomains) {
             return FormValidation.validateRequired(additionalDomains);
         }
 
-        public FormValidation doCheckEnvironmentalVariablesFile(@QueryParameter String environmentalVariablesFile) {
-            if(environmentalVariablesFile != null && !environmentalVariablesFile.isEmpty() && !environmentalVariablesFile.endsWith(".json")) {
-                return FormValidation.error(Messages.error_file_type_invalid_json());
+        // Helper method for file type validation
+        private FormValidation validateFileExtension(String fileName, String extensionType, boolean required) {
+            if (fileName != null && !fileName.isEmpty()) {
+                if (!fileName.endsWith(extensionType)) {
+                    return FormValidation.error(Messages.error_file_type_invalid(extensionType));
+                }
             }
-            return FormValidation.ok();
+            return required ? FormValidation.validateRequired(fileName) : FormValidation.ok();
+        }
+
+        public FormValidation doCheckPostmanCollectionFile(@QueryParameter String postmanCollectionFile) {
+            return validateFileExtension(postmanCollectionFile, ".json", true);
+        }
+
+        public FormValidation doCheckEnvironmentalVariablesFile(@QueryParameter String environmentalVariablesFile) {
+            return validateFileExtension(environmentalVariablesFile, ".json", false);
         }
 
         public FormValidation doCheckGlobalVariablesFile(@QueryParameter String globalVariablesFile) {
-            if(globalVariablesFile != null && !globalVariablesFile.isEmpty() && !globalVariablesFile.endsWith(".json")) {
-                return FormValidation.error(Messages.error_file_type_invalid_json());
-            }
-            return FormValidation.ok();
+            return validateFileExtension(globalVariablesFile, ".json", false);
         }
 
         public FormValidation doCheckAdditionalFiles(@QueryParameter String additionalFiles) {
-            if(additionalFiles != null && !additionalFiles.isEmpty() && !additionalFiles.endsWith(".zip")) {
-                return FormValidation.error(Messages.error_file_type_invalid_zip());
-            }
-            return FormValidation.ok();
+            return validateFileExtension(additionalFiles, ".zip", false);
         }
     }
 }

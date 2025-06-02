@@ -1,5 +1,5 @@
 /**
- * @ Copyright HCL Technologies Ltd. 2019, 2020, 2023.
+ * @ Copyright HCL Technologies Ltd. 2019, 2020, 2023, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -7,7 +7,6 @@ package com.hcl.appscan.jenkins.plugin.builders;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -23,6 +22,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanMode;
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeConstants;
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeFactory;
 import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
@@ -243,7 +243,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	@DataBoundSetter
 	public void setTrafficFile(String trafficFile) {
-		if("Manual".equals(m_loginType))
+		if(ScanModeConstants.MANUAL.equals(m_loginType))
 			m_trafficFile = trafficFile;
 	}
 
@@ -373,7 +373,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	//To retain backward compatibility
 	protected Object readResolve() {
 		if(m_scanMode == null && m_scanType != null)
-			m_scanMode = ScanModeFactory.getScanTypeImplementation(m_scanType, m_loginType, m_userName, Secret.toString(m_password), m_trafficFile, m_exploreData);
+			m_scanMode = ScanModeFactory.getScanTypeMode(m_scanType, m_loginType, m_userName, Secret.toString(m_password), m_trafficFile, m_exploreData);
 		return this;
 	}
 
@@ -527,7 +527,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 						while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase("Waiting to Auto Run") || m_scanStatus.equalsIgnoreCase("Waiting to Run")
 								|| m_scanStatus.equalsIgnoreCase("Starting") || m_scanStatus.equalsIgnoreCase("Running")
-								|| m_scanStatus.equals("Post Processing") || m_scanStatus.equals("Waiting to Generate Results") || m_scanStatus.equals("Generating Results"))) {
+								|| m_scanStatus.equals("Post Processing") || m_scanStatus.equals("Waiting to Generate Results") || m_scanStatus.equals("Generating Results") || m_scanStatus.equalsIgnoreCase("Canceling"))) {
 							Thread.sleep(60000);
 							m_scanStatus = provider.getStatus();
 						}

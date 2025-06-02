@@ -1,3 +1,9 @@
+/**
+ * @ Copyright HCL Technologies Ltd. 2025.
+ * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+ */
+
+
 package com.hcl.appscan.jenkins.plugin.scanModes;
 
 import hudson.Extension;
@@ -77,22 +83,17 @@ public class TestOnly extends ScanMode {
     }
 
     public String isLoginTypeTestScan(String loginTypeName) {
-        if (m_loginTypeTestScan != null) {
-            return m_loginTypeTestScan.equalsIgnoreCase(loginTypeName) ? "true" : "";
-        } else if (loginTypeName.equals("Manual")) { //Default
-            return "true";
-        }
-        return "";
+        return loginTypeName.equalsIgnoreCase(m_loginTypeTestScan) || loginTypeName.equals(ScanModeConstants.MANUAL) ? "true" : "";
     }
 
     @Override
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
-        properties.put("scanType", TEST_ONLY);
-        properties.put("loginType", m_loginTypeTestScan);
+        properties.put(ScanModeConstants.SCAN_TYPE, TEST_ONLY);
+        properties.put(ScanModeConstants.LOGIN_TYPE, m_loginTypeTestScan);
         properties.put("exploreData", resolver == null ? m_exploreDataTestScan : resolvePath(m_exploreDataTestScan, resolver));
-        if ("Manual".equals(m_loginTypeTestScan)) {
+        if (ScanModeConstants.MANUAL.equals(m_loginTypeTestScan)) {
             properties.put("trafficFile", resolver == null ? m_trafficFileTestScan : resolvePath(m_trafficFileTestScan, resolver));
-        } else if("Automatic".equals(m_loginTypeTestScan)) {
+        } else if(ScanModeConstants.AUTOMATIC.equals(m_loginTypeTestScan)) {
             properties.put("userName", resolver == null ? m_userNameTestScan : Util.replaceMacro(m_userNameTestScan, resolver));
             properties.put("password", resolver == null ? Secret.toString(m_passwordTestScan) : Util.replaceMacro(Secret.toString(m_passwordTestScan), resolver));
         }
@@ -105,14 +106,11 @@ public class TestOnly extends ScanMode {
 
         @Override
         public String getDisplayName() {
-            return "Test Only";
+            return TEST_ONLY;
         }
 
         public FormValidation doCheckExploreDataTestScan(@QueryParameter String exploreDataTestScan) {
             return FormValidation.validateRequired(exploreDataTestScan);
         }
-
-
-
     }
 }

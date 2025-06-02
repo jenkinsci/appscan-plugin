@@ -1,3 +1,9 @@
+/**
+ * @ Copyright HCL Technologies Ltd. 2025.
+ * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+ */
+
+
 package com.hcl.appscan.jenkins.plugin.scanModes;
 
 import hudson.Extension;
@@ -75,22 +81,17 @@ public class FullScan extends ScanMode {
     }
 
     public String isLoginType(String loginTypeName) {
-        if (m_loginType != null)
-            return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
-        else if (loginTypeName.equals("Manual")) { //Default
-            return "true";
-        }
-        return "";
+        return loginTypeName.equalsIgnoreCase(m_loginType) || loginTypeName.equals(ScanModeConstants.MANUAL) ? "true" : "";
     }
 
     @Override
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
-        properties.put("scanType", FULL_SCAN);
-        properties.put("loginType", m_loginType);
+        properties.put(ScanModeConstants.SCAN_TYPE, FULL_SCAN);
+        properties.put(ScanModeConstants.LOGIN_TYPE, m_loginType);
         properties.put("exploreData", resolver == null ? m_exploreData : resolvePath(m_exploreData, resolver));
-        if ("Manual".equals(m_loginType)) {
+        if (ScanModeConstants.MANUAL.equals(m_loginType)) {
             properties.put("trafficFile", resolver == null ? m_trafficFile : resolvePath(m_trafficFile, resolver));
-        } else if("Automatic".equals(m_loginType)) {
+        } else if(ScanModeConstants.AUTOMATIC.equals(m_loginType)) {
             properties.put("userName", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
             properties.put("password", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
         }
