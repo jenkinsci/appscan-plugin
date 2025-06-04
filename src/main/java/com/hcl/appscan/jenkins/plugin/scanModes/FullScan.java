@@ -88,9 +88,9 @@ public class FullScan extends ScanMode {
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
         properties.put(ScanModeConstants.SCAN_TYPE, FULL_SCAN);
         properties.put(ScanModeConstants.LOGIN_TYPE, m_loginType);
-        properties.put("exploreData", resolver == null ? m_exploreData : resolvePath(m_exploreData, resolver));
+        properties.put("exploreData", resolver == null || m_exploreData.equals(EMPTY) ? m_exploreData : resolvePath(m_exploreData, resolver));
         if (ScanModeConstants.MANUAL.equals(m_loginType)) {
-            properties.put("trafficFile", resolver == null ? m_trafficFile : resolvePath(m_trafficFile, resolver));
+            properties.put("trafficFile", resolver == null || m_trafficFile.equals(EMPTY) ? m_trafficFile : resolvePath(m_trafficFile, resolver));
         } else if(ScanModeConstants.AUTOMATIC.equals(m_loginType)) {
             properties.put("userName", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
             properties.put("password", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
