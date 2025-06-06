@@ -525,9 +525,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 						m_scanStatus = provider.getStatus();
 
-						while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase("Waiting to Auto Run") || m_scanStatus.equalsIgnoreCase("Waiting to Run")
-								|| m_scanStatus.equalsIgnoreCase("Starting") || m_scanStatus.equalsIgnoreCase("Running")
-								|| m_scanStatus.equals("Post Processing") || m_scanStatus.equals("Waiting to Generate Results") || m_scanStatus.equals("Generating Results") || m_scanStatus.equalsIgnoreCase("Canceling"))) {
+						while(m_scanStatus != null && !(m_scanStatus.equalsIgnoreCase(CoreConstants.READY) || m_scanStatus.equalsIgnoreCase(CoreConstants.FAILED) || m_scanStatus.startsWith(CoreConstants.SUSPENDED))) {
 							Thread.sleep(60000);
 							m_scanStatus = provider.getStatus();
 						}
