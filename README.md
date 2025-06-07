@@ -169,26 +169,38 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
             -   **Description**: Description of the job.
             -   **Contact**: Contact user of the job.
             -   **Starting URL**: Enter the URL from where you want the
-                scan to start exploring the site.                
-       - **Which Login method you want to use**       
-            - **Recorded login**: Select this option to allow login to the application
-              using a recorded login sequence. Once selected, you would be prompted
-              to enter the path to recorded login sequence. Supported file formats are EXD, HAR, DAST.CONFIG and LOGIN.
-              Please note that .login file is supported from AppScan Enterprise 10.0.4 release onwards.
-            - **Automatic login**: Select this option to allow Login to the application
-              using a username and password. Once selected, you would be prompted
-              to enter the username and password.
-            - **Login not required**: Selecting this option will result in AppScan not
-              scanning pages that require a login.            
-       - **Scan**       
-            - **Full automatic scan**: Select this option to automatically explore
-              and test your web application              
-            - **Test only (manual explore data is required)**: Select this option to run the test
-              only on external recorded manual explore data.            
-       - **Manual Explore (externally recorded)**       
-            - **Path**: Enter the local path to the Manual explore data, to use as part of a new scan.
-              For example: "C:\samplefileName.dast.config".
-              Supported Manual explore file formats are: EXD, HAR, DAST.CONFIG, and CONFIG.
+                scan to start exploring the site.           
+       - **Scan**: The type of scan to run.
+            - **Full Automatic Scan**: Select this option to automatically explore
+     	    	- **Which Login method you want to use**:      
+            		- **Recorded login**: Select this option to allow login to the application
+              	  	  using a recorded login sequence. Once selected, you would be prompted
+              	  	  to enter the path to recorded login sequence. Supported file formats are EXD, HAR, DAST.CONFIG and LOGIN.
+              	  	  Please note that .login file is supported from AppScan Enterprise 10.0.4 release onwards.
+            		- **Automatic login**: Select this option to allow Login to the application
+              	  	  using a username and password. Once selected, you would be prompted to enter the username and password.
+                	- **Login not required**: Selecting this option will result in AppScan not scanning pages that require a login.
+                 - **Manual Explore (externally recorded)**:
+                 	- **Path**: Enter the local path to the Manual explore data, to use as part of a new scan. For example: "C:\samplefileName.dast.config". 
+			  Supported Manual explore file formats are: EXD, HAR, DAST.CONFIG, and CONFIG.
+            - **Postman Collection**: Test the APIs in the Postman collection file. Add the Postman collection file & supported files.
+     	    	- **Postman Collection File**: Export a .json file from Postman containing the APIs to be tested. Supported File type: .json.
+     	    	- **Additional Domains**: Specify the domain details for the APIs in the collection. Multiple domains can be listed, separated by commas.
+                - **Environmental Variables File**: Upload an optional .json file containing environmental variables required for the collection.
+                - **Global Variables File**: Upload an optional .json file containing global variables required for the collection.
+                - **Additional Files**:  If the collection required additional files for API execution, add them to a .zip archive.
+            - **Test Only**: Select this option to run the test only on external recorded manual explore data.            
+     	    	- **Which Login method you want to use**:     
+            		- **Recorded login**: Select this option to allow login to the application
+              	  	  using a recorded login sequence. Once selected, you would be prompted
+              	  	  to enter the path to recorded login sequence. Supported file formats are EXD, HAR, DAST.CONFIG and LOGIN.
+              	  	  Please note that .login file is supported from AppScan Enterprise 10.0.4 release onwards.
+            		- **Automatic login**: Select this option to allow Login to the application
+              	  	  using a username and password. Once selected, you would be prompted to enter the username and password.
+                	- **Login not required**: Selecting this option will result in AppScan not scanning pages that require a login.
+                 - **Manual Explore (externally recorded)**: **Required for Test Only scan type**
+                 	- **Path**: Enter the local path to the Manual explore data, to use as part of a new scan. For example: "C:\samplefileName.dast.config". 
+			  Supported Manual explore file formats are: EXD, HAR, DAST.CONFIG, and CONFIG.
        - **Test Optimization**
             - **Fast**: Select this option for approximately 97% issue coverage and twice as fast test stage speed.
 			  Recommended for security experts for more frequent scans.
