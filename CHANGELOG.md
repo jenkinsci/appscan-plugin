@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+1.7.0 (June, 2025)
+------
+- Support for Web API scanning using Postman Collections in HCL AppScan Enterprise.
+- Bug fixes.
+
 1.6.0 (March, 2025)
 ------
 - Support for Rescan of DAST Scans in both HCL AppScan on Cloud and HCL AppScan 360°.
