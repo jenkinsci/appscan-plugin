@@ -24,16 +24,16 @@ public class TestOnly extends ScanMode {
 
     private String m_loginTypeTestScan;
     private String m_trafficFileTestScan;
-    private String m_userNameTestScan;
-    private Secret m_passwordTestScan;
+    private String m_accessIdTestScan;
+    private Secret m_secretKeyTestScan;
     private String m_exploreDataTestScan;
 
     @DataBoundConstructor
     public TestOnly(String loginTypeTestScan, String accessIdTestScan, String secretKeyTestScan, String trafficFileTestScan, String exploreDataTestScan) {
         m_loginTypeTestScan = loginTypeTestScan;
         m_trafficFileTestScan = trafficFileTestScan;
-        m_userNameTestScan = accessIdTestScan;
-        m_passwordTestScan = Secret.fromString(secretKeyTestScan);
+        m_accessIdTestScan = accessIdTestScan;
+        m_secretKeyTestScan = Secret.fromString(secretKeyTestScan);
         m_exploreDataTestScan = exploreDataTestScan;
     }
 
@@ -47,21 +47,21 @@ public class TestOnly extends ScanMode {
     }
 
     @DataBoundSetter
-    public void setAccessIdTestScan(String userNameTestScan) {
-            m_userNameTestScan = userNameTestScan;
+    public void setAccessIdTestScan(String accessIdTestScan) {
+            m_accessIdTestScan = accessIdTestScan;
     }
 
     public String getAccessIdTestScan() {
-        return m_userNameTestScan;
+        return m_accessIdTestScan;
     }
 
     @DataBoundSetter
-    public void setSecretKeyTestScan(String passwordTestScan) {
-            m_passwordTestScan = Secret.fromString(passwordTestScan);
+    public void setSecretKeyTestScan(String secretKeyTestScan) {
+            m_secretKeyTestScan = Secret.fromString(secretKeyTestScan);
     }
 
     public String getSecretKeyTestScan() {
-        return Secret.toString(m_passwordTestScan);
+        return Secret.toString(m_secretKeyTestScan);
     }
 
     @DataBoundSetter
@@ -90,12 +90,12 @@ public class TestOnly extends ScanMode {
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
         properties.put(ScanModeConstants.SCAN_TYPE, TEST_ONLY);
         properties.put(ScanModeConstants.LOGIN_TYPE, m_loginTypeTestScan);
-        properties.put("exploreData", resolver == null || m_exploreDataTestScan.equals(EMPTY) ? m_exploreDataTestScan : resolvePath(m_exploreDataTestScan, resolver));
+        properties.put(ScanModeConstants.EXPLORE_DATA, resolver == null || EMPTY.equals(m_exploreDataTestScan) ? m_exploreDataTestScan : resolvePath(m_exploreDataTestScan, resolver));
         if (ScanModeConstants.MANUAL.equals(m_loginTypeTestScan)) {
-            properties.put("trafficFile", resolver == null || m_trafficFileTestScan.equals(EMPTY) ? m_trafficFileTestScan : resolvePath(m_trafficFileTestScan, resolver));
+            properties.put(ScanModeConstants.TRAFFIC_FILE, resolver == null || EMPTY.equals(m_trafficFileTestScan) ? m_trafficFileTestScan : resolvePath(m_trafficFileTestScan, resolver));
         } else if(ScanModeConstants.AUTOMATIC.equals(m_loginTypeTestScan)) {
-            properties.put("userName", resolver == null ? m_userNameTestScan : Util.replaceMacro(m_userNameTestScan, resolver));
-            properties.put("password", resolver == null ? Secret.toString(m_passwordTestScan) : Util.replaceMacro(Secret.toString(m_passwordTestScan), resolver));
+            properties.put(ScanModeConstants.USER_NAME, resolver == null ? m_accessIdTestScan : Util.replaceMacro(m_accessIdTestScan, resolver));
+            properties.put(ScanModeConstants.PASSWORD, resolver == null ? Secret.toString(m_secretKeyTestScan) : Util.replaceMacro(Secret.toString(m_secretKeyTestScan), resolver));
         }
         return properties;
     }

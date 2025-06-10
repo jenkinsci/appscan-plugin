@@ -22,15 +22,15 @@ public class FullScan extends ScanMode {
 
     private String m_loginType;
     private String m_trafficFile;
-    private String m_userName;
-    private Secret m_password;
+    private String m_accessId;
+    private Secret m_secretKey;
     private String m_exploreData;
 
     @DataBoundConstructor
     public FullScan(String loginType, String accessId, String secretKey, String trafficFile, String exploreData) {
         m_loginType = loginType;
-        m_userName = accessId;
-        m_password = Secret.fromString(secretKey);
+        m_accessId = accessId;
+        m_secretKey = Secret.fromString(secretKey);
         m_trafficFile = trafficFile;
         m_exploreData = exploreData;
     }
@@ -45,21 +45,21 @@ public class FullScan extends ScanMode {
     }
 
     @DataBoundSetter
-    public void setAccessId(String userName) {
-            m_userName = userName;
+    public void setAccessId(String accessId) {
+            m_accessId = accessId;
     }
 
     public String getAccessId() {
-        return m_userName;
+        return m_accessId;
     }
 
     @DataBoundSetter
-    public void setSecretKey(String password) {
-            m_password = Secret.fromString(password);
+    public void setSecretKey(String secretKey) {
+            m_secretKey = Secret.fromString(secretKey);
     }
 
     public String getSecretKey() {
-        return Secret.toString(m_password);
+        return Secret.toString(m_secretKey);
     }
 
     @DataBoundSetter
@@ -88,12 +88,12 @@ public class FullScan extends ScanMode {
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
         properties.put(ScanModeConstants.SCAN_TYPE, FULL_SCAN);
         properties.put(ScanModeConstants.LOGIN_TYPE, m_loginType);
-        properties.put("exploreData", resolver == null || m_exploreData.equals(EMPTY) ? m_exploreData : resolvePath(m_exploreData, resolver));
+        properties.put(ScanModeConstants.EXPLORE_DATA, resolver == null || EMPTY.equals(m_exploreData) ? m_exploreData : resolvePath(m_exploreData, resolver));
         if (ScanModeConstants.MANUAL.equals(m_loginType)) {
-            properties.put("trafficFile", resolver == null || m_trafficFile.equals(EMPTY) ? m_trafficFile : resolvePath(m_trafficFile, resolver));
+            properties.put(ScanModeConstants.TRAFFIC_FILE, resolver == null || EMPTY.equals(m_trafficFile) ? m_trafficFile : resolvePath(m_trafficFile, resolver));
         } else if(ScanModeConstants.AUTOMATIC.equals(m_loginType)) {
-            properties.put("userName", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
-            properties.put("password", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
+            properties.put(ScanModeConstants.USER_NAME, resolver == null ? m_accessId : Util.replaceMacro(m_accessId, resolver));
+            properties.put(ScanModeConstants.PASSWORD, resolver == null ? Secret.toString(m_secretKey) : Util.replaceMacro(Secret.toString(m_secretKey), resolver));
         }
         return properties;
     }

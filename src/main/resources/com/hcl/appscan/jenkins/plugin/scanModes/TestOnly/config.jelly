@@ -14,10 +14,10 @@
             </f:radioBlock>
 
             <f:radioBlock name="loginTypeTestScan" title="${%label.automatic}" checked="${instance.isLoginTypeTestScan('Automatic')}" value="Automatic" help="/plugin/appscan/help/loginAutomatic.html" inline="true">
-                <f:entry title="${%label.user.name}" field="userNameTestScan" help="/plugin/appscan/help/userName.html">
+                <f:entry title="${%label.user.name}" help="/plugin/appscan/help/userName.html">
                     <f:textbox field="accessIdTestScan" />
                 </f:entry>
-                <f:entry title="${%label.password}" field="passwordTestScan" help="/plugin/appscan/help/password.html">
+                <f:entry title="${%label.password}" help="/plugin/appscan/help/password.html">
                     <f:password field="secretKeyTestScan" />
                 </f:entry>
             </f:radioBlock>

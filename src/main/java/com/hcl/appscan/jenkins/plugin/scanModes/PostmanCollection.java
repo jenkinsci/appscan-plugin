@@ -33,12 +33,12 @@ public class PostmanCollection extends ScanMode {
         this("", "", "", "", "");
     }
 
-    public PostmanCollection(String postmanCollectionFile, String additionalDomains, String environmentalVariablesFile, String globalVariablesFile, String additionaFiles) {
+    public PostmanCollection(String postmanCollectionFile, String additionalDomains, String environmentalVariablesFile, String globalVariablesFile, String additionalFiles) {
         m_postmanCollectionFile = postmanCollectionFile;
         m_additionalDomains = additionalDomains;
         m_environmentalVariablesFile = environmentalVariablesFile;
         m_globalVariablesFile = globalVariablesFile;
-        m_additionalFiles = additionaFiles;
+        m_additionalFiles = additionalFiles;
     }
 
     @DataBoundSetter
@@ -90,16 +90,16 @@ public class PostmanCollection extends ScanMode {
     @Override
     public Map<String, String> configureScanProperties(Map<String, String> properties, VariableResolver<String> resolver) {
         properties.put(ScanModeConstants.SCAN_TYPE, POSTMAN_COLLECTION);
-        addResolvedProperty(properties, "postmanCollectionFile", m_postmanCollectionFile, resolver);
-        addResolvedProperty(properties, "additionalDomains", m_additionalDomains, resolver);
-        addResolvedProperty(properties, "environmentalVariablesFile", m_environmentalVariablesFile, resolver);
-        addResolvedProperty(properties, "globalVariablesFile", m_globalVariablesFile, resolver);
-        addResolvedProperty(properties, "additionalFiles", m_additionalFiles, resolver);
+        addResolvedProperty(properties, ScanModeConstants.POSTMAN_COLLECTION_FILE, m_postmanCollectionFile, resolver);
+        addResolvedProperty(properties, ScanModeConstants.ADDITIONAL_DOMAINS, m_additionalDomains, resolver);
+        addResolvedProperty(properties, ScanModeConstants.ENVIRONMENTAL_VARIABLES_FILE, m_environmentalVariablesFile, resolver);
+        addResolvedProperty(properties, ScanModeConstants.GLOBAL_VARIABLES_FILE, m_globalVariablesFile, resolver);
+        addResolvedProperty(properties, ScanModeConstants.ADDITIONAL_FILES, m_additionalFiles, resolver);
         return properties;
     }
 
     private void addResolvedProperty(Map<String, String> properties, String key, String value, VariableResolver resolver) {
-        if (!isNullOrEmpty(value)) return;
+        if (!isNotNullOrEmpty(value)) return;
         String resolvedValue = (resolver == null) ? value :
                 ("additionalDomains".equals(key) ? Util.replaceMacro(value, resolver) : resolvePath(value, resolver));
         properties.put(key, resolvedValue);

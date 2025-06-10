@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 public abstract class ScanMode extends AbstractDescribableImpl<ScanMode> implements ScannerConstants, Serializable {
 
-
+    private static final long serialVersionUID = 1L;
 
     public ScanMode() {
     }
@@ -45,7 +45,7 @@ public abstract class ScanMode extends AbstractDescribableImpl<ScanMode> impleme
         return path;
     }
 
-    protected boolean isNullOrEmpty(String string) {
+    protected boolean isNotNullOrEmpty(String string) {
         return string != null && !string.trim().isEmpty();
     }
 }

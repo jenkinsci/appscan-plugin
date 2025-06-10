@@ -13,10 +13,10 @@
         </f:radioBlock>
 
         <f:radioBlock name="loginType" title="${%label.automatic}" checked="${instance.isLoginType('Automatic')}" value="Automatic" help="/plugin/appscan/help/loginAutomatic.html" inline="true">
-            <f:entry title="${%label.user.name}" field="userName" help="/plugin/appscan/help/userName.html">
+            <f:entry title="${%label.user.name}" help="/plugin/appscan/help/userName.html">
                 <f:textbox field="accessId" />
             </f:entry>
-            <f:entry title="${%label.password}" field="password" help="/plugin/appscan/help/password.html">
+            <f:entry title="${%label.password}" help="/plugin/appscan/help/password.html">
                 <f:password field="secretKey" />
             </f:entry>
         </f:radioBlock>
