@@ -1,5 +1,5 @@
 /**
- * @ Copyright HCL Technologies Ltd. 2019, 2020, 2023.
+ * @ Copyright HCL Technologies Ltd. 2019, 2020, 2023, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -21,6 +21,10 @@ import java.util.Set;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanMode;
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeConstants;
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeFactory;
+import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jenkinsci.Symbol;
@@ -53,7 +57,6 @@ import com.hcl.appscan.jenkins.plugin.ScanFactory;
 import com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever;
 import com.hcl.appscan.jenkins.plugin.auth.ASEJenkinsAuthenticationProvider;
 import com.hcl.appscan.jenkins.plugin.auth.ASECredentials;
-import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.jenkins.plugin.results.FailureCondition;
 import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
@@ -95,7 +98,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private String m_folder;
 	private String m_testPolicy;
 	private String m_template;
-	private String m_exploreData;
 	private String m_agent;
 	private String m_jobName;
 	private boolean m_email;
@@ -103,25 +105,25 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	private boolean m_failBuild;
 	private List<FailureCondition> m_failureConditions;
 
-	//LoginMangement
+	//Login Management
 	private String m_loginType;
 	private String m_trafficFile;
 	private String m_userName;
 	private Secret m_password;
-	
+	private String m_exploreData;
 	private String m_scanType;
-
 	private String m_testOptimization;
 	private String m_scanStatus;
-    	private String m_description;
-    	private String m_contact;
+	private String m_description;
+	private String m_contact;
+	private ScanMode m_scanMode;
 	
 	private IAuthenticationProvider m_authProvider;
 	private static final File JENKINS_INSTALL_DIR = new File(System.getProperty("user.dir"), ".appscan"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	@DataBoundConstructor
-	public AppScanEnterpriseBuildStep(String credentials, String folder, String testPolicy, String template, String jobName) {
-		
+	public AppScanEnterpriseBuildStep(ScanMode scanMode, String credentials, String folder, String testPolicy, String template, String jobName) {
+		m_scanMode = scanMode;
 		m_credentials = credentials;
 		m_application = "";
 		m_target = "";
@@ -134,22 +136,20 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// template name to template id before saving it in
 		// job configuration file.
 		m_template = getDescriptor().getTemplateId(template);
-		m_exploreData = "";
 		m_agent = "";
 		m_jobName = (jobName == null || jobName.trim().equals("")) ? String.valueOf(ThreadLocalRandom.current().nextInt(0, 10000)) : jobName ; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		m_email = false;
 		m_wait = false;
 		m_failBuild = false;
-		
 		m_loginType = "";
 		m_trafficFile = "";
 		m_userName = "";
 		m_password = Secret.fromString("");
-		
+		m_exploreData = "";
 		m_scanType = "";
 		m_testOptimization = "";
-        	m_description = "";
-        	m_contact = "";
+		m_description = "";
+		m_contact = "";
 	}
 	
 	public String getCredentials() {
@@ -231,51 +231,42 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public String getTarget() {
 		return m_target;
 	}
-	
+
 	@DataBoundSetter
 	public void setLoginType(String loginType) {
 		m_loginType = loginType;
 	}
-	
+
 	public String getLoginType() {
 		return m_loginType;
 	}
-	
+
 	@DataBoundSetter
 	public void setTrafficFile(String trafficFile) {
-		if("Manual".equals(m_loginType))
+		if(ScanModeConstants.MANUAL.equals(m_loginType))
 			m_trafficFile = trafficFile;
 	}
-	
+
 	public String getTrafficFile() {
 		return m_trafficFile;
 	}
-	
+
 	@DataBoundSetter
-    public void setAccessId(String userName) {	
-		m_userName = userName;
-    }
- 
+	public void setAccessId(String userName) {
+			m_userName = userName;
+	}
+
 	public String getAccessId() {
 		return m_userName;
 	}
 
 	@DataBoundSetter
-    public void setSecretKey(String password) {
-		m_password = Secret.fromString(password);
-    }
-	
+	public void setSecretKey(String password) {
+			m_password = Secret.fromString(password);
+	}
+
 	public String getSecretKey() {
 		return Secret.toString(m_password);
-	}
-	
-	@DataBoundSetter
-	public void setScanType(String scanType) {
-		 m_scanType = scanType;
-	}
-	
-	public String getScanType() {
-		return m_scanType;
 	}
 
 	@DataBoundSetter
@@ -285,6 +276,19 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	public String getExploreData() {
 		return m_exploreData;
+	}
+
+	@DataBoundSetter
+	public void setScanType(String scanType) {
+		m_scanType = scanType;
+	}
+
+	public String getScanType() {
+		return m_scanType;
+	}
+
+	public ScanMode getScanMode() {
+		return m_scanMode;
 	}
 
 	@DataBoundSetter
@@ -332,23 +336,23 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		return m_failBuild;
 	}
 
-    	@DataBoundSetter
-    	public void setDescription(String description) {
-        	m_description = description;
-    	}
+	@DataBoundSetter
+	public void setDescription(String description) {
+		m_description = description;
+	}
 
-    	public String getDescription() {
-        	return m_description;
-    	}
+	public String getDescription() {
+		return m_description;
+	}
 
-    	@DataBoundSetter
-    	public void setContact(String contact) {
-        	m_contact = contact;
-    	}
+	@DataBoundSetter
+	public void setContact(String contact) {
+		m_contact = contact;
+	}
 
-    	public String getContact() {
-        	return m_contact;
-    	}
+	public String getContact() {
+		return m_contact;
+	}
 
 	@DataBoundSetter
 	public void setFailureConditions(List<FailureCondition> failureConditions) {
@@ -364,6 +368,13 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	@Override
 	public DescriptorImpl getDescriptor() {
 		return (DescriptorImpl) super.getDescriptor();
+	}
+
+	//To retain backward compatibility
+	protected Object readResolve() {
+		if(m_scanMode == null && m_scanType != null)
+			m_scanMode = ScanModeFactory.getScanTypeMode(m_scanType, m_loginType, m_userName, Secret.toString(m_password), m_trafficFile, m_exploreData);
+		return this;
 	}
 
 	@Override
@@ -383,24 +394,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	public BuildStepMonitor getRequiredMonitorService() {
 		return BuildStepMonitor.NONE;
 	}
-	
-	public String isLoginType(String loginTypeName) {
-		if (m_loginType != null)
-			return m_loginType.equalsIgnoreCase(loginTypeName) ? "true" : "";
-		else if (loginTypeName.equals("Manual")) { //Default
-			return "true";
-		}
-		return "";
-	}
-	
-	public String isScanType(String scanType) {
-		if(m_scanType != null) {
-			return m_scanType.equalsIgnoreCase(scanType) ? "true" : "";
-		} else if (scanType.equals("1")) { //Default
-			return "true";
-		}
-		return "";
-	}
 
 	public String isTestOptimization(String testOptimizationLevel) {
 		if (m_testOptimization != null) {
@@ -419,8 +412,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 properties.put("credentials", m_credentials);
                 properties.put("testPolicyId", m_testPolicy);
                 properties.put("agentServer", m_agent);
-                properties.put("loginType", m_loginType);
-                properties.put("scanType", m_scanType);
                 properties.put("testOptimization", m_testOptimization);
                 properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
                 
@@ -429,7 +420,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", m_target);
                     properties.put("folder", m_folder);
                     properties.put("templateId", m_template);
-                    properties.put("exploreData", m_exploreData);
                     properties.put(CoreConstants.SCAN_NAME, m_jobName + "_" + SystemUtil.getTimeStamp());
                     properties.put("description", m_description);
                     properties.put("contact", m_contact);
@@ -439,20 +429,11 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                     properties.put("startingURL", Util.replaceMacro(m_target, resolver));
                     properties.put("folder", Util.replaceMacro(m_folder, resolver));
                     properties.put("templateId", Util.replaceMacro(m_template, resolver));
-                    properties.put("exploreData", m_exploreData.equals("") ? m_exploreData : resolvePath(m_exploreData, resolver));
                     properties.put(CoreConstants.SCAN_NAME, Util.replaceMacro(m_jobName, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
                     properties.put("description", Util.replaceMacro(m_description, resolver));
                     properties.put("contact", Util.replaceMacro(m_contact, resolver));
                 }
-
-		if (m_loginType != null) {
-                    if (m_loginType.equals("Manual")) {
-                        properties.put("trafficFile", (resolver == null || m_trafficFile.equals(""))? m_trafficFile : resolvePath(m_trafficFile, resolver));
-                    } else if (m_loginType.equals("Automatic")) {
-                        properties.put("userName", resolver == null ? m_userName : Util.replaceMacro(m_userName, resolver));
-                        properties.put("password", resolver == null ? Secret.toString(m_password) : Util.replaceMacro(Secret.toString(m_password), resolver));
-                    }
-                }
+				properties = m_scanMode.configureScanProperties(properties, resolver);
             return properties;
 	}
 
@@ -496,9 +477,10 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
+		readResolve();
 		Map<String, String> properties = getScanProperties(build, listener);
 
-        	if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
+		if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
             		throw new AbortException(Messages.error_url_validation(m_target));
         	}
 
@@ -543,9 +525,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 						progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 						m_scanStatus = provider.getStatus();
 
-						while(m_scanStatus != null && (m_scanStatus.equalsIgnoreCase("Waiting to Auto Run") || m_scanStatus.equalsIgnoreCase("Waiting to Run")
-								|| m_scanStatus.equalsIgnoreCase("Starting") || m_scanStatus.equalsIgnoreCase("Running")
-								|| m_scanStatus.equals("Post Processing") || m_scanStatus.equals("Waiting to Generate Results") || m_scanStatus.equals("Generating Results"))) {
+						while(m_scanStatus != null && !(m_scanStatus.equalsIgnoreCase(CoreConstants.READY) || m_scanStatus.equalsIgnoreCase(CoreConstants.FAILED) || m_scanStatus.startsWith(CoreConstants.SUSPENDED))) {
 							Thread.sleep(60000);
 							m_scanStatus = provider.getStatus();
 						}
@@ -590,21 +570,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			System.setProperty(CoreConstants.SACLIENT_INSTALL_DIR, JENKINS_INSTALL_DIR.getPath());
 		}
 	}
-        
-        private String resolvePath(String path, VariableResolver<String> resolver) {
-		//First replace any variables in the path
-		path = Util.replaceMacro(path, resolver);
-		
-		//If the path is not absolute, make it relative to the workspace
-		File file = new File(path);
-		if(!file.isAbsolute()) {
-			String targetPath = "${WORKSPACE}" + File.separator + file.getPath();
-			targetPath = Util.replaceMacro(targetPath, resolver);
-			file = new File(targetPath);
-		}
-
-		return file.getAbsolutePath();
-	}
 
 	@Symbol("appscanenterprise") //$NON-NLS-1$
     @Extension
@@ -621,6 +586,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		public boolean isApplicable(Class<? extends AbstractProject> projectType) {
 			return true;
 		}
+
 
 		@Override
 		public String getDisplayName() {
@@ -765,7 +731,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			if (credentials.trim().equals("")) //$NON-NLS-1$
 				return FormValidation.errorWithMarkup(Messages.error_no_creds_ase("/credentials")); //$NON-NLS-1$
 
-			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+			IAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			if (authProvider.isTokenExpired())
 				return FormValidation.errorWithMarkup(Messages.error_token_expired("/credentials")); //$NON-NLS-1$
 

@@ -1,0 +1,31 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <!--
+    © Copyright HCL Technologies Ltd.2025.
+    LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
+    -->
+
+        <f:entry title="${%label.login.management}">
+            <f:radioBlock name="loginTypeTestScan" title="${%label.recorded}" checked="true" value="Manual" help="/plugin/appscan/help/loginManual.html" inline="true">
+                <st:nbsp/>
+                <f:entry title="${%label.traffic.file}" field="trafficFileTestScan">
+                    <f:textbox/>
+                </f:entry>
+            </f:radioBlock>
+
+            <f:radioBlock name="loginTypeTestScan" title="${%label.automatic}" checked="${instance.isLoginTypeTestScan('Automatic')}" value="Automatic" help="/plugin/appscan/help/loginAutomatic.html" inline="true">
+                <f:entry title="${%label.user.name}" help="/plugin/appscan/help/userName.html">
+                    <f:textbox field="accessIdTestScan" />
+                </f:entry>
+                <f:entry title="${%label.password}" help="/plugin/appscan/help/password.html">
+                    <f:password field="secretKeyTestScan" />
+                </f:entry>
+            </f:radioBlock>
+
+            <f:radioBlock name="loginTypeTestScan" title="${%label.none}" checked="${instance.isLoginTypeTestScan('None')}" value="None" help="/plugin/appscan/help/loginNone.html" inline="true" />
+
+            <f:entry title="${%label.manual.explore}" field="exploreDataTestScan" help="/plugin/appscan/help/manualExploreData.html">
+                <f:textbox />
+            </f:entry>
+        </f:entry>
+</j:jelly>

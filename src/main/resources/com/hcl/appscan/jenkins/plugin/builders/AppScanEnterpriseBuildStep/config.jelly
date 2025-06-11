@@ -18,7 +18,7 @@
         <f:select onchange="resetFields(this)"/>
     </f:entry>
     
-    <f:section title="${%label.job.properties}" field="loginTypeOptions">
+    <f:section title="${%label.job.properties}">
 	    <f:entry title="${%label.template}" field="template">
 	        <f:textbox placeholder="${%template.placeholder}"
              data-maxsuggestions="99999"
@@ -60,37 +60,8 @@
 	        <f:textbox />
 	    </f:entry>
      </f:section>
-   
-    <f:section title="${%label.login.management}" field="loginTypeOptions">
-        <f:radioBlock name="loginType" title="${%label.recorded}" checked="true" value="Manual" inline="true">
-            <st:nbsp/>
-            <f:entry title="${%label.traffic.file}" field="trafficFile">
-                <f:textbox />
-            </f:entry>
-        </f:radioBlock>
-	
-        <f:radioBlock name="loginType" title="${%label.automatic}" checked="${instance.isLoginType('Automatic')}" value="Automatic" inline="true">
-            <f:entry title="${%label.user.name}" field="userName">
-                <f:textbox field="accessId" />
-            </f:entry>
-            <f:entry title="${%label.password}" field="password">
-                <f:password field="secretKey" />
-            </f:entry>
-        </f:radioBlock>
-	
-        <f:radioBlock name="loginType" title="${%label.none}" checked="${instance.isLoginType('None')}" value="None" inline="true" />
-    </f:section>  
-    
-    <f:section title="${%label.scan}" field="scanTypeOptions">
-        <f:radioBlock name="scanType" title="${%label.scan.full}"  checked="true" value="1"  help="/plugin/appscan/help/scanFull.html" inline="true"/>        
-        <f:radioBlock name="scanType" title="${%label.scan.test}"  checked="${instance.isScanType('3')}" value="3"  help="/plugin/appscan/help/scanTest.html" inline="true"/>
-    </f:section>    
-            
-    <f:section title="${%label.manual.explore}" field="loginTypeOptions">
-	    <f:entry title="${%label.explore.data}" field="exploreData">
-	        <f:textbox />
-	    </f:entry>
-    </f:section>
+
+    <f:dropdownDescriptorSelector title="${%label.scan}" field="scanMode"/>
 
     <f:section title="${%label.test.optimization}" field="testOptimizationOptions">
         <f:entry help="/plugin/appscan/help/testOptimization.html">
