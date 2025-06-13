@@ -538,6 +538,9 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			}
 		});
 
+		if(suspend && m_scanStatus == null) // to address the status in association with Master and Slave configuration
+			m_scanStatus = provider.getStatus();
+
 		if (CoreConstants.FAILED.equalsIgnoreCase(m_scanStatus)) {
 			String message = com.hcl.appscan.sdk.Messages.getMessage(ScanConstants.SCAN_FAILED, " Scan Name: " + scan.getName());
 			if (provider.getMessage() != null && provider.getMessage().trim().length() > 0) {
