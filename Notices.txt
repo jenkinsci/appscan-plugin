@@ -2,7 +2,7 @@
 Notices & Information
 ---------------------
 ---------------------------------
-HCL AppScan Jenkins Plugin v1.6.0
+HCL AppScan Jenkins Plugin v1.7.0
 ---------------------------------
 
 ======
@@ -11,13 +11,13 @@ DETAIL
 Note: generic licenses are marked with (*)
 Note: missing copyright references are marked with (*)
 **********************************************************
-1. Library: appscan.sdk-1.1.6.jar Product: AppScan Jenkins
+1. Library: appscan.sdk-1.1.7.jar Product: AppScan Jenkins
 **********************************************************
 ========
 LICENSES
 ========
 Licensed under Apache 2.0
-License terms can be found at: https://repo.maven.apache.org/maven2/com/hcl/appscan.sdk/1.1.6/appscan.sdk-1.1.6.pom
+License terms can be found at: https://repo.maven.apache.org/maven2/com/hcl/appscan.sdk/1.1.7/appscan.sdk-1.1.7.pom
 
 License Text Under Appendix
 
@@ -26,7 +26,19 @@ License Text Under Appendix
 ==========
 COPYRIGHTS
 ==========
-(*) The copyright for this library is unknown
+--------------------
+Copyright 1 out of 2
+--------------------
+Copyrighted under Copyright 2017-2025 HCL Technologies Ltd
+Copyright terms can be found at: https://index.mend.io/gri/app/reader/resource/content/asString/ec10c860-bd35-4433-bccc-aba8ea7dc9ef
+
+
+--------------------
+Copyright 2 out of 2
+--------------------
+Copyrighted under Copyright 2016 IBM Corporation
+Copyright terms can be found at: https://index.mend.io/gri/app/reader/resource/content/asString/ec10c860-bd35-4433-bccc-aba8ea7dc9ef
+
 
 ***************************************************************************
 2. Library: credentials-1319.v7eb_51b_3a_c97b_.jar Product: AppScan Jenkins
