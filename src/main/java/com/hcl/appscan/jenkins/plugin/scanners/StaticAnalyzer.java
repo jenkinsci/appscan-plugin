@@ -201,23 +201,11 @@ public class StaticAnalyzer extends Scanner {
                properties.remove(CoreConstants.INCLUDE_SCA);
            }
 
-            // Handle AppScan360-specific validation
-            if (authProvider.isAppScan360()) {
-                if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-                    throw new AbortException(Messages.error_sca_AppScan360());
-                }
-                // Remove INCLUDE_SCA and show warning if present in AppScan360 context
-                if (properties.containsKey(CoreConstants.INCLUDE_SCA)) {
-                    progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
-                    properties.remove(CoreConstants.INCLUDE_SCA);
-                }
-            } else {
-                // Handle SCA entitlement validation and removal of INCLUDE_SCA if no entitlement
-                if (properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
-                    progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
-                    properties.remove(CoreConstants.INCLUDE_SCA);
-                }
-            }
+           // Handle SCA entitlement validation and removal of INCLUDE_SCA if no entitlement
+           if (properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
+                properties.remove(CoreConstants.INCLUDE_SCA);
+           }
 
             //includeSCA is only available if the user upload an IRX file for upload files & folders scan method .
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {

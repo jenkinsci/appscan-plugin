@@ -17,6 +17,7 @@ import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
+import com.hcl.appscan.sdk.scanners.sast.SAClient;
 import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.JSONObject;
@@ -247,22 +248,35 @@ public class DynamicAnalyzer extends Scanner {
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}
-        if(getRescanDast()) {
-            if(!properties.containsKey(CoreConstants.SCAN_ID)) {
-                throw new AbortException(Messages.error_empty_scan_id());
-            } else if (m_incrementalScan && !isNullOrEmpty(m_executionId)) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_empty_execution_id()));
-            }
-        }
-        if (authProvider.isAppScan360()) {
-            if (properties.containsKey(Scanner.PRESENCE_ID)) {
-                throw new AbortException(Messages.error_presence_AppScan360());
-            } else if (!getRescanDast() && ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1 && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
-                throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
-            }
-        }
-		if (!getRescanDast() && !authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
-			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
+
+		if(getRescanDast()) {
+			if(!properties.containsKey(CoreConstants.SCAN_ID)) {
+				throw new AbortException(Messages.error_empty_scan_id());
+			} else if (m_incrementalScan && !isNullOrEmpty(m_executionId)) {
+				progress.setStatus(new Message(Message.WARNING, Messages.warning_empty_execution_id()));
+			}
+		}
+
+		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
+			throw new AbortException(Messages.error_presence_AppScan360());
+		}
+
+		if(!getRescanDast()) {
+			String target = properties.get(TARGET);
+			if (isNullOrEmpty(target)) {
+				throw new AbortException(Messages.error_target_empty());
+			}
+
+			if ((!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID)) ||
+					(authProvider.isAppScan360() && new SAClient().compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0, 5)))) {
+				boolean isUrlInvalid = !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
+				boolean isDomainInvalid = !ServiceUtil.isValidDomain(target, authProvider, authProvider.getProxy());
+				if (isDomainInvalid && isUrlInvalid) {
+					throw new AbortException(Messages.error_invalid_url_connection());
+				} else if (isDomainInvalid || isUrlInvalid) {
+					throw new AbortException(Messages.error_url_validation_ui());
+				}
+			}
 		}
     }
 
@@ -429,11 +443,18 @@ public class DynamicAnalyzer extends Scanner {
 				return FormValidation.ok();
 			}
 
-			// Validate the URL if conditions are met & for AppScan360, check the version and validate the URL
-			boolean isUrlInvalid = !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
-			if ((presenceId != null && presenceId.equals(EMPTY) && !authProvider.isAppScan360() ||
-					(authProvider.isAppScan360() && ServiceUtil.getServiceVersion(authProvider).substring(0, 5).compareTo("1.4.0") < 0)) && isUrlInvalid) {
-				return FormValidation.error(Messages.error_url_validation_ui());
+			// Validate the URL if conditions are met & for AppScan360, check the version and validate the URL & domain
+			if ((presenceId != null && presenceId.equals(EMPTY) && !authProvider.isAppScan360()) ||
+					(authProvider.isAppScan360() && new SAClient().compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0,5)))) {
+				boolean isUrlInvalid = !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
+				boolean isDomainInvalid = !target.equals(EMPTY) && !ServiceUtil.isValidDomain(target, authProvider, authProvider.getProxy());
+				if(isDomainInvalid && isUrlInvalid) {
+					return FormValidation.error(Messages.error_invalid_url_connection());
+				} else if(isDomainInvalid || isUrlInvalid) {
+					return FormValidation.error(Messages.error_url_validation_ui());
+				} else {
+					return FormValidation.ok();
+				}
 			}
 			
 			return FormValidation.validateRequired(target);
