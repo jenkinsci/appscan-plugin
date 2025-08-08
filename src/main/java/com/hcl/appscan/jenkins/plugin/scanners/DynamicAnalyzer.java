@@ -269,11 +269,11 @@ public class DynamicAnalyzer extends Scanner {
 
 			if ((!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID)) ||
 					(authProvider.isAppScan360() && new SAClient().compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0, 5)))) {
-				boolean isUrlInvalid = !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
-				boolean isDomainInvalid = !ServiceUtil.isValidDomain(target, authProvider, authProvider.getProxy());
-				if (isDomainInvalid && isUrlInvalid) {
+				boolean isUrlValid = !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
+				boolean isDomainValid = !ServiceUtil.isValidDomain(target, properties.get(CoreConstants.APP_ID), authProvider, authProvider.getProxy());
+				if (!isUrlValid) {
 					throw new AbortException(Messages.error_invalid_url_connection());
-				} else if (isDomainInvalid || isUrlInvalid) {
+				} else if (!isDomainValid) {
 					throw new AbortException(Messages.error_url_validation_ui());
 				}
 			}
@@ -430,7 +430,7 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.ok();
 		}
 
-		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
+		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials,@RelativePath("..") @QueryParameter String application, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
 
 			// Check if the user has a valid entitlement
@@ -443,20 +443,23 @@ public class DynamicAnalyzer extends Scanner {
 				return FormValidation.ok();
 			}
 
-			// Validate the URL if conditions are met & for AppScan360, check the version and validate the URL & domain
+			if (target.trim().equals(EMPTY)) {
+				return FormValidation.validateRequired(target);
+			}
+
+			// Validate the URL if conditions are met for ASoC or AppScan360, check the version and validate the URL & domain
 			if ((presenceId != null && presenceId.equals(EMPTY) && !authProvider.isAppScan360()) ||
 					(authProvider.isAppScan360() && new SAClient().compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0,5)))) {
-				boolean isUrlInvalid = !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
-				boolean isDomainInvalid = !target.equals(EMPTY) && !ServiceUtil.isValidDomain(target, authProvider, authProvider.getProxy());
-				if(isDomainInvalid && isUrlInvalid) {
+				boolean isUrlValid = ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
+				boolean isDomainValid = ServiceUtil.isValidDomain(target, application, authProvider, authProvider.getProxy());
+				if (!isUrlValid) {
 					return FormValidation.error(Messages.error_invalid_url_connection());
-				} else if(isDomainInvalid || isUrlInvalid) {
+				} else if (!isDomainValid) {
 					return FormValidation.error(Messages.error_url_validation_ui());
 				} else {
 					return FormValidation.ok();
 				}
 			}
-			
 			return FormValidation.validateRequired(target);
 		}
 
