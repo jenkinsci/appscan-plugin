@@ -258,14 +258,6 @@ public class StaticAnalyzer extends Scanner {
 			return "Static Analysis (SAST)";
 		}
 
-        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter String includeSCAGenerateIRX, @QueryParameter boolean rescan, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
-            if (!rescan && Boolean.parseBoolean(includeSCAGenerateIRX) && checkAppScan360Connection.isAppScan360()) {
-                    return FormValidation.error(Messages.error_include_sca_ui());
-            }
-            return FormValidation.ok();
-        }
-
         public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             if (scanId == null || scanId.isEmpty()) {
                     return FormValidation.validateRequired(scanId);
@@ -295,15 +287,6 @@ public class StaticAnalyzer extends Scanner {
                     // Ignore and move on
             }
             return false;
-        }
-
-
-        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
-            if (Boolean.parseBoolean(includeSCAUploadDirect) && checkAppScan360Connection.isAppScan360()) {
-                    return FormValidation.error(Messages.error_include_sca_ui());
-            }
-            return FormValidation.ok();
         }
 
         public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {

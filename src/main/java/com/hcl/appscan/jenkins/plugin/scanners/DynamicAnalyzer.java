@@ -17,7 +17,6 @@ import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
-import com.hcl.appscan.sdk.scanners.sast.SAClient;
 import org.apache.wink.json4j.JSONArray;
 import org.apache.wink.json4j.JSONException;
 import org.apache.wink.json4j.JSONObject;
@@ -263,14 +262,14 @@ public class DynamicAnalyzer extends Scanner {
 
 		if(!getRescanDast()) {
 			String target = properties.get(TARGET);
-			if (isNullOrEmpty(target)) {
+			if (!isNullOrEmpty(target)) {
 				throw new AbortException(Messages.error_target_empty());
 			}
 
 			if ((!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID)) ||
-					(authProvider.isAppScan360() && new SAClient().compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0, 5)))) {
-				boolean isUrlValid = !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
-				boolean isDomainValid = !ServiceUtil.isValidDomain(target, properties.get(CoreConstants.APP_ID), authProvider, authProvider.getProxy());
+					(authProvider.isAppScan360() && ServiceUtil.compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0, 5)))) {
+				boolean isUrlValid = ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
+				boolean isDomainValid = ServiceUtil.isValidDomain(target, properties.get(CoreConstants.APP_ID), authProvider, authProvider.getProxy());
 				if (!isUrlValid) {
 					throw new AbortException(Messages.error_invalid_url_connection());
 				} else if (!isDomainValid) {
@@ -449,7 +448,7 @@ public class DynamicAnalyzer extends Scanner {
 
 			// Validate the URL if conditions are met for ASoC or AppScan360, check the version and validate the URL & domain
 			if ((presenceId != null && presenceId.equals(EMPTY) && !authProvider.isAppScan360()) ||
-					(authProvider.isAppScan360() && new SAClient().compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0,5)))) {
+					(authProvider.isAppScan360() && ServiceUtil.compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0,5)))) {
 				boolean isUrlValid = ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
 				boolean isDomainValid = ServiceUtil.isValidDomain(target, application, authProvider, authProvider.getProxy());
 				if (!isUrlValid) {
