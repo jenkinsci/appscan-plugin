@@ -57,9 +57,6 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         if(!ServiceUtil.hasScaEntitlement(authProvider)) {
             throw new AbortException(Messages.error_active_subscription_validation(getType()));
         }
-        if (authProvider.isAppScan360()) {
-            throw new AbortException(Messages.error_sca_AppScan360());
-        }
     }
 
     public Map<String, String> getProperties(VariableResolver<String> resolver) {
@@ -93,9 +90,6 @@ public class SoftwareCompositionAnalyzer extends Scanner {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(!ServiceUtil.hasScaEntitlement(authProvider)) {
                 return FormValidation.error(Messages.error_active_subscription_validation_ui());
-            }
-            if(authProvider.isAppScan360()){
-                return FormValidation.error(Messages.error_sca_AppScan360_ui());
             }
             return FormValidation.ok();
         }
