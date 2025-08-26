@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022, 2024, 2025.
+ * @ Copyright HCL Technologies Ltd. 2017, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -20,12 +20,8 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
-import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
-import com.hcl.appscan.sdk.scan.IScanServiceProvider;
+import com.hcl.appscan.sdk.results.CloudCombinedResultsProvider;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
-import com.hcl.appscan.sdk.utils.ServiceUtil;
-import org.apache.wink.json4j.JSONException;
-import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -398,6 +394,17 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
             if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase(CoreConstants.PARTIAL_SUCCESS)) {
                 throw new AbortException(Messages.error_scan_status_unstable());
+            }
+
+            //Scan logs are available only for DAST and SAST scans
+            if (!m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) && m_scanStatus != null && !m_scanStatus.isEmpty() && (m_scanStatus.equalsIgnoreCase(CoreConstants.READY) || m_scanStatus.equalsIgnoreCase(CoreConstants.PARTIAL_SUCCESS))) {
+                progress.setStatus(new Message(Message.INFO, "Reports and scan Logs will be available in the Jenkins Job directory: " + build.getRootDir().getAbsolutePath()));
+                File file = new File(build.getRootDir(), "ScanLogs" + ".zip");
+                if (provider instanceof NonCompliantIssuesResultProvider) {
+                	((NonCompliantIssuesResultProvider) provider).getScanLogs(file);
+                } else if (provider instanceof CloudCombinedResultsProvider) {
+                	provider.getScanLogFile(file);
+                }
             }
         }
     }
