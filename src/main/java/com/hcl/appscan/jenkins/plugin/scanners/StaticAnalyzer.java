@@ -201,23 +201,11 @@ public class StaticAnalyzer extends Scanner {
                properties.remove(CoreConstants.INCLUDE_SCA);
            }
 
-            // Handle AppScan360-specific validation
-            if (authProvider.isAppScan360()) {
-                if (properties.containsKey(CoreConstants.OPEN_SOURCE_ONLY)) {
-                    throw new AbortException(Messages.error_sca_AppScan360());
-                }
-                // Remove INCLUDE_SCA and show warning if present in AppScan360 context
-                if (properties.containsKey(CoreConstants.INCLUDE_SCA)) {
-                    progress.setStatus(new Message(Message.WARNING, Messages.warning_include_sca_AppScan360()));
-                    properties.remove(CoreConstants.INCLUDE_SCA);
-                }
-            } else {
-                // Handle SCA entitlement validation and removal of INCLUDE_SCA if no entitlement
-                if (properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
-                    progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
-                    properties.remove(CoreConstants.INCLUDE_SCA);
-                }
-            }
+           // Handle SCA entitlement validation and removal of INCLUDE_SCA if no entitlement
+           if (properties.containsKey(CoreConstants.INCLUDE_SCA) && !ServiceUtil.hasScaEntitlement(authProvider)) {
+                progress.setStatus(new Message(Message.WARNING, Messages.warning_sca_subscription()));
+                properties.remove(CoreConstants.INCLUDE_SCA);
+           }
 
             //includeSCA is only available if the user upload an IRX file for upload files & folders scan method .
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
@@ -270,14 +258,6 @@ public class StaticAnalyzer extends Scanner {
 			return "Static Analysis (SAST)";
 		}
 
-        public FormValidation doCheckIncludeSCAGenerateIRX(@QueryParameter String includeSCAGenerateIRX, @QueryParameter boolean rescan, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
-            if (!rescan && Boolean.parseBoolean(includeSCAGenerateIRX) && checkAppScan360Connection.isAppScan360()) {
-                    return FormValidation.error(Messages.error_include_sca_ui());
-            }
-            return FormValidation.ok();
-        }
-
         public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
             if (scanId == null || scanId.isEmpty()) {
                     return FormValidation.validateRequired(scanId);
@@ -307,15 +287,6 @@ public class StaticAnalyzer extends Scanner {
                     // Ignore and move on
             }
             return false;
-        }
-
-
-        public FormValidation doCheckIncludeSCAUploadDirect(@QueryParameter String includeSCAUploadDirect, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials, context);
-            if (Boolean.parseBoolean(includeSCAUploadDirect) && checkAppScan360Connection.isAppScan360()) {
-                    return FormValidation.error(Messages.error_include_sca_ui());
-            }
-            return FormValidation.ok();
         }
 
         public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
