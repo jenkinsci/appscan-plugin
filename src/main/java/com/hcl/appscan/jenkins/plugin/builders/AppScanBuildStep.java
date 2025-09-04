@@ -398,13 +398,15 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
             //Scan logs are available only for DAST and SAST scans
             if (!m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) && m_scanStatus != null && !m_scanStatus.isEmpty() && (m_scanStatus.equalsIgnoreCase(CoreConstants.READY) || m_scanStatus.equalsIgnoreCase(CoreConstants.PARTIAL_SUCCESS))) {
-                progress.setStatus(new Message(Message.INFO, "Reports and scan Logs will be available in the Jenkins Job directory: " + build.getRootDir().getAbsolutePath()));
-                File file = new File(build.getRootDir(), "ScanLogs" + ".zip");
+                progress.setStatus(new Message(Message.INFO,  SystemUtil.getTimeStamp()));
+                progress.setStatus(new Message(Message.INFO, Messages.scan_log_location(build.getRootDir().getAbsolutePath())));
+                File file = new File(build.getRootDir(), m_name + "_ScanLogs" + ".zip");
                 if (provider instanceof NonCompliantIssuesResultProvider) {
                 	((NonCompliantIssuesResultProvider) provider).getScanLogs(file);
                 } else if (provider instanceof CloudCombinedResultsProvider) {
                 	provider.getScanLogFile(file);
                 }
+                progress.setStatus(new Message(Message.INFO,  SystemUtil.getTimeStamp()));
             }
         }
     }
