@@ -273,7 +273,11 @@ public class DynamicAnalyzer extends Scanner {
 				if (!isUrlValid) {
 					throw new AbortException(Messages.error_invalid_url_connection());
 				} else if (!isDomainValid) {
-					throw new AbortException(Messages.error_url_validation_ui());
+					if (isAppScan360) {
+						throw new AbortException(Messages.error_invalid_domain_AppScan360());
+					} else {
+						throw new AbortException(Messages.error_invalid_domain_ASoC());
+					}
 				}
 			}
 		}
@@ -454,7 +458,11 @@ public class DynamicAnalyzer extends Scanner {
 				if (!isUrlValid) {
 					return FormValidation.error(Messages.error_invalid_url_connection());
 				} else if (!isDomainValid) {
-					return FormValidation.error(Messages.error_url_validation_ui());
+					if (authProvider.isAppScan360()) {
+						return FormValidation.error(Messages.error_invalid_domain_AppScan360());
+					} else {
+						return FormValidation.error(Messages.error_invalid_domain_ASoC());
+					}
 				} else {
 					return FormValidation.ok();
 				}
