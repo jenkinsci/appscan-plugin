@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+1.8.0 (September, 2025)
+------
+- Support for executing SCA Scans via HCL AppScan 360° v2.0 and above.
+- Bug fixes.
+
 1.7.0 (June, 2025)
 ------
 - Support for Web API scanning using Postman Collections in HCL AppScan Enterprise.

@@ -2,7 +2,7 @@
 
 [![AppScan](img/AppScan.svg)](https://cloud.appscan.com)
 
-Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scans using HCL AppScan on Cloud and HCL AppScan 360°, SCA (Software Composition Analysis) scans using HCL AppScan on Cloud and DAST (Dynamic Application Security Testing) scans using HCL AppScan on Cloud (ASoC), HCL AppScan 360° and HCL AppScan Enterprise (ASE).
+Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scans and SCA (Software Composition Analysis) scans using HCL AppScan on Cloud and HCL AppScan 360°, and DAST (Dynamic Application Security Testing) scans using HCL AppScan on Cloud (ASoC), HCL AppScan 360° and HCL AppScan Enterprise (ASE).
 
 ## Prerequisites
 
@@ -92,7 +92,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
 						-   **Login Sequence File**: Provide a path to the login sequence file data. Supported file type is .CONFIG.
         -   **Software Composition Analysis (SCA)**
             -	**Rescan**: Select this option to rescan the same application, updating and overwriting the previous scan results with the latest findings.<br>
-              	**Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/appseccloud_scanning_rescan_cm.html).
+              	**Note**: If you are looking to use the Auto Close feature, ensure it has been enabled by your AppScan on Cloud/AppScan 360° organization administrator. Learn more about [rescanning](https://help.hcl-software.com/appscan/ASoC/appseccloud_scanning_rescan_cm.html).
              	- **Scan ID**: Enter the Scan ID of the parent scan based on the application and technology you selected earlier. You can retrieve Scan ID from the AppScan on Cloud/AppScan 360° Server.
             -   **Target**: Enter the complete path to the directory containing the files to scan, or provide the full path to an existing .irx file. Leave this field empty to scan all supported files within the workspace directory.
         -   **Static Analysis (SAST)**
@@ -104,7 +104,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
                 -   **Generate IRX**: Generate an IRX archive locally from the specified files and folders.
                     -   **Additional Options**: If selected, the following options are available:
                         -   **Source Code Only**: Analyze source code only.
-                        -   **Include SCA**: Include analysis of open source packages. Include SCA creates an SCA scan in addition to a SAST scan.<br> **Note**: Software Composition Analysis (SCA) is available for AppScan on Cloud only.
+                        -   **Include SCA**: Include analysis of open source packages. Include SCA creates an SCA scan in addition to a SAST scan.
                         -   **Select Scan Speed**: Optimize scan speed and results according to development stage. Choose faster scans early in the development lifecycle to identify basic security issues; choose thorough scans later in the cycle to ensure complete coverage for your application.
                             -   **Normal**: Performs a complete analysis of the code, identifying vulnerabilities in detail and differentiating issues that could be reported as false positives. This scan takes the longest to complete.
                             -   **Fast**: Performs a comprehensive analysis of your files to identify vulnerabilities, taking longer to complete than “Faster” or “Fastest” scans.
@@ -113,7 +113,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
                 -   **Upload files and folders**: Upload files and folders directly to AppScan for immediate scanning preparation, resulting in faster processing.
                     -   **Additional Options**: If selected, the following options are available:
                         -   **Include SCA**:  Applicable only for IRX files.
-                            -   Include analysis of open source packages. Include SCA creates an SCA scan in addition to a SAST scan.<br> **Note**: Software Composition Analysis (SCA) is available for AppScan on Cloud only.
+                            -   Include analysis of open source packages. Include SCA creates an SCA scan in addition to a SAST scan.
     -   **Email notification:** Send the user an email when analysis is complete.
     -   **Run as a personal scan:** A personal scan does not affect the application data and compliance until it is promoted.
     -   **Allow intervention by scan enablement team:** Available for AppScan on Cloud only.
@@ -137,7 +137,6 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
         they are separated by a logical OR.
 
 **Notes:**
-- Support for SAST scanning using HCL AppScan 360° was added for version 1.1.0 of the Jenkins extension. The existing HCL AppScan on Cloud connection endpoint and build step have been enhanced to allow users to connect to HCL AppScan 360°.
 - AppScan on Cloud (ASoC) now performs SAST and SCA analysis as separate scans. To execute an open-source only scan, use the Software Composition Analysis (SCA) scan type.
 
  For more information on adding security analysis to Jenkins automation server, please visit this [link](https://help.hcl-software.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins).
