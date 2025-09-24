@@ -247,22 +247,39 @@ public class DynamicAnalyzer extends Scanner {
 		if(!ServiceUtil.hasDastEntitlement(authProvider)) {
 			throw new AbortException(Messages.error_active_subscription_validation(getType()));
 		}
-        if(getRescanDast()) {
-            if(!properties.containsKey(CoreConstants.SCAN_ID)) {
-                throw new AbortException(Messages.error_empty_scan_id());
-            } else if (m_incrementalScan && !isNullOrEmpty(m_executionId)) {
-                progress.setStatus(new Message(Message.WARNING, Messages.warning_empty_execution_id()));
-            }
-        }
-        if (authProvider.isAppScan360()) {
-            if (properties.containsKey(Scanner.PRESENCE_ID)) {
-                throw new AbortException(Messages.error_presence_AppScan360());
-            } else if (!getRescanDast() && ServiceUtil.getServiceVersion(authProvider).substring(0,5).compareTo("1.4.0") != -1 && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
-                throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
-            }
-        }
-		if (!getRescanDast() && !authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID) && !ServiceUtil.isValidUrl(properties.get(TARGET), authProvider, authProvider.getProxy())) {
-			throw new AbortException(Messages.error_url_validation(properties.get(TARGET)));
+
+		if(getRescanDast()) {
+			if(!properties.containsKey(CoreConstants.SCAN_ID)) {
+				throw new AbortException(Messages.error_empty_scan_id());
+			} else if (m_incrementalScan && !isNullOrEmpty(m_executionId)) {
+				progress.setStatus(new Message(Message.WARNING, Messages.warning_empty_execution_id()));
+			}
+		}
+
+		if (authProvider.isAppScan360() && properties.containsKey(Scanner.PRESENCE_ID)) {
+			throw new AbortException(Messages.error_presence_AppScan360());
+		}
+
+		if(!getRescanDast()) {
+			String target = properties.get(TARGET);
+			if (!isNullOrEmpty(target)) {
+				throw new AbortException(Messages.error_target_empty());
+			}
+
+			if ((!authProvider.isAppScan360() && !properties.containsKey(Scanner.PRESENCE_ID)) ||
+					(authProvider.isAppScan360() && ServiceUtil.compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0, 5)))) {
+				boolean isUrlValid = ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
+				boolean isDomainValid = ServiceUtil.isValidDomain(target, properties.get(CoreConstants.APP_ID), authProvider, authProvider.getProxy());
+				if (!isUrlValid) {
+					throw new AbortException(Messages.error_invalid_url_connection());
+				} else if (!isDomainValid) {
+					if (isAppScan360) {
+						throw new AbortException(Messages.error_invalid_domain_AppScan360());
+					} else {
+						throw new AbortException(Messages.error_invalid_domain_ASoC());
+					}
+				}
+			}
 		}
     }
 
@@ -416,7 +433,7 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.ok();
 		}
 
-		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
+		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials,@RelativePath("..") @QueryParameter String application, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
 
 			// Check if the user has a valid entitlement
@@ -429,13 +446,27 @@ public class DynamicAnalyzer extends Scanner {
 				return FormValidation.ok();
 			}
 
-			// Validate the URL if conditions are met & for AppScan360, check the version and validate the URL
-			boolean isUrlInvalid = !target.equals(EMPTY) && !ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
-			if ((presenceId != null && presenceId.equals(EMPTY) && !authProvider.isAppScan360() ||
-					(authProvider.isAppScan360() && ServiceUtil.getServiceVersion(authProvider).substring(0, 5).compareTo("1.4.0") < 0)) && isUrlInvalid) {
-				return FormValidation.error(Messages.error_url_validation_ui());
+			if (target.trim().equals(EMPTY)) {
+				return FormValidation.validateRequired(target);
 			}
-			
+
+			// Validate the URL if conditions are met for ASoC or AppScan360, check the version and validate the URL & domain
+			if ((presenceId != null && presenceId.equals(EMPTY) && !authProvider.isAppScan360()) ||
+					(authProvider.isAppScan360() && ServiceUtil.compareVersions("1.4.0", ServiceUtil.getServiceVersion(authProvider).substring(0,5)))) {
+				boolean isUrlValid = ServiceUtil.isValidUrl(target, authProvider, authProvider.getProxy());
+				boolean isDomainValid = ServiceUtil.isValidDomain(target, application, authProvider, authProvider.getProxy());
+				if (!isUrlValid) {
+					return FormValidation.error(Messages.error_invalid_url_connection());
+				} else if (!isDomainValid) {
+					if (authProvider.isAppScan360()) {
+						return FormValidation.error(Messages.error_invalid_domain_AppScan360());
+					} else {
+						return FormValidation.error(Messages.error_invalid_domain_ASoC());
+					}
+				} else {
+					return FormValidation.ok();
+				}
+			}
 			return FormValidation.validateRequired(target);
 		}
 
