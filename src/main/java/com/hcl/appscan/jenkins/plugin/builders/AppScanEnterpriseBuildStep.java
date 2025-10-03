@@ -441,14 +441,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		if (!m_failBuild)
 			return;
 		String failureMessage = Messages.error_threshold_exceeded();
-		try {
-			List<FailureCondition> failureConditions = m_failureConditions;
-			if (new ResultsInspector(failureConditions, provider).shouldFail()) {
-				build.setDescription(failureMessage);
-				throw new AbortException(failureMessage);
-			}
-		} catch (NullPointerException e) {
-			throw new AbortException(Messages.error_checking_results(provider.getStatus()));
+
+		if (provider == null) {
+			throw new AbortException(Messages.error_checking_results("Provider is null"));
+		}
+
+		List<FailureCondition> failureConditions = m_failureConditions;
+		if (failureConditions != null && new ResultsInspector(failureConditions, provider).shouldFail()) {
+			build.setDescription(failureMessage);
+			throw new AbortException(failureMessage);
 		}
 	}
 
@@ -458,7 +459,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
             		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             		int responseCode = conn.getResponseCode();
                     	return responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE;
-        	} catch (Exception e){
+        	} catch (IOException e){
             		throw new AbortException(Messages.error_url_validation(m_target));
         	}
     	}
@@ -498,7 +499,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
         	}
 		final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider); // Call ASEScanFactory directly
 
-		IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
+		final hudson.remoting.VirtualChannel channel = launcher.getChannel();
+		if (channel == null) {
+			throw new AbortException("Jenkins launcher channel is not available. Cannot execute scan remotely.");
+		}
+
+		IResultsProvider provider = channel.call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
 
 			@Override

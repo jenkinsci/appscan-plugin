@@ -6,6 +6,7 @@
 package com.ibm.appscan.jenkins.plugin.results;
 
 //Added for backward compatibility during HCL wash
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
 public class FailureCondition extends com.hcl.appscan.jenkins.plugin.results.FailureCondition {
 
 	private static final long serialVersionUID = 1L;
