@@ -291,23 +291,24 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	if(!m_failBuild && !m_failBuildNonCompliance)
     		return ;
         String failureMessage=Messages.error_threshold_exceeded();
-		try {
-                    List<FailureCondition> failureConditions=m_failureConditions;
-                    progress.setStatus(new Message(Message.INFO, Messages.fail_build_check()));
-                    if (m_failBuildNonCompliance){
-                        failureConditions =new ArrayList<>();
-                        FailureCondition nonCompliantCondition = new FailureCondition("total", 0);
-                        failureConditions.add(nonCompliantCondition);
-                        failureMessage=Messages.error_noncompliant_issues();
-                    }
-	    	if(new ResultsInspector(failureConditions, provider).shouldFail()){
-                    build.setDescription(failureMessage);
-                    throw new AbortException(failureMessage);
-                }
-                    
-	    } catch(NullPointerException e) {
-	    	throw new AbortException(Messages.error_checking_results(provider.getStatus()));
-	    }
+
+        if (provider == null) {
+            throw new AbortException(Messages.error_checking_results("Provider is null"));
+        }
+
+        List<FailureCondition> failureConditions=m_failureConditions;
+        progress.setStatus(new Message(Message.INFO, Messages.fail_build_check()));
+        if (m_failBuildNonCompliance){
+            failureConditions =new ArrayList<>();
+            FailureCondition nonCompliantCondition = new FailureCondition("total", 0);
+            failureConditions.add(nonCompliantCondition);
+            failureMessage=Messages.error_noncompliant_issues();
+        }
+
+        if (failureConditions != null && new ResultsInspector(failureConditions, provider).shouldFail()){
+            build.setDescription(failureMessage);
+            throw new AbortException(failureMessage);
+        }
 	}
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
@@ -328,7 +329,12 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
         final IScan scan = ScanFactory.createScan(properties, progress, m_authProvider);
 
-        IResultsProvider provider = launcher.getChannel().call(new Callable<IResultsProvider, AbortException>() {
+        final hudson.remoting.VirtualChannel channel = launcher.getChannel();
+        if (channel == null) {
+            throw new AbortException("Jenkins launcher channel is not available. Cannot execute scan remotely.");
+        }
+
+        IResultsProvider provider = channel.call(new Callable<IResultsProvider, AbortException>() {
 			private static final long serialVersionUID = 1L;
 
 			@Override

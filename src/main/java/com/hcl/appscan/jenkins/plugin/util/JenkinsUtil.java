@@ -16,10 +16,11 @@ public class JenkinsUtil {
     }
     
     public static String getPluginVersion() {
-    	if(Jenkins.getInstanceOrNull() != null) {
-	    	Plugin tempPlugin = Jenkins.getInstanceOrNull().getPlugin("appscan");
-	
-	    	if(tempPlugin != null) {
+    	Jenkins jenkins = Jenkins.getInstanceOrNull();
+    	if(jenkins != null) {
+	    	Plugin tempPlugin = jenkins.getPlugin("appscan");
+
+	    	if(tempPlugin != null && tempPlugin.getWrapper() != null) {
 	    		return tempPlugin.getWrapper().getVersion();
 	    	}
     	}
