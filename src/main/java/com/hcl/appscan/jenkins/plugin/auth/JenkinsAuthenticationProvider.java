@@ -40,18 +40,31 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
 		configureCredentials(id, context);
 	}
-	
+
+
 	@Override
 	public boolean isTokenExpired() {
-		boolean isExpired = false;
-		AuthenticationHandler handler = new AuthenticationHandler(this);
-
 		try {
-			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated,JenkinsUtil.getClientType());
-		} catch (IOException | JSONException e) {
-			isExpired = true;
+			AuthenticationHandler handler = new AuthenticationHandler(this);
+			return handler.isTokenExpired() && !createNewToken(handler);
+		} catch (RuntimeException e) {
+			//handle unexpected failure
+			return true;
 		}
-		return isExpired;
+	}
+
+	private boolean createNewToken(AuthenticationHandler handler) {
+		boolean isLogin = false;
+		try {
+			if(isAppScan360()) {
+				isLogin = handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated);
+			} else {
+				isLogin = handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated,JenkinsUtil.getClientType());
+			}
+		} catch (IOException | JSONException e) {
+			isLogin = false;
+		}
+		return isLogin;
 	}
 
 	@Override
