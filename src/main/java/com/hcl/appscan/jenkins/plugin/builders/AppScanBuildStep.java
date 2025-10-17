@@ -20,7 +20,6 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
-import com.hcl.appscan.sdk.results.CloudCombinedResultsProvider;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
@@ -40,7 +39,6 @@ import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.IResultsProvider;
-import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
 
 import com.hcl.appscan.sdk.utils.SystemUtil;
@@ -337,8 +335,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					setInstallDir();
 		    		scan.run();
 		    		
-                                IResultsProvider provider=scan.getResultsProvider(true);
-                                provider.setReportFormat(scan.getReportFormat());
+		    		IResultsProvider provider=scan.getResultsProvider(true);
+		    		provider.setReportFormat(scan.getReportFormat());
+		    		progress.setStatus(new Message(Message.INFO, m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) ? Messages.report_location_sca(build.getRootDir().getAbsolutePath()) : Messages.scan_log_location(build.getRootDir().getAbsolutePath())));
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			m_scanStatus = provider.getStatus();
@@ -394,17 +393,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 
             if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase(CoreConstants.PARTIAL_SUCCESS)) {
                 throw new AbortException(Messages.error_scan_status_unstable());
-            }
-
-            //Scan logs are available only for DAST and SAST scans
-            if (!m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) && m_scanStatus != null && !m_scanStatus.isEmpty() && (m_scanStatus.equalsIgnoreCase(CoreConstants.READY) || m_scanStatus.equalsIgnoreCase(CoreConstants.PARTIAL_SUCCESS))) {
-                progress.setStatus(new Message(Message.INFO, Messages.scan_log_location(build.getRootDir().getAbsolutePath())));
-                File file = new File(build.getRootDir(), m_name + "_ScanLogs" +SystemUtil.getTimeStamp() + ".zip");
-                if (provider instanceof NonCompliantIssuesResultProvider) {
-                	((NonCompliantIssuesResultProvider) provider).getScanLogs(file);
-                } else if (provider instanceof CloudCombinedResultsProvider) {
-                	provider.getScanLogFile(file);
-                }
             }
         }
     }
