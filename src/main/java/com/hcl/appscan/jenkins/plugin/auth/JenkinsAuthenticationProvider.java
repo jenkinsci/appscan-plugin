@@ -44,27 +44,30 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 
 	@Override
 	public boolean isTokenExpired() {
+		AuthenticationHandler handler = new AuthenticationHandler(this);
+
+		// If token is not expired, return false
+		if (!handler.isTokenExpired()) {
+			return false;
+		}
+
+		// Try logging in again if token is expired
 		try {
-			AuthenticationHandler handler = new AuthenticationHandler(this);
-			return handler.isTokenExpired() && !createNewToken(handler);
-		} catch (RuntimeException e) {
-			//handle unexpected failure
+			String username = m_credentials.getUsername();
+			String password = Secret.toString(m_credentials.getPassword());
+			boolean isExpired = false;
+
+			// Check login based on a connection type
+			if (isAppScan360()) {
+				isExpired = handler.login(username, password, true, LoginType.ASoC_Federated);
+			} else {
+				isExpired = handler.login(username, password, true, LoginType.ASoC_Federated, JenkinsUtil.getClientType());
+			}
+			return isExpired;
+		} catch (IOException | JSONException e) {
+			// If an error occurs, treat token as expired
 			return true;
 		}
-	}
-
-	private boolean createNewToken(AuthenticationHandler handler) {
-		boolean isLogin = false;
-		try {
-			if(isAppScan360()) {
-				isLogin = handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated);
-			} else {
-				isLogin = handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated,JenkinsUtil.getClientType());
-			}
-		} catch (IOException | JSONException e) {
-			isLogin = false;
-		}
-		return isLogin;
 	}
 
 	@Override
