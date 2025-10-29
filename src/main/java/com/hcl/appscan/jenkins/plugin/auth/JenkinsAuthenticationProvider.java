@@ -40,7 +40,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
 		configureCredentials(id, context);
 	}
-
+	
 	@Override
 	public boolean isTokenExpired() {
 		boolean isExpired = false;
