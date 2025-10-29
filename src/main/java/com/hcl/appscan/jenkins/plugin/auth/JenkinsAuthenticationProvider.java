@@ -41,9 +41,9 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		configureCredentials(id, context);
 	}
 
-
 	@Override
 	public boolean isTokenExpired() {
+		boolean isExpired = false;
 		AuthenticationHandler handler = new AuthenticationHandler(this);
 
 		// If token is not expired, return false
@@ -55,7 +55,6 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		try {
 			String username = m_credentials.getUsername();
 			String password = Secret.toString(m_credentials.getPassword());
-			boolean isExpired = false;
 
 			// Check login based on a connection type
 			if (isAppScan360()) {
