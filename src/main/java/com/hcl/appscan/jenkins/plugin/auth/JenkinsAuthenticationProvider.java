@@ -46,12 +46,27 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		boolean isExpired = false;
 		AuthenticationHandler handler = new AuthenticationHandler(this);
 
-		try {
-			isExpired = handler.isTokenExpired() && !handler.login(m_credentials.getUsername(), Secret.toString(m_credentials.getPassword()), true, LoginType.ASoC_Federated,JenkinsUtil.getClientType());
-		} catch (IOException | JSONException e) {
-			isExpired = true;
+		// If token is not expired, return false
+		if (!handler.isTokenExpired()) {
+			return false;
 		}
-		return isExpired;
+
+		// Try logging in again if token is expired
+		try {
+			String username = m_credentials.getUsername();
+			String password = Secret.toString(m_credentials.getPassword());
+
+			// Check login based on a connection type
+			if (isAppScan360()) {
+				isExpired = handler.login(username, password, true, LoginType.ASoC_Federated);
+			} else {
+				isExpired = handler.login(username, password, true, LoginType.ASoC_Federated, JenkinsUtil.getClientType());
+			}
+			return isExpired;
+		} catch (IOException | JSONException e) {
+			// If an error occurs, treat token as expired
+			return true;
+		}
 	}
 
 	@Override
