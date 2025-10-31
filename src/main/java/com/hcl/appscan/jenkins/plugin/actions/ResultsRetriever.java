@@ -8,11 +8,14 @@ package com.hcl.appscan.jenkins.plugin.actions;
 
 import com.hcl.appscan.jenkins.plugin.util.ExecutorUtil;
 import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.results.CloudCombinedResultsProvider;
+import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
-import com.hcl.appscan.sdk.utils.ServiceUtil;
+import com.hcl.appscan.sdk.utils.SystemUtil;
 import hudson.model.Action;
 import hudson.model.Run;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -120,6 +123,13 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 					} else if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
 						rTemp.getActions().remove(ResultsRetriever.this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
 						ScanResultsFactory.createResult(rTemp, m_build, m_provider, m_name, m_scanServerUrl, m_label);
+
+						m_status = m_provider.getStatus();
+						//Scan logs are available only for DAST and SAST scans
+						if (!getScanType().equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) && m_status != null && !m_status.isEmpty() && (m_status.equalsIgnoreCase(CoreConstants.READY) || m_status.equalsIgnoreCase(CoreConstants.PARTIAL_SUCCESS))) {
+							downloadScanLogs();
+						}
+
 						try {
 							rTemp.save();
 						} catch (IOException e) {
@@ -140,5 +150,14 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 		}
 
 		return results;
+	}
+
+	private void downloadScanLogs() {
+		File file = new File(m_build.getRootDir(), m_name + "_ScanLogs" + SystemUtil.getTimeStamp() + ".zip");
+		if (m_provider instanceof NonCompliantIssuesResultProvider) {
+			((NonCompliantIssuesResultProvider) m_provider).getScanLogs(file);
+		} else if (m_provider instanceof CloudCombinedResultsProvider) {
+			m_provider.getScanLogFile(file);
+		}
 	}
 }

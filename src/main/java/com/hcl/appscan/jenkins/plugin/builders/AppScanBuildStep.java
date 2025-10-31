@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2020, 2021, 2022, 2024, 2025.
+ * @ Copyright HCL Technologies Ltd. 2017, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -20,12 +20,7 @@ import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
-import com.hcl.appscan.sdk.scan.CloudScanServiceProvider;
-import com.hcl.appscan.sdk.scan.IScanServiceProvider;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
-import com.hcl.appscan.sdk.utils.ServiceUtil;
-import org.apache.wink.json4j.JSONException;
-import org.apache.wink.json4j.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -44,7 +39,6 @@ import com.hcl.appscan.sdk.logging.IProgress;
 import com.hcl.appscan.sdk.logging.Message;
 import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.IResultsProvider;
-import com.hcl.appscan.sdk.results.NonCompliantIssuesResultProvider;
 import com.hcl.appscan.sdk.scan.IScan;
 
 import com.hcl.appscan.sdk.utils.SystemUtil;
@@ -341,8 +335,9 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 					setInstallDir();
 		    		scan.run();
 		    		
-                                IResultsProvider provider=scan.getResultsProvider(true);
-                                provider.setReportFormat(scan.getReportFormat());
+		    		IResultsProvider provider=scan.getResultsProvider(true);
+		    		provider.setReportFormat(scan.getReportFormat());
+		    		progress.setStatus(new Message(Message.INFO, m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) ? Messages.report_location_sca(build.getRootDir().getAbsolutePath()) : Messages.scan_log_location(build.getRootDir().getAbsolutePath())));
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			m_scanStatus = provider.getStatus();
