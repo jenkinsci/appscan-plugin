@@ -339,7 +339,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    		
 		    		IResultsProvider provider=scan.getResultsProvider(true);
 		    		provider.setReportFormat(scan.getReportFormat());
-		    		progress.setStatus(new Message(Message.INFO, m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) ? Messages.report_location_sca(build.getRootDir().getAbsolutePath()) : Messages.scan_log_location(build.getRootDir().getAbsolutePath())));
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			m_scanStatus = provider.getStatus();
@@ -379,6 +378,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             build.setResult(Result.UNSTABLE);
         } else {
             provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+            progress.setStatus(new Message(Message.INFO, m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) ? Messages.report_location_sca(build.getRootDir().getAbsolutePath()) : Messages.scan_log_location(build.getRootDir().getAbsolutePath())));
             VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
             String asocAppUrl = m_authProvider.getServer() + "/main/myapps/" + m_application + "/scans/";
             String label;
