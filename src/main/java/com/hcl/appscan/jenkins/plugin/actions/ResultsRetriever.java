@@ -153,7 +153,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	}
 
 	private void downloadScanLogs() {
-		File file = new File(m_build.getRootDir(), m_name + "_ScanLogs" + SystemUtil.getTimeStamp() + ".zip");
+		File file = new File(m_build.getRootDir(), "ScanLogs_" + m_name + "_" + SystemUtil.getTimeStamp() + ".zip");
 		if (m_provider instanceof NonCompliantIssuesResultProvider) {
 			((NonCompliantIssuesResultProvider) m_provider).getScanLogs(file);
 		} else if (m_provider instanceof CloudCombinedResultsProvider) {
