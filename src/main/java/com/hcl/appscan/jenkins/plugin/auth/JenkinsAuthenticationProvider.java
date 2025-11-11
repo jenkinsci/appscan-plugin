@@ -58,7 +58,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 
 			// Check login based on a connection type
 			if (isAppScan360()) {
-				isExpired = handler.login(username, password, true, LoginType.ASoC_Federated);
+				isExpired = handler.login(username, password, true, LoginType.ASoC_Federated, JenkinsUtil.getClientTypeUpdated());
 			} else {
 				isExpired = handler.login(username, password, true, LoginType.ASoC_Federated, JenkinsUtil.getClientType());
 			}
