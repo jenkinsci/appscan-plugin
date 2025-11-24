@@ -274,9 +274,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
 			properties.put("APPSCAN_CLIENT_VERSION", Jenkins.VERSION);
 			properties.put("IRGEN_CLIENT_PLUGIN_VERSION", JenkinsUtil.getPluginVersion());
-			if(!((JenkinsAuthenticationProvider) m_authProvider).isAppScan360()) {
-				properties.put("ClientType", JenkinsUtil.getClientType());
-			}
+			properties.put("ClientType", ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360() ? JenkinsUtil.getClientTypeUpdated() : JenkinsUtil.getClientType());
 			properties.put(CoreConstants.SERVER_URL,m_authProvider.getServer());
 			properties.put(CoreConstants.ACCEPT_INVALID_CERTS,Boolean.toString(m_authProvider.getacceptInvalidCerts()));
 			return properties;
@@ -339,7 +337,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		    		
 		    		IResultsProvider provider=scan.getResultsProvider(true);
 		    		provider.setReportFormat(scan.getReportFormat());
-		    		progress.setStatus(new Message(Message.INFO, m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) ? Messages.report_location_sca(build.getRootDir().getAbsolutePath()) : Messages.scan_log_location(build.getRootDir().getAbsolutePath())));
 		    		if(suspend) {
 		    			progress.setStatus(new Message(Message.INFO, Messages.analysis_running()));
 		    			m_scanStatus = provider.getStatus();
@@ -379,6 +376,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             build.setResult(Result.UNSTABLE);
         } else {
             provider.setProgress(new StdOutProgress()); //Avoid serialization problem with StreamBuildListener.
+            if(m_scanStatus != null && !m_scanStatus.isEmpty() && m_scanStatus.equalsIgnoreCase(CoreConstants.READY)) {
+                progress.setStatus(new Message(Message.INFO, Messages.scan_completion()));
+            }
+            progress.setStatus(new Message(Message.INFO, m_type.equals(CoreConstants.SOFTWARE_COMPOSITION_ANALYZER) ? Messages.report_location_sca(build.getRootDir().getAbsolutePath()) : Messages.scan_log_location(build.getRootDir().getAbsolutePath())));
             VariableResolver<String> resolver = build instanceof AbstractBuild ? new BuildVariableResolver((AbstractBuild<?,?>)build, listener) : null;
             String asocAppUrl = m_authProvider.getServer() + "/main/myapps/" + m_application + "/scans/";
             String label;

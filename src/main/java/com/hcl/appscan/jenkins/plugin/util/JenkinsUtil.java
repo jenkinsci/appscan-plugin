@@ -14,6 +14,10 @@ public class JenkinsUtil {
     public static String getClientType() {
         return "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion();
     }
+
+    public static String getClientTypeUpdated() {
+        return "jenkins-" + getPluginVersion();
+    }
     
     public static String getPluginVersion() {
     	if(Jenkins.getInstanceOrNull() != null) {
