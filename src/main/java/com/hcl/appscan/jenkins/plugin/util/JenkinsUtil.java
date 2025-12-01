@@ -1,5 +1,5 @@
 /**
- * @ Copyright HCL Technologies Ltd. 2022.
+ * @ Copyright HCL Technologies Ltd. 2022, 2025.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -13,6 +13,10 @@ public class JenkinsUtil {
     
     public static String getClientType() {
         return "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion();
+    }
+
+    public static String getClientTypeUpdated() {
+        return "jenkins-" + getPluginVersion();
     }
     
     public static String getPluginVersion() {
