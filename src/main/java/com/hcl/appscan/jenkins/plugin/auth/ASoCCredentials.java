@@ -47,7 +47,7 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
 		return m_url;
 	}
 
-        public boolean getacceptInvalidCerts() {return m_acceptInvalidCerts;}
+        public boolean getAcceptInvalidCerts() {return m_acceptInvalidCerts;}
 	
 	public String getServer() {
 		String url = m_url;
