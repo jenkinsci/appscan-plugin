@@ -1,13 +1,47 @@
-------------------
-Attribution Report
-------------------
+-----------------------
+Notices and Information
+-----------------------
+---------------------------------------------------
+HCL AppScan Jenkins v1.8.1 Notices and Information
+---------------------------------------------------
 
 ======
 DETAIL
 ======
+Note: generic licenses are marked with (*)
 Note: missing copyright references are marked with (*)
+**********************************************************
+1. Library: appscan.sdk-1.1.9.jar Product: AppScan Jenkins
+**********************************************************
+========
+LICENSES
+========
+Licensed under Apache 2.0
+License terms can be found at: https://repo.maven.apache.org/maven2/com/hcl/appscan.sdk/1.1.9/appscan.sdk-1.1.9.pom
+
+License Text Under Appendix
+
+
+
+==========
+COPYRIGHTS
+==========
+--------------------
+Copyright 1 out of 2
+--------------------
+Copyrighted under Copyright 2017-2025 HCL Technologies Ltd
+Copyright terms can be found at: https://index.mend.io/gri/app/reader/resource/content/asString/0f001865-397d-4438-ab33-772f7b38e8cf
+
+
+--------------------
+Copyright 2 out of 2
+--------------------
+Copyrighted under Copyright 2016 IBM Corporation
+Copyright terms can be found at: https://index.mend.io/gri/app/reader/resource/content/asString/0f001865-397d-4438-ab33-772f7b38e8cf
+
+
 ***************************************************************************
-1. Library: credentials-1319.v7eb_51b_3a_c97b_.jar Product: AppScan Jenkins
+2. Library: credentials-1319.v7eb_51b_3a_c97b_.jar Product: AppScan Jenkins
 ***************************************************************************
 ========
 LICENSES
@@ -28,14 +62,8 @@ Copyright terms can be found at: https://repo.jenkins-ci.org/releases/org/jenkin
 
 
 
-=======
-NOTICES
-=======
-Notices:
-There is no notice for this library
-
 ***********************************************************************************
-2. Library: ibm-asoc-plugin-ibm-application-security-1.1.2 Product: AppScan Jenkins
+3. Library: ibm-asoc-plugin-ibm-application-security-1.1.2 Product: AppScan Jenkins
 ***********************************************************************************
 ========
 LICENSES
@@ -52,14 +80,8 @@ COPYRIGHTS
 ==========
 (*) The copyright for this library is unknown
 
-=======
-NOTICES
-=======
-Notices:
-There is no notice for this library
-
 ********************************************************************
-3. Library: structs-325.vcb_307d2a_2782.jar Product: AppScan Jenkins
+4. Library: structs-325.vcb_307d2a_2782.jar Product: AppScan Jenkins
 ********************************************************************
 ========
 LICENSES
@@ -80,14 +102,8 @@ Copyright terms can be found at: https://index.mend.io/gri/app/reader/resource/c
 
 
 
-=======
-NOTICES
-=======
-Notices:
-There is no notice for this library
-
 ********************************************************
-4. Library: wink-json4j-1.4.jar Product: AppScan Jenkins
+5. Library: wink-json4j-1.4.jar Product: AppScan Jenkins
 ********************************************************
 ========
 LICENSES
@@ -107,12 +123,6 @@ Copyright terms can be found at: null(*) Cannot be established
 
 
 
-
-=======
-NOTICES
-=======
-Notices:
-There is no notice for this library
 
 =========================
 APPENDIX: License Details
