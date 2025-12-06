@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+1.8.1 (December, 2025)
+------
+- Enabled automatic download of scan logs for dynamic and static scans across HCL AppScan on Cloud and HCL AppScan 360°.
+- Bug fixes.
+
 1.8.0 (September, 2025)
 ------
 - Support for executing SCA Scans via HCL AppScan 360° v2.0 and above.
