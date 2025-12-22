@@ -389,7 +389,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 label = Messages.label_asoc_homepage();
             }
 
-            build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
+            String reportName = properties.get(CoreConstants.SCAN_NAME);
+            build.addAction(new ResultsRetriever(build, provider, resolver == null ? reportName + SystemUtil.getTimeStamp() : Util.replaceMacro(reportName, resolver), asocAppUrl, label));
 
             if(m_wait)
                 shouldFailBuild(provider,build, progress);
