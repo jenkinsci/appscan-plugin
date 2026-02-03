@@ -309,6 +309,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
         Map<String, String> properties = getScanProperties(build,listener);
+        String reportName = properties.get(CoreConstants.SCAN_NAME);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
         m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress, isAppScan360);
@@ -389,8 +390,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 label = Messages.label_asoc_homepage();
             }
 
-            String reportName = properties.get(CoreConstants.SCAN_NAME);
-            build.addAction(new ResultsRetriever(build, provider, resolver == null ? reportName + SystemUtil.getTimeStamp() : Util.replaceMacro(reportName, resolver), asocAppUrl, label));
+            build.addAction(new ResultsRetriever(build, provider, resolver == null ? reportName + "_" + SystemUtil.getTimeStamp() : Util.replaceMacro(reportName, resolver), asocAppUrl, label));
 
             if(m_wait)
                 shouldFailBuild(provider,build, progress);
