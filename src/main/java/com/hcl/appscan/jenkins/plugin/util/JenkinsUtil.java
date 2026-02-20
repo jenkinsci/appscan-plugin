@@ -12,7 +12,7 @@ import jenkins.model.Jenkins;
 public class JenkinsUtil {
     
     public static String getClientType() {
-        return "jenkins-" + SystemUtil.getOS() + "-" + getPluginVersion();
+        return "jenkins-" + SystemUtil.getOSUpdated() + "-" + getPluginVersion();
     }
 
     public static String getClientTypeUpdated() {
