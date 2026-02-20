@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2025.
+ * @ Copyright HCL Technologies Ltd. 2017, 2026.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -390,6 +390,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 label = Messages.label_asoc_homepage();
             }
 
+            //resolver is null for pipeline jobs, in that case we will append time stamp to report name
             build.addAction(new ResultsRetriever(build, provider, resolver == null ? reportName + "_" + SystemUtil.getTimeStamp() : Util.replaceMacro(reportName, resolver), asocAppUrl, label));
 
             if(m_wait)
