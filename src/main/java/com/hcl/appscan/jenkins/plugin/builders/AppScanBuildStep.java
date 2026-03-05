@@ -1,6 +1,6 @@
 /**
  * @ Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2017, 2025.
+ * @ Copyright HCL Technologies Ltd. 2017, 2026.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -309,6 +309,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
         Map<String, String> properties = getScanProperties(build,listener);
+        String reportName = properties.get(CoreConstants.SCAN_NAME);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
         m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress, isAppScan360);
@@ -389,7 +390,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
                 label = Messages.label_asoc_homepage();
             }
 
-            build.addAction(new ResultsRetriever(build, provider, resolver == null ? m_name : Util.replaceMacro(m_name, resolver), asocAppUrl, label));
+            //resolver is null for pipeline jobs, in that case we will append time stamp to report name
+            build.addAction(new ResultsRetriever(build, provider, resolver == null ? reportName + "_" + SystemUtil.getTimeStamp() : Util.replaceMacro(reportName, resolver), asocAppUrl, label));
 
             if(m_wait)
                 shouldFailBuild(provider,build, progress);
