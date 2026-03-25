@@ -4,6 +4,11 @@
 
 Easily integrate security testing into your Jenkins builds using the HCL AppScan Jenkins plug-in. This plug-in enables you to execute SAST (Static Application Security Testing) scans and SCA (Software Composition Analysis) scans using HCL AppScan on Cloud and HCL AppScan 360°, and DAST (Dynamic Application Security Testing) scans using HCL AppScan on Cloud (ASoC), HCL AppScan 360° and HCL AppScan Enterprise (ASE).
 
+**Post-scan results**
+* The scan results summary and report link are available on the Jenkins Build Summary page.
+* Scan logs are downloaded to the Jenkins workspace directory.
+* Complete scan results can also be viewed in the respective AppScan portal (ASoC / AppScan 360° / ASE).
+
 ## Prerequisites
 
 The plugin supports scanning through following HCL AppScan products:
@@ -35,6 +40,9 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
     -   From the main Jenkins dashboard, click **Credentials**.
     -   Add new global credentials.
     -   In the **Kind** drop-down list, select **HCL AppScan on Cloud/HCL AppScan 360° Credentials**.
+    - Enter your AppScan on Cloud/AppScan 360° server URL. For example:
+        - AppScan on Cloud: `https://cloud.appscan.com/`
+        - AppScan 360°: `https://<AppScan360-server-hostname>/`
     -   Enter your API key details.
     -   Check **Allow Untrusted Connections** to enable untrusted connection to AppScan 360° service.
 2.  Add a **Run AppScan on Cloud/AppScan 360° Security Test** build step to your Jenkins project
@@ -233,6 +241,7 @@ The Mobile Scan functionality
 has been removed from Jenkins since version 1.0.10. The existing jobs that 
 have Mobile Scan configurations must therefore be updated accordingly.
 - If you are unable to view the scan report on the Jenkins, first verify that the "Test Name" field. Test Name can't contain any of the following characters: \/:*?"<>|
+- In Jenkins pipeline projects, rerunning a pipeline in the same workspace might reuse the existing IRX file because it lacks a timestamp, which excludes recent code changes from the scan. To ensure a new IRX file is generated for each run, either clean the workspace beforehand or append a unique value (such as a build number, build ID, or timestamp) to the scan name.
 
 ## Additional Resources
 - [HCL AppScan Enterprise: Jenkins Integration](https://www.youtube.com/watch?v=XctRBAd0HQc)
