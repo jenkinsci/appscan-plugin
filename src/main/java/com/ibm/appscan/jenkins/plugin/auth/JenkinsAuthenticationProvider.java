@@ -5,13 +5,14 @@
 
 package com.ibm.appscan.jenkins.plugin.auth;
 
+import hudson.model.Descriptor;
 import hudson.model.ItemGroup;
 
 public class JenkinsAuthenticationProvider extends com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider {
 
 	private static final long serialVersionUID = 1L;
 
-	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
+	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) throws Descriptor.FormException {
 		super(id, context);		
 	}
 }

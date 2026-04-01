@@ -258,7 +258,7 @@ public class StaticAnalyzer extends Scanner {
 			return "Static Analysis (SAST)";
 		}
 
-        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
             if (scanId == null || scanId.isEmpty()) {
                     return FormValidation.validateRequired(scanId);
             }
@@ -289,7 +289,7 @@ public class StaticAnalyzer extends Scanner {
             return false;
         }
 
-        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(!ServiceUtil.hasSastEntitlement(authProvider)) {
                     return FormValidation.error(Messages.error_active_subscription_validation_ui());

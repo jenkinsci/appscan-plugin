@@ -6,13 +6,14 @@
 package com.ibm.appscan.jenkins.plugin.auth;
 
 import com.cloudbees.plugins.credentials.CredentialsScope;
+import hudson.model.Descriptor;
 
 // Added for backward compatibility during HCL wash
 public class ASoCCredentials extends com.hcl.appscan.jenkins.plugin.auth.ASoCCredentials {
 
 	private static final long serialVersionUID = 1L;
 
-	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean acceptInvalidCerts) {
+	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, Boolean acceptInvalidCerts) throws Descriptor.FormException {
 		super(scope, id, description, username, password, acceptInvalidCerts);
 	}
 }

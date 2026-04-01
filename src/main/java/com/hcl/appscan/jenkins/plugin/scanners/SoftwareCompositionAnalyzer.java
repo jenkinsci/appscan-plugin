@@ -77,7 +77,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
             return "Software Composition Analysis (SCA)";
         }
 
-        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
+        public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException, FormException {
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
             if(scanId!=null && !scanId.isEmpty()) {
                 JSONObject scanDetails = new CloudScanServiceProvider(provider).getScanDetails(SOFTWARE_COMPOSITION_ANALYZER, scanId);
@@ -86,7 +86,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
             return FormValidation.validateRequired(scanId);
         }
 
-        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+        public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
             if(!ServiceUtil.hasScaEntitlement(authProvider)) {
                 return FormValidation.error(Messages.error_active_subscription_validation_ui());

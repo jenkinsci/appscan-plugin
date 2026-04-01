@@ -13,6 +13,7 @@ import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.utils.SystemUtil;
 
 import hudson.Extension;
+import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import java.util.List;
@@ -28,12 +29,12 @@ public class ASECredentials extends UsernamePasswordCredentialsImpl{
 	private List<String> m_cookies;
 
 	@DataBoundConstructor
-	public ASECredentials(String id, String description, String username, String password, String url) {
+	public ASECredentials(String id, String description, String username, String password, String url) throws Descriptor.FormException {
 		this(CredentialsScope.GLOBAL, id, description, username, password);
 		m_url=url;
 	}
 	
-	public ASECredentials(CredentialsScope scope, String id, String description, String username, String password) {
+	public ASECredentials(CredentialsScope scope, String id, String description, String username, String password) throws Descriptor.FormException {
 		super(scope, description, description, username, password);
 	}
 	

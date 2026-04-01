@@ -6,6 +6,7 @@
 package com.hcl.appscan.jenkins.plugin.auth;
 
 import hudson.Extension;
+import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 
@@ -28,13 +29,13 @@ public class ASoCCredentials extends UsernamePasswordCredentialsImpl {
         public boolean m_acceptInvalidCerts;
 
 	@DataBoundConstructor
-	public ASoCCredentials(String id, String description, String username, String password, String url, boolean acceptInvalidCerts) {
+	public ASoCCredentials(String id, String description, String username, String password, String url, boolean acceptInvalidCerts) throws Descriptor.FormException {
 		this(CredentialsScope.GLOBAL, id, description, username, password, acceptInvalidCerts);
 		m_url=url;
                 m_acceptInvalidCerts=acceptInvalidCerts;
 	}
 	
-	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, boolean acceptInvalidCerts) {
+	public ASoCCredentials(CredentialsScope scope, String id, String description, String username, String password, boolean acceptInvalidCerts) throws Descriptor.FormException {
 		super(scope, description, description, username, password);
 	}
 	
