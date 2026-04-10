@@ -27,13 +27,13 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.52</version>
+    <version>5.9</version>
     <relativePath />
   </parent>
 
   <properties>
         <slf4jVersion>1.7.26</slf4jVersion>
-        <jenkins.baseline>2.462</jenkins.baseline>
+        <jenkins.baseline>2.479</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <findbugs.failOnError>false</findbugs.failOnError>
         <spotbugs.failOnError>false</spotbugs.failOnError>
@@ -49,7 +49,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>4228.v0a_71308d905b_</version>
+                <version>4023.va_eeb_b_4e45f07</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -76,8 +76,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <release>17</release>
         </configuration>
       </plugin>
       
@@ -102,13 +101,12 @@
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>credentials</artifactId>
-            <version>1381.v2c3a_12074da_b_</version>
         </dependency>
   </dependencies>
   
   <scm>
   	<connection>scm:git:https://github.com/jenkinsci/appscan-plugin.git</connection>
-  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
+  	<developerConnection>scm:git:https://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/appscan-plugin</url>
     <tag>HEAD</tag>
   </scm>
