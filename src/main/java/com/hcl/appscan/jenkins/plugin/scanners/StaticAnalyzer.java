@@ -9,7 +9,6 @@ package com.hcl.appscan.jenkins.plugin.scanners;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.auth.JenkinsAuthenticationProvider;
 import com.hcl.appscan.sdk.CoreConstants;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
