@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'BRANCH_TO_BUILD', defaultValue: 'main', description: 'Git branch')
+        string(name: 'BRANCH_TO_BUILD', defaultValue: 'master', description: 'Git branch')
     }
 
     tools {
