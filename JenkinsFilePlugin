@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'BRANCH_TO_BUILD', defaultValue: 'main', description: 'Git branch')
+    }
+
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: "${params.BRANCH_TO_BUILD}",
+                    url: 'https://github.com/jenkinsci/appscan-plugin.git'
+            }
+        }
+
+        stage('Build Plugin') {
+            steps {
+                bat 'mvn -B clean install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+
+        stage('Package Plugin') {
+            steps {
+                bat 'mvn package'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: '**\\target\\*.hpi, **\\target\\*.jpi', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Plugin build successful!"
+        }
+        failure {
+            echo "Build failed. Check logs."
+        }
+    }
+}
