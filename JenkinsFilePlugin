@@ -25,21 +25,9 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                bat 'mvn test'
-            }
-        }
-
-        stage('Package Plugin') {
-            steps {
-                bat 'mvn package'
-            }
-        }
-
         stage('Archive Artifacts') {
             steps {
-                archiveArtifacts artifacts: '**\\target\\*.hpi, **\\target\\*.jpi', fingerprint: true
+                archiveArtifacts artifacts: '**/target/*.hpi, **/target/*.jpi', fingerprint: true
             }
         }
     }
