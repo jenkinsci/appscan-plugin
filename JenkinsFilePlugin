@@ -38,12 +38,18 @@ pipeline {
         string(name: 'BRANCH_TO_BUILD', defaultValue: 'master', description: 'Git branch to build')
     }
 
+    environment {
+        REPO_URL = 'https://github.com/jenkinsci/appscan-plugin.git'
+        REPO_NAME = 'jenkinsci/appscan-plugin'
+    }
+
     stages {
         stage('Validate Parameters') {
             steps {
                 script {
+                    env.GIT_BRANCH_NAME = params.BRANCH_TO_BUILD?.trim() ?: 'master'
                     if (!params.BRANCH_TO_BUILD?.trim()) {
-                        echo "WARNING: BRANCH_TO_BUILD not set, defaulting to 'master'"
+                        echo "WARNING: BRANCH_TO_BUILD not set, Using default: 'master'"
                     }
                 }
             }
@@ -58,7 +64,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    def branch = params.BRANCH_TO_BUILD?.trim() ?: 'master'
                     def retryCount = 0
                     retry(3) {
                         if (retryCount > 0) {
@@ -66,8 +71,8 @@ pipeline {
                             sleep time: 30, unit: 'SECONDS'
                         }
                         retryCount++
-                        git branch: branch,
-                            url: 'https://github.com/jenkinsci/appscan-plugin.git'
+                        git branch: env.GIT_BRANCH_NAME,
+                            url: env.REPO_URL
                     }
                 }
             }
@@ -90,12 +95,14 @@ pipeline {
 
                     // Get git commit info
                     def gitCommit = ''
-                    def gitBranch = params.BRANCH_TO_BUILD?.trim() ?: 'master'
                     if (isUnix()) {
                         gitCommit = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                     } else {
                         gitCommit = bat(script: '@git rev-parse HEAD', returnStdout: true).trim()
                     }
+
+                    // Set build description visible in Jenkins build history UI
+                    currentBuild.description = "Branch: ${env.GIT_BRANCH_NAME} | Commit: ${gitCommit.take(8)} | By: ${buildStartedBy}"
 
                     // Create BUILDINFO.json
                     def buildInfo = groovy.json.JsonOutput.toJson([
@@ -105,13 +112,13 @@ pipeline {
                         startedBy   : buildStartedBy,
                         buildNumber : env.BUILD_NUMBER,
                         parameters  : [
-                            BRANCH_TO_BUILD: gitBranch
+                            BRANCH_TO_BUILD: env.GIT_BRANCH_NAME
                         ],
                         branchInfo  : [
-                            name   : 'jenkinsci/appscan-plugin',
-                            branch : gitBranch,
+                            name   : env.REPO_NAME,
+                            branch : env.GIT_BRANCH_NAME,
                             commit : gitCommit,
-                            url    : 'https://github.com/jenkinsci/appscan-plugin.git'
+                            url    : env.REPO_URL
                         ]
                     ])
                     writeFile file: 'BUILDINFO.json', text: groovy.json.JsonOutput.prettyPrint(buildInfo)
@@ -141,9 +148,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'mvn -B clean install'
+                        sh 'mvn -B clean verify'
                     } else {
-                        bat 'mvn -B clean install'
+                        bat 'mvn -B clean verify'
                     }
                 }
             }
