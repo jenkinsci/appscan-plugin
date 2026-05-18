@@ -112,17 +112,22 @@ pipeline {
         stage('Changeset Info') {
             steps {
                 script {
-                    def gitLogCmd = 'git log --pretty=format:"%H|%an|%ad|%s" --date=format:"%Y-%m-%d %H:%M:%S" -20'
                     def gitLogOutput = ''
                     if (isUnix()) {
-                        gitLogOutput = sh(script: gitLogCmd, returnStdout: true).trim()
+                        gitLogOutput = sh(
+                            script: 'git log --pretty=format:"%H~%an~%ad~%s" --date=format:"%Y-%m-%d %H:%M:%S" -20',
+                            returnStdout: true
+                        ).trim()
                     } else {
-                        gitLogOutput = bat(script: "@${gitLogCmd}", returnStdout: true).trim()
+                        gitLogOutput = bat(
+                            script: '@git log --pretty=format:"%%H~%%an~%%ad~%%s" --date=format:"%%Y-%%m-%%d %%H:%%M:%%S" -20',
+                            returnStdout: true
+                        ).trim()
                     }
 
                     def changes = []
                     gitLogOutput.eachLine { line ->
-                        def parts = line.split('\\|', 4)
+                        def parts = line.split('~', 4)
                         if (parts.size() == 4) {
                             changes.add([
                                 commitId : parts[0].trim(),
