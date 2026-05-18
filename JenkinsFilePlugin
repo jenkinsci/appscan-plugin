@@ -3,7 +3,6 @@ pipeline {
     // For actual build, ensure this labeled node is online and available.
     // For testing, you can comment this and use: agent any
     agent { label 'jenkinsAgent' }
-    //agent any
 
     tools {
         jdk 'TOOLS-JDK-17'
@@ -14,6 +13,7 @@ pipeline {
         timestamps()
         timeout(time: 30, unit: 'MINUTES')
         buildDiscarder(logRotator(numToKeepStr: '10'))
+        skipDefaultCheckout(true) //Since i am checking out later in code, avoid automatic checkout at start of pipeline
     }
 
     parameters {
@@ -31,7 +31,7 @@ pipeline {
                 script {
                     env.GIT_BRANCH_NAME = params.BRANCH_TO_BUILD?.trim() ?: 'master'
                     if (!params.BRANCH_TO_BUILD?.trim()) {
-                        echo "WARNING: BRANCH_TO_BUILD not set, Using default: 'master'"
+                        echo 'BRANCH_TO_BUILD not provided. Using default branch: master'
                     }
                 }
             }
@@ -39,7 +39,7 @@ pipeline {
 
         stage('Clean Workspace') {
             steps {
-                deleteDir()
+                cleanWs()
             }
         }
 
@@ -63,7 +63,6 @@ pipeline {
         stage('Build Info') {
             steps {
                 script {
-                    // Determine who started the build
                     def buildStartedBy = 'Unknown'
                     def causes = currentBuild.getBuildCauses()
                     for (cause in causes) {
@@ -90,7 +89,7 @@ pipeline {
                     def buildInfo = groovy.json.JsonOutput.toJson([
                         description : 'AppScan Plugin Build Information',
                         jobUrl      : env.BUILD_URL,
-                        buildDate   : new Date().format("yyyy-MM-dd HH:mm:ss"),
+                        buildDate   : new Date().format('yyyy-MM-dd HH:mm:ss'),
                         startedBy   : buildStartedBy,
                         buildNumber : env.BUILD_NUMBER,
                         parameters  : [
@@ -104,7 +103,7 @@ pipeline {
                         ]
                     ])
                     writeFile file: 'BUILDINFO.json', text: groovy.json.JsonOutput.prettyPrint(buildInfo)
-                    echo "BUILDINFO.json created"
+                    echo 'BUILDINFO.json created'
                 }
             }
         }
@@ -143,19 +142,13 @@ pipeline {
 
         stage('Build Plugin') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'mvn -B clean package'
-                    } else {
-                        bat 'mvn -B clean package'
-                    }
-                }
+                isUnix() ? sh('mvn -B clean verify') : bat('mvn -B clean verify')
             }
         }
 
         stage('Archive Artifacts') {
             steps {
-                archiveArtifacts artifacts: '**/target/*.hpi, BUILDINFO.json, CHANGEINFO.json', fingerprint: true
+                archiveArtifacts artifacts: '**/target/*.hpi, BUILDINFO.json, CHANGEINFO.json', allowEmptyArchive: false , fingerprint: true
             }
         }
     }
