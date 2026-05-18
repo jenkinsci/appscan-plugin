@@ -17,6 +17,16 @@ pipeline {
     }
 
     stages {
+        stage('Validate Parameters') {
+            steps {
+                script {
+                    if (!params.BRANCH_TO_BUILD?.trim()) {
+                        echo "WARNING: BRANCH_TO_BUILD not set, defaulting to 'master'"
+                    }
+                }
+            }
+        }
+
         stage('Clean Workspace') {
             steps {
                 deleteDir()
@@ -25,9 +35,94 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                retry(3) {
-                    git branch: params.BRANCH_TO_BUILD ?: 'master',
-                        url: 'https://github.com/jenkinsci/appscan-plugin.git'
+                script {
+                    def branch = params.BRANCH_TO_BUILD?.trim() ?: 'master'
+                    def retryCount = 0
+                    retry(3) {
+                        if (retryCount > 0) {
+                            echo "Retry #${retryCount} in 30 seconds..."
+                            sleep time: 30, unit: 'SECONDS'
+                        }
+                        retryCount++
+                        git branch: branch,
+                            url: 'https://github.com/jenkinsci/appscan-plugin.git'
+                    }
+                }
+            }
+        }
+
+        stage('Build Info') {
+            steps {
+                script {
+                    // Determine who started the build
+                    def buildStartedBy = 'Unknown'
+                    def causes = currentBuild.getBuildCauses()
+                    for (cause in causes) {
+                        if (cause.userId) {
+                            buildStartedBy = cause.userId
+                        } else if (cause.shortDescription) {
+                            buildStartedBy = cause.shortDescription
+                        }
+                    }
+                    echo "Build started by: ${buildStartedBy}"
+
+                    // Get git commit info
+                    def gitCommit = ''
+                    def gitBranch = params.BRANCH_TO_BUILD?.trim() ?: 'master'
+                    if (isUnix()) {
+                        gitCommit = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                    } else {
+                        gitCommit = bat(script: '@git rev-parse HEAD', returnStdout: true).trim()
+                    }
+
+                    // Create BUILDINFO.json
+                    def buildInfo = [
+                        description : 'AppScan Plugin Build Information',
+                        jobUrl      : env.BUILD_URL,
+                        buildDate   : new Date().format("yyyy-MM-dd HH:mm:ss"),
+                        startedBy   : buildStartedBy,
+                        buildNumber : env.BUILD_NUMBER,
+                        parameters  : [
+                            BRANCH_TO_BUILD: gitBranch
+                        ],
+                        branchInfo  : [
+                            name   : 'jenkinsci/appscan-plugin',
+                            branch : gitBranch,
+                            commit : gitCommit,
+                            url    : 'https://github.com/jenkinsci/appscan-plugin.git'
+                        ]
+                    ]
+                    writeJSON file: 'BUILDINFO.json', json: buildInfo, pretty: 4
+                    echo "BUILDINFO.json created"
+                }
+            }
+        }
+
+        stage('Changeset Info') {
+            steps {
+                script {
+                    // Capture changeset from current build
+                    def changes = []
+                    def changeLogSets = currentBuild.changeSets
+                    for (changeLogSet in changeLogSets) {
+                        for (entry in changeLogSet.items) {
+                            changes.add([
+                                commitId : entry.commitId,
+                                author   : entry.author.toString(),
+                                date     : new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss"),
+                                message  : entry.msg,
+                                files    : entry.affectedFiles.collect { it.path }
+                            ])
+                        }
+                    }
+                    def changeInfo = [
+                        description : 'AppScan Plugin Changeset History',
+                        buildNumber : env.BUILD_NUMBER,
+                        totalChanges: changes.size(),
+                        changes     : changes
+                    ]
+                    writeJSON file: 'CHANGEINFO.json', json: changeInfo, pretty: 4
+                    echo "CHANGEINFO.json created with ${changes.size()} change(s)"
                 }
             }
         }
@@ -46,7 +141,7 @@ pipeline {
 
         stage('Archive Artifacts') {
             steps {
-                archiveArtifacts artifacts: '**/target/*.hpi', fingerprint: true
+                archiveArtifacts artifacts: '**/target/*.hpi, BUILDINFO.json, CHANGEINFO.json', fingerprint: true
             }
         }
     }
