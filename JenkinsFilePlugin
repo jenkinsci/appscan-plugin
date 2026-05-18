@@ -142,7 +142,9 @@ pipeline {
 
         stage('Build Plugin') {
             steps {
-                isUnix() ? sh('mvn -B clean verify') : bat('mvn -B clean verify')
+                script {
+                    isUnix() ? sh('mvn -B clean verify') : bat('mvn -B clean verify')
+                }
             }
         }
 
