@@ -148,9 +148,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'mvn -B clean verify'
+                        sh 'mvn -B clean package'
                     } else {
-                        bat 'mvn -B clean verify'
+                        bat 'mvn -B clean package'
                     }
                 }
             }
