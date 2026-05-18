@@ -10,11 +10,25 @@ pipeline {
         maven 'Maven 3.6.1'     //My Windows controller has apache-maven-3.9.15 installed
     }
 
+    options {
+        timestamps()
+        timeout(time: 30, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
     stages {
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
         stage('Checkout') {
             steps {
-                git branch: "${params.BRANCH_TO_BUILD}" ?: 'master',
-                    url: 'https://github.com/jenkinsci/appscan-plugin.git'
+                retry(3) {
+                    git branch: "${params.BRANCH_TO_BUILD}" ?: 'master',
+                        url: 'https://github.com/jenkinsci/appscan-plugin.git'
+                }
             }
         }
 
@@ -39,10 +53,13 @@ pipeline {
 
     post {
         success {
-            echo 'Plugin build successful!'
+            echo "Plugin build successful! Build #${env.BUILD_NUMBER}"
         }
         failure {
-            echo 'Build failed. Check logs.'
+            echo "Build #${env.BUILD_NUMBER} failed. Check logs: ${env.BUILD_URL}console"
+        }
+        always {
+            cleanWs()
         }
     }
 }
