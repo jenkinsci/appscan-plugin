@@ -1,3 +1,21 @@
+// @NonCPS prevents Jenkins CPS serialization of non-serializable Git objects
+@NonCPS
+def getChangesetData(build) {
+    def changes = []
+    for (changeLogSet in build.changeSets) {
+        for (entry in changeLogSet.items) {
+            changes.add([
+                commitId : entry.commitId,
+                author   : entry.author.toString(),
+                date     : new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss"),
+                message  : entry.msg,
+                files    : entry.affectedFiles.collect { it.path }
+            ])
+        }
+    }
+    return changes
+}
+
 pipeline {
     // Label of my Windows controller node
     // For actual build, ensure this labeled node is online and available.
@@ -106,19 +124,7 @@ pipeline {
             steps {
                 script {
                     // Capture changeset from current build
-                    def changes = []
-                    def changeLogSets = currentBuild.changeSets
-                    for (changeLogSet in changeLogSets) {
-                        for (entry in changeLogSet.items) {
-                            changes.add([
-                                commitId : entry.commitId,
-                                author   : entry.author.toString(),
-                                date     : new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss"),
-                                message  : entry.msg,
-                                files    : entry.affectedFiles.collect { it.path }
-                            ])
-                        }
-                    }
+                    def changes = getChangesetData(currentBuild)
                     def changeInfo = groovy.json.JsonOutput.toJson([
                         description : 'AppScan Plugin Changeset History',
                         buildNumber : env.BUILD_NUMBER,
