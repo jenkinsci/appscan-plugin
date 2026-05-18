@@ -16,6 +16,10 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
+    parameters {
+        string(name: 'BRANCH_TO_BUILD', defaultValue: 'master', description: 'Git branch to build')
+    }
+
     stages {
         stage('Validate Parameters') {
             steps {
