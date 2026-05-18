@@ -1,27 +1,32 @@
 pipeline {
-    agent any
-
-    parameters {
-        string(name: 'BRANCH_TO_BUILD', defaultValue: 'master', description: 'Git branch')
-    }
+    // Label of my Windows controller node
+    // For actual build, ensure this labeled node is online and available.
+    // For testing, you can comment this and use: agent any
+    agent { label 'jenkinsAgent' }
+    //agent any
 
     tools {
-        jdk 'jdk17'
-        maven 'maven3'
+        jdk 'TOOLS-JDK-17'
+        maven 'Maven 3.6.1'     //My Windows controller has apache-maven-3.9.15 installed
     }
 
     stages {
-
         stage('Checkout') {
             steps {
-                git branch: "${params.BRANCH_TO_BUILD}",
+                git branch: "${params.BRANCH_TO_BUILD}" ?: 'master',
                     url: 'https://github.com/jenkinsci/appscan-plugin.git'
             }
         }
 
         stage('Build Plugin') {
             steps {
-                bat 'mvn -B clean install'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn -B clean install'
+                    } else {
+                        bat 'mvn -B clean install'
+                    }
+                }
             }
         }
 
@@ -34,10 +39,10 @@ pipeline {
 
     post {
         success {
-            echo "Plugin build successful!"
+            echo 'Plugin build successful!'
         }
         failure {
-            echo "Build failed. Check logs."
+            echo 'Build failed. Check logs.'
         }
     }
 }
