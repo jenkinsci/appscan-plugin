@@ -112,39 +112,30 @@ pipeline {
         stage('Changeset Info') {
             steps {
                 script {
-                    def gitLogOutput = ''
-                    if (isUnix()) {
-                        gitLogOutput = sh(
-                            script: 'git log --pretty=format:"%H~%an~%ad~%s" --date=format:"%Y-%m-%d %H:%M:%S" -20',
-                            returnStdout: true
-                        ).trim()
-                    } else {
-                        gitLogOutput = bat(
-                            script: '@git log --pretty=format:"%%H~%%an~%%ad~%%s" --date=format:"%%Y-%%m-%%d %%H:%%M:%%S" -20',
-                            returnStdout: true
-                        ).trim()
-                    }
+                    def gitLogOutput = isUnix()
+                        ? sh(script:  'git log --pretty=format:"%H~%an~%ad~%s" --date=format:"%Y-%m-%d %H:%M:%S" -20', returnStdout: true).trim()
+                        : bat(script: '@git log --pretty=format:"%%H~%%an~%%ad~%%s" --date=format:"%%Y-%%m-%%d %%H:%%M:%%S" -20', returnStdout: true).trim()
 
-                    def changes = []
-                    gitLogOutput.eachLine { line ->
-                        def parts = line.split('~', 4)
-                        if (parts.size() == 4) {
-                            changes.add([
-                                commitId : parts[0].trim(),
-                                author   : parts[1].trim(),
-                                date     : parts[2].trim(),
-                                message  : parts[3].trim()
-                            ])
+                    def changes = gitLogOutput
+                        ? gitLogOutput.readLines().collect { line ->
+                            def parts = line.split('~', 4)
+                            [
+                                commitId: parts[0]?.trim(),
+                                author  : parts[1]?.trim(),
+                                date    : parts[2]?.trim(),
+                                message : parts[3]?.trim()
+                            ]
                         }
-                    }
+                        : []
 
-                    def changeInfo = groovy.json.JsonOutput.toJson([
-                        description : 'AppScan Plugin Changeset History',
-                        buildNumber : env.BUILD_NUMBER,
-                        totalChanges: changes.size(),
-                        changes     : changes
-                    ])
-                    writeFile file: 'CHANGEINFO.json', text: groovy.json.JsonOutput.prettyPrint(changeInfo)
+                    writeFile file: 'CHANGEINFO.json',
+                              text: groovy.json.JsonOutput.prettyPrint(
+                                        groovy.json.JsonOutput.toJson([
+                                            description : 'AppScan Plugin Changeset History',
+                                            buildNumber : env.BUILD_NUMBER,
+                                            totalChanges: changes.size(),
+                                            changes     : changes
+                                        ]))
                     echo "CHANGEINFO.json created with ${changes.size()} change(s)"
                 }
             }
