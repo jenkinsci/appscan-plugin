@@ -1,21 +1,3 @@
-// @NonCPS prevents Jenkins CPS serialization of non-serializable Git objects
-@NonCPS
-def getChangesetData(build) {
-    def changes = []
-    for (changeLogSet in build.changeSets) {
-        for (entry in changeLogSet.items) {
-            changes.add([
-                commitId : entry.commitId,
-                author   : entry.author.toString(),
-                date     : new Date(entry.timestamp).format("yyyy-MM-dd HH:mm:ss"),
-                message  : entry.msg,
-                files    : entry.affectedFiles.collect { it.path }
-            ])
-        }
-    }
-    return changes
-}
-
 pipeline {
     // Label of my Windows controller node
     // For actual build, ensure this labeled node is online and available.
@@ -130,8 +112,27 @@ pipeline {
         stage('Changeset Info') {
             steps {
                 script {
-                    // Capture changeset from current build
-                    def changes = getChangesetData(currentBuild)
+                    def gitLogCmd = 'git log --pretty=format:"%H|%an|%ad|%s" --date=format:"%Y-%m-%d %H:%M:%S" -20'
+                    def gitLogOutput = ''
+                    if (isUnix()) {
+                        gitLogOutput = sh(script: gitLogCmd, returnStdout: true).trim()
+                    } else {
+                        gitLogOutput = bat(script: "@${gitLogCmd}", returnStdout: true).trim()
+                    }
+
+                    def changes = []
+                    gitLogOutput.eachLine { line ->
+                        def parts = line.split('\\|', 4)
+                        if (parts.size() == 4) {
+                            changes.add([
+                                commitId : parts[0].trim(),
+                                author   : parts[1].trim(),
+                                date     : parts[2].trim(),
+                                message  : parts[3].trim()
+                            ])
+                        }
+                    }
+
                     def changeInfo = groovy.json.JsonOutput.toJson([
                         description : 'AppScan Plugin Changeset History',
                         buildNumber : env.BUILD_NUMBER,
