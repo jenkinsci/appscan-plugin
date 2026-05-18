@@ -76,7 +76,7 @@ pipeline {
                     }
 
                     // Create BUILDINFO.json
-                    def buildInfo = [
+                    def buildInfo = groovy.json.JsonOutput.toJson([
                         description : 'AppScan Plugin Build Information',
                         jobUrl      : env.BUILD_URL,
                         buildDate   : new Date().format("yyyy-MM-dd HH:mm:ss"),
@@ -91,8 +91,8 @@ pipeline {
                             commit : gitCommit,
                             url    : 'https://github.com/jenkinsci/appscan-plugin.git'
                         ]
-                    ]
-                    writeJSON file: 'BUILDINFO.json', json: buildInfo, pretty: 4
+                    ])
+                    writeFile file: 'BUILDINFO.json', text: groovy.json.JsonOutput.prettyPrint(buildInfo)
                     echo "BUILDINFO.json created"
                 }
             }
@@ -115,13 +115,13 @@ pipeline {
                             ])
                         }
                     }
-                    def changeInfo = [
+                    def changeInfo = groovy.json.JsonOutput.toJson([
                         description : 'AppScan Plugin Changeset History',
                         buildNumber : env.BUILD_NUMBER,
                         totalChanges: changes.size(),
                         changes     : changes
-                    ]
-                    writeJSON file: 'CHANGEINFO.json', json: changeInfo, pretty: 4
+                    ])
+                    writeFile file: 'CHANGEINFO.json', text: groovy.json.JsonOutput.prettyPrint(changeInfo)
                     echo "CHANGEINFO.json created with ${changes.size()} change(s)"
                 }
             }
