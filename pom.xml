@@ -15,25 +15,18 @@
   		<url> https://www.apache.org/licenses/LICENSE-2.0</url>
   	</license>
   </licenses>
-  
-  <developers>
-  	<developer>
-      		<id>mattmurp</id>
-      		<name>Matt Murphy</name>
-      		<email>matthew.murphy@hcl.com</email>
-    	</developer>
-  </developers>
 	
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.52</version>
+    <version>4.88</version>
     <relativePath />
   </parent>
 
   <properties>
         <slf4jVersion>1.7.26</slf4jVersion>
-        <jenkins.baseline>2.426</jenkins.baseline>
+        <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
+        <jenkins.baseline>2.462</jenkins.baseline>
         <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <findbugs.failOnError>false</findbugs.failOnError>
         <spotbugs.failOnError>false</spotbugs.failOnError>
@@ -49,7 +42,7 @@
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
                 <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>2718.v7e8a_d43b_3f0b_</version>
+                <version>4228.v0a_71308d905b_</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -107,7 +100,7 @@
   </dependencies>
   
   <scm>
-  	<connection>scm:git:ssh://github.com/jenkinsci/appscan-plugin.git</connection>
+  	<connection>scm:git:https://github.com/jenkinsci/appscan-plugin.git</connection>
   	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/appscan-plugin</url>
     <tag>HEAD</tag>
