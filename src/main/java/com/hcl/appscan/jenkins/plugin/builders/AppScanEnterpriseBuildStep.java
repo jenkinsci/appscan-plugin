@@ -24,7 +24,6 @@ import java.util.HashMap;
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanMode;
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeConstants;
 import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeFactory;
-import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jenkinsci.Symbol;
