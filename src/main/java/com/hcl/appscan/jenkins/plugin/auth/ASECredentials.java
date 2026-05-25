@@ -1,5 +1,5 @@
 /** 
- * @ Copyright HCL Technologies Ltd. 2019.
+ * @ Copyright HCL Technologies Ltd. 2019, 2026.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,8 +9,6 @@ import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.hcl.appscan.jenkins.plugin.Messages;
-import com.hcl.appscan.sdk.CoreConstants;
-import com.hcl.appscan.sdk.utils.SystemUtil;
 
 import hudson.Extension;
 import hudson.model.Descriptor;
