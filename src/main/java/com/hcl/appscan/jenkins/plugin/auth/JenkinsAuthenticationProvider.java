@@ -137,6 +137,6 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 
     	@Override
     	public boolean getacceptInvalidCerts() {
-        	return m_credentials.getacceptInvalidCerts();
+        	return m_credentials.getAcceptInvalidCerts();
     	}
 }
