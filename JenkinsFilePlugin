@@ -19,12 +19,14 @@ pipeline {
         REPO_URL = 'https://github.com/jenkinsci/appscan-plugin.git'
         REPO_NAME = 'jenkinsci/appscan-plugin'
         GITHUB_CREDENTIALS_ID = 'GithubAccess'
+        PIPELINE_VERSION = '1.1.0'
     }
 
     stages {
         stage('Validate Parameters') {
             steps {
                 script {
+                    echo "Pipeline Version: ${env.PIPELINE_VERSION}"
                     // Federal jobs require config.xml-defined parameters.
                     // This Jenkinsfile must not define a parameters block.
 
@@ -51,8 +53,8 @@ pipeline {
                         }
                     }
 
-                    echo "Running on OS: ${env.THIS_OS}" 
-                    echo "GLOBAL_JENKINS_FEDERAL=${env.GLOBAL_JENKINS_FEDERAL ?: 'false'}" 
+                    echo "Running on OS: ${env.THIS_OS}"
+                    echo "GLOBAL_JENKINS_FEDERAL=${env.GLOBAL_JENKINS_FEDERAL ?: 'false'}"
                     echo "Branch=${env.GIT_BRANCH_NAME}"
 
                     if (env.THIS_OS == 'linux' || isFederal) {
