@@ -206,9 +206,11 @@ public class StaticAnalyzer extends Scanner {
                 properties.remove(CoreConstants.INCLUDE_SCA);
            }
 
-            //includeSCA is only available if the user upload an IRX file for upload files & folders scan method .
+            // For upload-direct scans, INCLUDE_SCA requires an IRX target.
+            // If a non-IRX target is provided, continue with SAST by dropping INCLUDE_SCA.
             if (properties.containsKey(CoreConstants.INCLUDE_SCA) && properties.containsKey(CoreConstants.UPLOAD_DIRECT) && !properties.get(TARGET).endsWith(".irx")) {
-                throw new AbortException(Messages.error_invalid_format_include_sca());
+                progress.setStatus(new Message(Message.WARNING, Messages.error_invalid_format_include_sca()));
+                properties.remove(CoreConstants.INCLUDE_SCA);
             }
 
             if(properties.containsKey(CoreConstants.SCAN_ID)) {
