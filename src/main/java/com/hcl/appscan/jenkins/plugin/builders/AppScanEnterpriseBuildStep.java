@@ -682,6 +682,9 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			Map<String, String> items = componentProvider.getComponents();
 			ListBoxModel model = new ListBoxModel();
 
+			// Add empty option as the default selection
+			model.add("", "");
+
 			if (items != null) {
 				List<Entry<String, String>> list = sortComponents(items.entrySet());
 				for (Map.Entry<String, String> entry : list)
