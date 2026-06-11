@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import hudson.model.Descriptor;
 import org.apache.wink.json4j.JSONException;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -38,7 +37,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	
 	private ASoCCredentials m_credentials;
         
-	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) throws Descriptor.FormException {
+	public JenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
 		configureCredentials(id, context);
 	}
 	
@@ -123,7 +122,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 		return  keyId.trim().startsWith("local");
 	}
 	
-	public void configureCredentials(String id, ItemGroup<?> context) throws Descriptor.FormException {
+	public void configureCredentials(String id, ItemGroup<?> context) {
 		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
 		for(ASoCCredentials creds : credentialsList) {
@@ -132,7 +131,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 				return;
 			}
 		}
-		m_credentials = new ASoCCredentials("", "", "", "", "",false); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		m_credentials = null;
 	}
 
     	@Override

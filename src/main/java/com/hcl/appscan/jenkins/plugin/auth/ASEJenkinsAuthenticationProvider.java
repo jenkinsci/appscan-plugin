@@ -10,7 +10,6 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.hcl.appscan.jenkins.plugin.util.ASESessionManager;
 import com.hcl.appscan.sdk.auth.ASEAuthenticationHandler;
 import com.hcl.appscan.sdk.auth.IASEAuthenticationProvider;
-import hudson.model.Descriptor;
 import hudson.model.ItemGroup;
 import hudson.util.Secret;
 import java.io.IOException;
@@ -30,7 +29,7 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 	transient private static final Object m_object = new Object();
 	transient private Boolean m_reloaded = null;
 
-	public ASEJenkinsAuthenticationProvider(String id, ItemGroup<?> context) throws Descriptor.FormException {
+	public ASEJenkinsAuthenticationProvider(String id, ItemGroup<?> context) {
         m_reloaded = true;
 		List<ASECredentials> credentialsList = CredentialsProvider.lookupCredentials(ASECredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
@@ -40,7 +39,7 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 				return;
 			}
 		}
-		m_credentials = new ASECredentials("", "", "", "",""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		m_credentials = null;
 	}
 
 	@Override
