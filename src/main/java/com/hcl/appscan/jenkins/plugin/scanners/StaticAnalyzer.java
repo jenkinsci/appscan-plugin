@@ -261,7 +261,7 @@ public class StaticAnalyzer extends Scanner {
             if (scanId == null || scanId.isEmpty()) {
                     return FormValidation.validateRequired(scanId);
             }
-            if(credentials == null) {
+            if(credentials == null || credentials.isEmpty()) {
                     return FormValidation.error(Messages.error_credential_validation());
             }
 
@@ -292,7 +292,7 @@ public class StaticAnalyzer extends Scanner {
         }
 
         public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            if (credentials == null) {
+            if (credentials == null || credentials.isEmpty()) {
                     return FormValidation.error(Messages.error_credential_validation());
             }
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);

@@ -236,7 +236,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-    perform((Run<?,?>)build, launcher, listener);
+	perform((Run<?,?>)build, launcher, listener);
 	        return true;
     }
     
@@ -305,7 +305,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	}
     
     private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-    	if(m_credentials == null) {
+    	if(m_credentials == null || m_credentials.trim().isEmpty()) {
 			throw new AbortException(Messages.error_credential_validation());
 		}
 		m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
@@ -457,7 +457,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
 			ListBoxModel model = new ListBoxModel();
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return model;
 			}
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
@@ -498,7 +498,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
     	
     	public FormValidation doCheckApplication(@QueryParameter String application, @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return FormValidation.error(Messages.error_credential_validation());
 			}
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
@@ -511,7 +511,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	}
 
 	public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-		if (credentials == null) {
+		if (credentials == null	|| credentials.trim().isEmpty()) {
 			return FormValidation.error(Messages.error_credential_validation());
 		}
 		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);

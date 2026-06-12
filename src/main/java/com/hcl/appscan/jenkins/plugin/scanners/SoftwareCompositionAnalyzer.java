@@ -77,7 +77,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         }
 
         public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
-            if (credentials == null) {
+            if (credentials == null || credentials.isEmpty()) {
                 return FormValidation.error(Messages.error_credential_validation());
             }
             JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
@@ -89,7 +89,7 @@ public class SoftwareCompositionAnalyzer extends Scanner {
         }
 
         public FormValidation doCheckTarget(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-            if (credentials == null) {
+            if (credentials == null || credentials.isEmpty()) {
                 return FormValidation.error(Messages.error_credential_validation());
             }
             JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);

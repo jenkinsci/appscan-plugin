@@ -476,16 +476,20 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
+		if(m_credentials == null || m_credentials.isEmpty()) {
+			throw new AbortException(Messages.error_credential_validation());
+		}
 		readResolve();
 		Map<String, String> properties = getScanProperties(build, listener);
+		final IProgress progress = new ScanProgress(listener);
 
+		progress.setStatus(new Message(Message.INFO, Messages.test_policy_deprecation()));
 		if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
             		throw new AbortException(Messages.error_url_validation(m_target));
         	}
 
         	m_authProvider = new ASEJenkinsAuthenticationProvider(properties.get("credentials"),
 				build.getParent().getParent());
-		final IProgress progress = new ScanProgress(listener);
 		final boolean suspend = m_wait;
         	if(m_application.equals(getApplication())){
 		// indicating that we have an application name, not an id, so we need to fetch the id
@@ -671,7 +675,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			ListBoxModel model = new ListBoxModel();
 			// Add empty option as the default selection
 			model.add("", "");
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return model;
 			}
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
@@ -709,7 +713,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 				@AncestorInPath ItemGroup<?> context) { // $NON-NLS-1$
 			ListBoxModel model = new ListBoxModel();
 			model.add(""); //$NON-NLS-1$
-			if(credentials == null) {
+			if(credentials == null || credentials.trim().isEmpty()) {
 				return model;
 			}
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
@@ -766,7 +770,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 
 		//This method will initialize Template, folder and application list.
 		private void setAutoCompleteList(String credentials, ItemGroup<?> context) {
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return;
 			}
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);

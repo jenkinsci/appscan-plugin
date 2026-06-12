@@ -371,7 +371,7 @@ public class DynamicAnalyzer extends Scanner {
 
 		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
 			ListBoxModel model = new ListBoxModel();
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return model;
 			}
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
@@ -406,7 +406,7 @@ public class DynamicAnalyzer extends Scanner {
 		public ListBoxModel doFillPresenceIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) { //$NON-NLS-1$
 			ListBoxModel model = new ListBoxModel();
 			model.add(""); //$NON-NLS-1$
-			if (credentials == null) {
+			if (credentials ==  null || credentials.trim().isEmpty()) {
 				return model;
 			}
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
@@ -440,7 +440,7 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials,@RelativePath("..") @QueryParameter String application, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return FormValidation.error(Messages.error_credential_validation());
 			}
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
@@ -480,7 +480,7 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return FormValidation.error(Messages.error_credential_validation());
 			}
 			JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
@@ -492,7 +492,7 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckExecutionId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) {
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return FormValidation.error(Messages.error_credential_validation());
 			}
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
@@ -505,7 +505,7 @@ public class DynamicAnalyzer extends Scanner {
 		}
 
 		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
-			if (credentials == null) {
+			if (credentials == null || credentials.trim().isEmpty()) {
 				return FormValidation.error(Messages.error_credential_validation());
 			}
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
