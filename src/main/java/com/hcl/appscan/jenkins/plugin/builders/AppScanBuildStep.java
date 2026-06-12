@@ -236,14 +236,14 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-        perform((Run<?,?>)build, launcher, listener);
-		return true;
+    perform((Run<?,?>)build, launcher, listener);
+	        return true;
     }
     
         @Override
         public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-			perform(run, launcher, listener);
-		}
+	        perform(run, launcher, listener);
+        }
     
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
@@ -457,7 +457,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     	
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
 			ListBoxModel model = new ListBoxModel();
-			if (credentials == null || credentials.trim().isEmpty()) {
+			if (credentials == null) {
 				return model;
 			}
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);

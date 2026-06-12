@@ -379,15 +379,15 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	@Override
 	public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
 			throws IOException, InterruptedException {
-            performScan((Run<?, ?>) build, launcher, listener);
-        return true;
+		performScan((Run<?, ?>) build, launcher, listener);
+		return true;
 	}
 
 	@Override
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
-            performScan((Run<?, ?>) run, launcher, listener);
-    }
+		performScan((Run<?, ?>) run, launcher, listener);
+	}
 
 	@Override
 	public BuildStepMonitor getRequiredMonitorService() {
@@ -475,7 +475,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
     	}
 
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
-            throws InterruptedException, IOException {
+			throws InterruptedException, IOException {
 		readResolve();
 		Map<String, String> properties = getScanProperties(build, listener);
 
