@@ -1,5 +1,5 @@
 /** 
- * @ Copyright HCL Technologies Ltd. 2019.
+ * @ Copyright HCL Technologies Ltd. 2019, 2026.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -11,6 +11,7 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.hcl.appscan.jenkins.plugin.Messages;
 
 import hudson.Extension;
+import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import java.util.List;
@@ -26,12 +27,12 @@ public class ASECredentials extends UsernamePasswordCredentialsImpl{
 	private List<String> m_cookies;
 
 	@DataBoundConstructor
-	public ASECredentials(String id, String description, String username, String password, String url) {
+	public ASECredentials(String id, String description, String username, String password, String url) throws Descriptor.FormException {
 		this(CredentialsScope.GLOBAL, id, description, username, password);
 		m_url=url;
 	}
 	
-	public ASECredentials(CredentialsScope scope, String id, String description, String username, String password) {
+	public ASECredentials(CredentialsScope scope, String id, String description, String username, String password) throws Descriptor.FormException {
 		super(scope, description, description, username, password);
 	}
 	
