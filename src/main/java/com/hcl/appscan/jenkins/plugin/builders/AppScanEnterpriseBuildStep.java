@@ -74,6 +74,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 import hudson.model.AutoCompletionCandidates;
+import hudson.model.Descriptor;
 import hudson.remoting.Callable;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -151,7 +152,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		m_contact = "";
 	}
 	
-	public String getCredentials() {
+	public String getCredentials() throws Descriptor.FormException {
 		// Post autocomplete feature, to handle backward compatibiliy 
 		// we have to initialize autocomplete lists explicitly 
 		// for already existing jobs.
@@ -379,15 +380,23 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 	@Override
 	public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
 			throws IOException, InterruptedException {
-		performScan((Run<?, ?>) build, launcher, listener);
-		return true;
+        try {
+            performScan((Run<?, ?>) build, launcher, listener);
+        } catch (Descriptor.FormException e) {
+            throw new AbortException(e.getMessage());
+        }
+        return true;
 	}
 
 	@Override
 	public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener)
 			throws InterruptedException, IOException {
-		performScan((Run<?, ?>) run, launcher, listener);
-	}
+        try {
+            performScan((Run<?, ?>) run, launcher, listener);
+        } catch (Descriptor.FormException e) {
+            throw new AbortException(e.getMessage());
+        }
+    }
 
 	@Override
 	public BuildStepMonitor getRequiredMonitorService() {
@@ -475,10 +484,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
     	}
 
 	private void performScan(Run<?, ?> build, Launcher launcher, TaskListener listener)
-			throws InterruptedException, IOException {
-		if(m_credentials == null || m_credentials.isEmpty()) {
-			throw new AbortException(Messages.error_credential_validation());
-		}
+            throws InterruptedException, IOException, Descriptor.FormException {
 		readResolve();
 		Map<String, String> properties = getScanProperties(build, listener);
 		final IProgress progress = new ScanProgress(listener);
@@ -600,7 +606,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 
 		public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials,
-				@AncestorInPath ItemGroup<?> context) {
+				@AncestorInPath ItemGroup<?> context) throws FormException {
 
 			ListBoxModel model = new ListBoxModel();
 			List<ASECredentials> credentialsList = CredentialsProvider.lookupCredentials(ASECredentials.class, context,
@@ -671,16 +677,14 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 
 		public ListBoxModel doFillTestPolicyItems(@QueryParameter String credentials,
-				@AncestorInPath ItemGroup<?> context) { // $NON-NLS-1$
-			ListBoxModel model = new ListBoxModel();
-			// Add empty option as the default selection
-			model.add("", "");
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return model;
-			}
+				@AncestorInPath ItemGroup<?> context) throws FormException { // $NON-NLS-1$
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			IComponent componentProvider = ConfigurationProviderFactory.getScanner("TestPolicies", authProvider);
 			Map<String, String> items = componentProvider.getComponents();
+			ListBoxModel model = new ListBoxModel();
+
+			// Add empty option as the default selection
+			model.add("", "");
 
 			if (items != null) {
 				List<Entry<String, String>> list = sortComponents(items.entrySet());
@@ -710,15 +714,12 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 
 		public ListBoxModel doFillAgentItems(@QueryParameter String credentials,
-				@AncestorInPath ItemGroup<?> context) { // $NON-NLS-1$
-			ListBoxModel model = new ListBoxModel();
-			model.add(""); //$NON-NLS-1$
-			if(credentials == null || credentials.trim().isEmpty()) {
-				return model;
-			}
+				@AncestorInPath ItemGroup<?> context) throws FormException { // $NON-NLS-1$
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			IComponent componentProvider = ConfigurationProviderFactory.getScanner("Agent", authProvider);
 			Map<String, String> items = componentProvider.getComponents();
+			ListBoxModel model = new ListBoxModel();
+			model.add(""); //$NON-NLS-1$
 
 			if (items != null) {
 				List<Entry<String, String>> list = sortComponents(items.entrySet());
@@ -741,7 +742,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 
 		public FormValidation doCheckCredentials(@QueryParameter String credentials,
-				@AncestorInPath ItemGroup<?> context) {
+				@AncestorInPath ItemGroup<?> context) throws FormException {
 			if (credentials.trim().equals("")) //$NON-NLS-1$
 				return FormValidation.errorWithMarkup(Messages.error_no_creds_ase("/credentials")); //$NON-NLS-1$
 
@@ -769,10 +770,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		}
 
 		//This method will initialize Template, folder and application list.
-		private void setAutoCompleteList(String credentials, ItemGroup<?> context) {
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return;
-			}
+		private void setAutoCompleteList(String credentials, ItemGroup<?> context) throws FormException {
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
 			IComponent folderComponentProvider = ConfigurationProviderFactory.getScanner("Folder", authProvider);
 			folderMap = folderComponentProvider.getComponents();

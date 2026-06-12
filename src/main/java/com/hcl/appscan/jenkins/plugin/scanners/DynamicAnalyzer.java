@@ -369,13 +369,10 @@ public class DynamicAnalyzer extends Scanner {
 			return "Dynamic Analysis (DAST)";
 		}
 
-		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException {
-			ListBoxModel model = new ListBoxModel();
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return model;
-			}
+		public ListBoxModel doFillExecutionIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws JSONException, FormException {
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
 			JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId);
+			ListBoxModel model = new ListBoxModel();
 			if(executionDetails != null) {
 				for(int i = 0; i < executionDetails.length(); i++) {
 					JSONObject value = executionDetails.getJSONObject(i);
@@ -403,14 +400,11 @@ public class DynamicAnalyzer extends Scanner {
 			return model;
 		}
 
-		public ListBoxModel doFillPresenceIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) { //$NON-NLS-1$
-			ListBoxModel model = new ListBoxModel();
-			model.add(""); //$NON-NLS-1$
-			if (credentials ==  null || credentials.trim().isEmpty()) {
-				return model;
-			}
+		public ListBoxModel doFillPresenceIdItems(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException { //$NON-NLS-1$
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
 			Map<String, String> presences = new CloudPresenceProvider(authProvider).getPresences();
+			ListBoxModel model = new ListBoxModel();
+			model.add(""); //$NON-NLS-1$
 
 			if (presences != null) {
 				List<Map.Entry<String, String>> list = sortPresences(presences.entrySet());
@@ -439,10 +433,7 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.ok();
 		}
 
-		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials,@RelativePath("..") @QueryParameter String application, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) {
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return FormValidation.error(Messages.error_credential_validation());
-			}
+		public FormValidation doCheckTarget(@QueryParameter String target,@RelativePath("..") @QueryParameter String credentials,@RelativePath("..") @QueryParameter String application, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId, @QueryParameter boolean rescanDast) throws FormException {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
 
 			// Check if the user has a valid entitlement
@@ -479,10 +470,7 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.validateRequired(target);
 		}
 
-		public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException {
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return FormValidation.error(Messages.error_credential_validation());
-			}
+		public FormValidation doCheckScanId(@QueryParameter String scanId, @RelativePath("..") @QueryParameter String application, @RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws JSONException, FormException {
 			JenkinsAuthenticationProvider provider = new JenkinsAuthenticationProvider(credentials, context);
             if(scanId!=null && !scanId.isEmpty()) {
 				JSONObject scanDetails = new CloudScanServiceProvider(provider).getScanDetails(DYNAMIC_ANALYZER, scanId);
@@ -491,10 +479,7 @@ public class DynamicAnalyzer extends Scanner {
 			return FormValidation.validateRequired(scanId);
 		}
 
-		public FormValidation doCheckExecutionId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) {
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return FormValidation.error(Messages.error_credential_validation());
-			}
+		public FormValidation doCheckExecutionId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String scanId) throws FormException {
 			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
 			JSONArray executionDetails = new CloudScanServiceProvider(authProvider).getBaseScanDetails(scanId);
 			if(executionDetails == null) {
@@ -504,10 +489,7 @@ public class DynamicAnalyzer extends Scanner {
 			}
 		}
 
-		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) {
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return FormValidation.error(Messages.error_credential_validation());
-			}
+		public FormValidation doCheckPresenceId(@RelativePath("..") @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context, @QueryParameter String presenceId) throws FormException {
 			JenkinsAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials,context);
 			if(authProvider.isAppScan360()){
 				return FormValidation.error(Messages.error_presence_AppScan360());

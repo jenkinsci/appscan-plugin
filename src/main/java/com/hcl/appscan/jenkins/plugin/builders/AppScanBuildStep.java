@@ -70,6 +70,7 @@ import hudson.model.Result;
 import hudson.model.Items;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.model.Descriptor;
 import hudson.remoting.Callable;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -236,13 +237,21 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     
     @Override
     public boolean perform(AbstractBuild<?,?> build, Launcher launcher, BuildListener listener) throws IOException, InterruptedException {
-	perform((Run<?,?>)build, launcher, listener);
-	        return true;
+        try {
+            perform((Run<?,?>)build, launcher, listener);
+        } catch (Descriptor.FormException e) {
+            throw new AbortException(e.getMessage());
+        }
+        return true;
     }
     
         @Override
         public void perform(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-	        perform(run, launcher, listener);
+            try {
+                perform(run, launcher, listener);
+            } catch (Descriptor.FormException e) {
+                throw new AbortException(e.getMessage());
+            }
         }
     
     @Override
@@ -304,11 +313,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 	    }
 	}
     
-    private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
-    	if(m_credentials == null || m_credentials.trim().isEmpty()) {
-			throw new AbortException(Messages.error_credential_validation());
-		}
-		m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
+    private void perform(Run<?,?> build, Launcher launcher, TaskListener listener) throws InterruptedException, IOException, Descriptor.FormException {
+    	m_authProvider = new JenkinsAuthenticationProvider(m_credentials, build.getParent().getParent());
     	final IProgress progress = new ScanProgress(listener);
     	final boolean suspend = m_wait;
         Map<String, String> properties = getScanProperties(build,listener);
@@ -455,13 +461,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		return model;
     	}
     	
-    	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-			ListBoxModel model = new ListBoxModel();
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return model;
-			}
+    	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
+    		ListBoxModel model = new ListBoxModel();
     		
     		if(applications != null) {
         		List<Entry<String , String>> list=sortApplications(applications.entrySet());
@@ -486,7 +489,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		return list;
     	}
     	
-    	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
+    	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
     		if(credentials.trim().equals("")) //$NON-NLS-1$
     			return FormValidation.errorWithMarkup(Messages.error_no_creds("/credentials")); //$NON-NLS-1$
     		
@@ -497,23 +500,17 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		return FormValidation.ok();
     	}
     	
-    	public FormValidation doCheckApplication(@QueryParameter String application, @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-			if (credentials == null || credentials.trim().isEmpty()) {
-				return FormValidation.error(Messages.error_credential_validation());
-			}
-			IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
+    	public FormValidation doCheckApplication(@QueryParameter String application, @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
+            IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
             Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
-            if((applications==null || applications.isEmpty()) && !credentials.isEmpty()){
+            if((applications==null || applications.isEmpty()) && !credentials.equals("")){
                 return FormValidation.error(Messages.error_application_empty_ui());
             } else {
                 return FormValidation.validateRequired(application);
             }
     	}
 
-	public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-		if (credentials == null	|| credentials.trim().isEmpty()) {
-			return FormValidation.error(Messages.error_credential_validation());
-		}
+	public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
 		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
 		if((intervention && checkAppScan360Connection.isAppScan360())){
 			return FormValidation.error(Messages.error_allow_intervention_ui());
