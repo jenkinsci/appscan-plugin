@@ -489,7 +489,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		Map<String, String> properties = getScanProperties(build, listener);
 		final IProgress progress = new ScanProgress(listener);
 
-		progress.setStatus(new Message(Message.INFO, Messages.test_policy_deprecation()));
+		progress.setStatus(new Message(Message.WARNING, Messages.test_policy_deprecation()));
 		if (m_target !=null && !m_target.isEmpty() && !checkURLAccessibility(m_target)) {
             		throw new AbortException(Messages.error_url_validation(m_target));
         	}
