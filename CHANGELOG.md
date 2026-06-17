@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+1.8.3 (June, 2026)
+------
+- Bug fixes and minor enhancements.
+
 1.8.2 (March, 2026)
 ------
 - Bug fixes and minor enhancements.
