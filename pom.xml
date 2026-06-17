@@ -106,7 +106,7 @@
   
   <scm>
   	<connection>scm:git:https://github.com/jenkinsci/appscan-plugin.git</connection>
-  	<developerConnection>scm:git:https://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
+  	<developerConnection>scm:git:ssh://git@github.com/jenkinsci/appscan-plugin.git</developerConnection>
   	<url>https://github.com/jenkinsci/appscan-plugin</url>
     <tag>HEAD</tag>
   </scm>
