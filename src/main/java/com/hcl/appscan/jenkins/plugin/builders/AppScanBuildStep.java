@@ -11,37 +11,25 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.Comparator;
 
 import javax.annotation.Nonnull;
 
-import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.hcl.appscan.sdk.CoreConstants;
-import com.hcl.appscan.sdk.app.CloudApplicationProvider;
-import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
-import com.hcl.appscan.sdk.error.InvalidTargetException;
-import com.hcl.appscan.sdk.error.ScannerException;
-import com.hcl.appscan.sdk.logging.IProgress;
-import com.hcl.appscan.sdk.logging.Message;
-import com.hcl.appscan.sdk.logging.StdOutProgress;
-import com.hcl.appscan.sdk.results.IResultsProvider;
-import com.hcl.appscan.sdk.scan.IScan;
-
-import com.hcl.appscan.sdk.utils.SystemUtil;
+import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
 import com.hcl.appscan.jenkins.plugin.Messages;
 import com.hcl.appscan.jenkins.plugin.ScanFactory;
 import com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever;
@@ -52,8 +40,20 @@ import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
 import com.hcl.appscan.jenkins.plugin.scanners.Scanner;
 import com.hcl.appscan.jenkins.plugin.scanners.ScannerFactory;
 import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
-import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
 import com.hcl.appscan.jenkins.plugin.util.JenkinsUtil;
+import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
+import com.hcl.appscan.sdk.CoreConstants;
+import com.hcl.appscan.sdk.app.CloudApplicationProvider;
+import com.hcl.appscan.sdk.auth.IAuthenticationProvider;
+import com.hcl.appscan.sdk.error.InvalidTargetException;
+import com.hcl.appscan.sdk.error.ScannerException;
+import com.hcl.appscan.sdk.logging.IProgress;
+import com.hcl.appscan.sdk.logging.Message;
+import com.hcl.appscan.sdk.logging.StdOutProgress;
+import com.hcl.appscan.sdk.results.IResultsProvider;
+import com.hcl.appscan.sdk.scan.IScan;
+import com.hcl.appscan.sdk.scanners.ScanConstants;
+import com.hcl.appscan.sdk.utils.SystemUtil;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -65,9 +65,10 @@ import hudson.init.Initializer;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Item;
 import hudson.model.ItemGroup;
-import hudson.model.Result;
 import hudson.model.Items;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.model.Descriptor;
@@ -442,23 +443,25 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             	return Messages.label_build_step();
         }
     	
-    	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) {
-    		//We could just use listCredentials() to get the ListBoxModel, but need to work around JENKINS-12802.
-    		ListBoxModel model = new ListBoxModel();
-    		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
-    				ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
-    		boolean hasSelected = false;
-    		
-    		for(ASoCCredentials creds : credentialsList) {
-    			if(creds.getId().equals(credentials))
-    				hasSelected = true;
-    			String displayName = creds.getDescription();
-    			displayName = displayName == null || displayName.equals("") ? creds.getUsername() + "/******" : displayName; //$NON-NLS-1$
-    			model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); //$NON-NLS-1$
+    	@RequirePOST
+    	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials, @AncestorInPath Item context) {
+    		StandardUsernameListBoxModel model = new StandardUsernameListBoxModel();
+
+    		if (context == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+    			return model;
+    		} else if (!context.hasPermission(Item.EXTENDED_READ) &&
+    				!context.hasPermission(CredentialsProvider.USE_ITEM)) {
+    			return model;
     		}
-    		if(!hasSelected)
-    			model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
-    		return model;
+
+    		return model.includeEmptyValue() 
+    				.includeAs(
+    						ACL.SYSTEM2, 
+    						context, 
+    						ASoCCredentials.class, 
+    						Collections.emptyList()
+    						)
+    				.includeCurrentValue(credentials);
     	}
     	
     	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {

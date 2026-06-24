@@ -13,18 +13,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.Set;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
-import com.hcl.appscan.jenkins.plugin.scanModes.ScanMode;
-import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeConstants;
-import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeFactory;
-import com.hcl.appscan.sdk.scanners.ScanConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
@@ -32,9 +28,22 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
+import com.hcl.appscan.jenkins.plugin.Messages;
+import com.hcl.appscan.jenkins.plugin.ScanFactory;
+import com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever;
+import com.hcl.appscan.jenkins.plugin.auth.ASECredentials;
+import com.hcl.appscan.jenkins.plugin.auth.ASEJenkinsAuthenticationProvider;
+import com.hcl.appscan.jenkins.plugin.results.FailureCondition;
+import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanMode;
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeConstants;
+import com.hcl.appscan.jenkins.plugin.scanModes.ScanModeFactory;
+import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
+import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
 import com.hcl.appscan.sdk.CoreConstants;
 import com.hcl.appscan.sdk.app.ASEApplicationProvider;
 import com.hcl.appscan.sdk.auth.IASEAuthenticationProvider;
@@ -49,17 +58,8 @@ import com.hcl.appscan.sdk.logging.StdOutProgress;
 import com.hcl.appscan.sdk.results.ASEResultsProvider;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.sdk.scan.IScan;
-
+import com.hcl.appscan.sdk.scanners.ScanConstants;
 import com.hcl.appscan.sdk.utils.SystemUtil;
-import com.hcl.appscan.jenkins.plugin.Messages;
-import com.hcl.appscan.jenkins.plugin.ScanFactory;
-import com.hcl.appscan.jenkins.plugin.actions.ResultsRetriever;
-import com.hcl.appscan.jenkins.plugin.auth.ASEJenkinsAuthenticationProvider;
-import com.hcl.appscan.jenkins.plugin.auth.ASECredentials;
-import com.hcl.appscan.jenkins.plugin.results.FailureCondition;
-import com.hcl.appscan.jenkins.plugin.results.ResultsInspector;
-import com.hcl.appscan.jenkins.plugin.util.BuildVariableResolver;
-import com.hcl.appscan.jenkins.plugin.util.ScanProgress;
 
 import hudson.AbortException;
 import hudson.Extension;
@@ -68,13 +68,13 @@ import hudson.Launcher;
 import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.AutoCompletionCandidates;
 import hudson.model.BuildListener;
+import hudson.model.Descriptor;
+import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import jenkins.model.Jenkins;
-import hudson.model.AutoCompletionCandidates;
-import hudson.model.Descriptor;
 import hudson.remoting.Callable;
 import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
@@ -84,6 +84,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import hudson.util.VariableResolver;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
 public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildStep, Serializable {
@@ -604,39 +605,41 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		public String getDisplayName() {
 			return Messages.label_asebuild_step();
 		}
+		
+    	@RequirePOST
+    	public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials, @AncestorInPath Item context) throws FormException {
+    		StandardUsernameListBoxModel model = new StandardUsernameListBoxModel();
 
-		public ListBoxModel doFillCredentialsItems(@QueryParameter String credentials,
-				@AncestorInPath ItemGroup<?> context) throws FormException {
+    		if (context == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+    			return model;
+    		} else if (!context.hasPermission(Item.EXTENDED_READ) &&
+    				!context.hasPermission(CredentialsProvider.USE_ITEM)) {
+    			return model;
+    		}
 
-			ListBoxModel model = new ListBoxModel();
-			List<ASECredentials> credentialsList = CredentialsProvider.lookupCredentials(ASECredentials.class, context,
-					ACL.SYSTEM, Collections.<DomainRequirement>emptyList());
-			boolean hasSelected = false;
-
-			for (ASECredentials creds : credentialsList) {
-				if (creds.getId().equals(credentials))
-					hasSelected = true;
-				String displayName = creds.getDescription();
-				displayName = displayName == null || displayName.equals("") ? creds.getUsername() + "/******" //$NON-NLS-1$
-						: displayName;
-				model.add(new ListBoxModel.Option(displayName, creds.getId(), creds.getId().equals(credentials))); // $NON-NLS-1$
-			}
-			if (!hasSelected)
-			{
-				model.add(new ListBoxModel.Option("", "", true)); //$NON-NLS-1$ //$NON-NLS-2$
-				//Resetting autocomplete lists
+    		model.includeEmptyValue() 
+    		.includeAs(
+    				ACL.SYSTEM2, 
+    				context, 
+    				ASECredentials.class, 
+    				Collections.emptyList()
+    				);
+    		
+    		if(model.stream().anyMatch(option -> credentials.equals(option.value))) {
+    			setAutoCompleteList(credentials, context.getParent()); //set AutoComplete lists if credential is selected
+    		}
+    		else {
+				//Reset autocomplete lists
 				sortedTemplateList = null;
 				sortedFolderList = null;
 				sortedApplicationList = null;
 				templateMap = null;
 				folderMap = null;
 				applicationMap = null;
-			}
-			else {
-				setAutoCompleteList(credentials, context); //set AutoComplete lists if credential is selected
-			}
-			return model;
-		}
+    		}
+
+    		return model.includeCurrentValue(credentials);
+    	}
 
 		public AutoCompletionCandidates doAutoCompleteApplication(@QueryParameter String value) {
 			AutoCompletionCandidates model = new AutoCompletionCandidates();
