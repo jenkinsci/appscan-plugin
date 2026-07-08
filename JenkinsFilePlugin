@@ -1,7 +1,7 @@
 pipeline {
     // For actual build, ensure this labeled node is online and available.
     // For testing, you can comment this and use: agent any
-    agent { label 'jenkinsAgent' }
+    agent { label 'pluginJenkins' }
 
     tools {
         jdk 'TOOLS-JDK-17'
@@ -11,8 +11,8 @@ pipeline {
     options {
         timestamps()
         timeout(time: 30, unit: 'MINUTES')
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-        skipDefaultCheckout(true)     //Since i am checking out later in code, avoid automatic checkout at start of pipeline
+        buildDiscarder(logRotator(numToKeepStr: '10'))  //Keep only the latest 10 build records for this job.
+        skipDefaultCheckout(true)     //Skip automatic checkout; the repository is checked out later in the pipeline.
     }
 
     environment {
@@ -30,11 +30,7 @@ pipeline {
                     // Federal jobs require config.xml-defined parameters.
                     // This Jenkinsfile must not define a parameters block.
 
-                    env.THIS_OS = isUnix() ? 'linux' : 'windows'
-
                     env.GIT_BRANCH_NAME = ((params?.BRANCH_TO_BUILD ?: env.BRANCH_TO_BUILD ?: 'master') as String).trim()
-                    env.FEDERAL_AP_JIRA_TICKET = ((params?.FEDERAL_AP_JIRA_TICKET ?: env.FEDERAL_AP_JIRA_TICKET ?: '') as String).trim()
-                    env.BUILD_NOTIFICATION_EMAILS = ((params?.BUILD_NOTIFICATION_EMAILS ?: env.BUILD_NOTIFICATION_EMAILS ?: '') as String).trim()
 
                     def isFederal = env.GLOBAL_JENKINS_FEDERAL?.toBoolean()
 
@@ -45,24 +41,10 @@ pipeline {
                         if (!currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')) {
                             error('Federal AP supports on-demand builds only. ' + 'Start the build manually from an approved Jira request.')
                         }
-                        if (!env.FEDERAL_AP_JIRA_TICKET) {
-                            error('FEDERAL_AP_JIRA_TICKET is required for Federal builds.')
-                        }
-                        if (!env.BUILD_NOTIFICATION_EMAILS) {
-                            error('BUILD_NOTIFICATION_EMAILS is required for Federal builds.')
-                        }
                     }
 
-                    echo "Running on OS: ${env.THIS_OS}"
                     echo "GLOBAL_JENKINS_FEDERAL=${env.GLOBAL_JENKINS_FEDERAL ?: 'false'}"
                     echo "Branch=${env.GIT_BRANCH_NAME}"
-
-                    if (env.THIS_OS == 'linux' || isFederal) {
-                        echo(
-                            'Federal/Linux guardrails enabled. External dependency access may be limited; Mirror dependencies in GitHub.'
-                        )
-                    }
-                    echo 'Artifacts will be available in the standard Jenkins artifact server.'
                 }
             }
         }
@@ -91,93 +73,11 @@ pipeline {
             }
         }
 
-        stage('Build Info') {
-            steps {
-                script {
-                    def buildStartedBy = 'Unknown'
-                    def causes = currentBuild.getBuildCauses()
-                    for (cause in causes) {
-                        if (cause.userId) {
-                            buildStartedBy = cause.userId
-                        } else if (cause.shortDescription) {
-                            buildStartedBy = cause.shortDescription
-                        }
-                    }
-                    echo "Build started by: ${buildStartedBy}"
-
-                    // Get git commit info
-                    def gitCommit = ''
-                    if (isUnix()) {
-                        gitCommit = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                    } else {
-                        gitCommit = bat(script: '@git rev-parse HEAD', returnStdout: true).trim()
-                    }
-
-                    // Set build description visible in Jenkins build history UI
-                    currentBuild.description = "Branch: ${env.GIT_BRANCH_NAME} | Commit: ${gitCommit.take(8)} | By: ${buildStartedBy}"
-
-                    // Create BUILDINFO.json
-                    def buildInfo = groovy.json.JsonOutput.toJson([
-                        description : 'AppScan Plugin Build Information',
-                        jobUrl      : env.BUILD_URL,
-                        buildDate   : new Date().format('yyyy-MM-dd HH:mm:ss'),
-                        startedBy   : buildStartedBy,
-                        buildNumber : env.BUILD_NUMBER,
-                        parameters  : [
-                            BRANCH_TO_BUILD      : env.GIT_BRANCH_NAME,
-                            FEDERAL_AP_JIRA_TICKET: env.FEDERAL_AP_JIRA_TICKET,
-                            BUILD_NOTIFICATION_EMAILS: env.BUILD_NOTIFICATION_EMAILS,
-                            GLOBAL_JENKINS_FEDERAL: env.GLOBAL_JENKINS_FEDERAL ?: 'false'
-                        ],
-                        branchInfo  : [
-                            name   : env.REPO_NAME,
-                            branch : env.GIT_BRANCH_NAME,
-                            commit : gitCommit,
-                            url    : env.REPO_URL
-                        ]
-                    ])
-                    writeFile file: 'BUILDINFO.json', text: groovy.json.JsonOutput.prettyPrint(buildInfo)
-                    echo 'BUILDINFO.json created'
-                }
-            }
-        }
-
-        stage('Changeset Info') {
-            steps {
-                script {
-                    def gitLogOutput = isUnix()
-                        ? sh(script:  'git log --pretty=format:"%H~%an~%ad~%s" --date=format:"%Y-%m-%d %H:%M:%S" -20', returnStdout: true).trim()
-                        : bat(script: '@git log --pretty=format:"%%H~%%an~%%ad~%%s" --date=format:"%%Y-%%m-%%d %%H:%%M:%%S" -20', returnStdout: true).trim()
-
-                    def changes = gitLogOutput
-                        ? gitLogOutput.readLines().collect { line ->
-                            def parts = line.split('~', 4)
-                            [
-                                commitId: parts[0]?.trim(),
-                                author  : parts[1]?.trim(),
-                                date    : parts[2]?.trim(),
-                                message : parts[3]?.trim()
-                            ]
-                        }
-                        : []
-
-                    writeFile file: 'CHANGEINFO.json',
-                              text: groovy.json.JsonOutput.prettyPrint(
-                                        groovy.json.JsonOutput.toJson([
-                                            description : 'AppScan Plugin Changeset History',
-                                            buildNumber : env.BUILD_NUMBER,
-                                            totalChanges: changes.size(),
-                                            changes     : changes
-                                        ]))
-                    echo "CHANGEINFO.json created with ${changes.size()} change(s)"
-                }
-            }
-        }
 
         stage('Build Plugin') {
             steps {
                 script {
-                    isUnix() ? sh('mvn -B clean verify') : bat('mvn -B clean verify')
+                    sh('mvn -B clean verify')
                 }
             }
         }
@@ -192,19 +92,9 @@ pipeline {
     post {
         success {
             echo "Plugin build successful! Build #${env.BUILD_NUMBER}"
-            emailext(
-            to: env.BUILD_NOTIFICATION_EMAILS,
-            subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: "Build completed successfully: ${env.BUILD_URL}"
-        )
         }
         failure {
             echo "Build #${env.BUILD_NUMBER} failed. Check logs: ${env.BUILD_URL}console"
-            emailext(
-            to: env.BUILD_NOTIFICATION_EMAILS,
-            subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-            body: "Build failed: ${env.BUILD_URL}"
-        )
         }
         always {
             cleanWs()
