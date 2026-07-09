@@ -5,14 +5,6 @@
 
 package com.hcl.appscan.jenkins.plugin.auth;
 
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.hcl.appscan.jenkins.plugin.util.ASESessionManager;
-import com.hcl.appscan.sdk.auth.ASEAuthenticationHandler;
-import com.hcl.appscan.sdk.auth.IASEAuthenticationProvider;
-import hudson.model.Descriptor;
-import hudson.model.ItemGroup;
-import hudson.util.Secret;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.Proxy;
@@ -20,7 +12,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.wink.json4j.JSONException;
+
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.hcl.appscan.jenkins.plugin.util.ASESessionManager;
+import com.hcl.appscan.sdk.auth.ASEAuthenticationHandler;
+import com.hcl.appscan.sdk.auth.IASEAuthenticationProvider;
+
+import hudson.model.ItemGroup;
+import hudson.model.Descriptor.FormException;
+import hudson.util.Secret;
 
 public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvider, Serializable {
 
@@ -30,9 +33,9 @@ public class ASEJenkinsAuthenticationProvider implements IASEAuthenticationProvi
 	transient private static final Object m_object = new Object();
 	transient private Boolean m_reloaded = null;
 
-	public ASEJenkinsAuthenticationProvider(String id, ItemGroup<?> context) throws Descriptor.FormException {
+	public ASEJenkinsAuthenticationProvider(String id, ItemGroup<?> context) throws FormException {
         m_reloaded = true;
-		List<ASECredentials> credentialsList = CredentialsProvider.lookupCredentials(ASECredentials.class, context,
+		List<ASECredentials> credentialsList = CredentialsProvider.lookupCredentialsInItemGroup(ASECredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
 		for(ASECredentials creds : credentialsList) {
 			if(creds.getId().equals(id)) {
