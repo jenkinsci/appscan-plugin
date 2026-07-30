@@ -5,7 +5,7 @@ pipeline {
 
     tools {
         jdk 'TOOLS-JDK-17'
-        maven 'Maven 3.6.1'
+        maven 'Maven 3.8.4'
     }
 
     environment {
@@ -65,7 +65,6 @@ pipeline {
                 }
             }
         }
-
 
         stage('Build Plugin') {
             steps {
