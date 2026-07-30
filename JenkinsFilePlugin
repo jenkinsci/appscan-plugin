@@ -8,13 +8,6 @@ pipeline {
         maven 'Maven 3.6.1'
     }
 
-    options {
-        timestamps()
-        timeout(time: 30, unit: 'MINUTES')
-        buildDiscarder(logRotator(numToKeepStr: '10'))  //Keep only the latest 10 build records for this job.
-        skipDefaultCheckout(true)     //Skip automatic checkout; the repository is checked out later in the pipeline.
-    }
-
     environment {
         REPO_URL = 'https://github.com/jenkinsci/appscan-plugin.git'
         REPO_NAME = 'jenkinsci/appscan-plugin'
