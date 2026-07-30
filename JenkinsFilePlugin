@@ -36,7 +36,8 @@ pipeline {
                         }
                     }
 
-                    echo "GLOBAL_JENKINS_FEDERAL=${env.GLOBAL_JENKINS_FEDERAL ?: 'false'}"
+                    def federalFlag = env.GLOBAL_JENKINS_FEDERAL ?: 'false'
+                    echo "GLOBAL_JENKINS_FEDERAL=${federalFlag}"
                     echo "Branch=${env.GIT_BRANCH_NAME}"
                 }
             }
@@ -76,7 +77,7 @@ pipeline {
 
         stage('Archive Artifacts') {
             steps {
-                archiveArtifacts artifacts: '**/target/*.hpi, BUILDINFO.json, CHANGEINFO.json', allowEmptyArchive: false , fingerprint: true
+                archiveArtifacts artifacts: '**/target/*.hpi', allowEmptyArchive: false, fingerprint: true
             }
         }
     }
