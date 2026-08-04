@@ -4,8 +4,8 @@ pipeline {
     agent { label 'pluginJenkins' }
 
     tools {
-        jdk 'TOOLS-JDK-17'
-        maven 'Maven 3.8.4'
+        jdk 'TOOLS-JDK-17-linux'
+        maven 'apache-maven-3.8.4-linux'
     }
 
     environment {
