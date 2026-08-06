@@ -21,7 +21,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.AncestorInPath;
@@ -175,7 +175,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// configuration. 
 		if (getDescriptor().folderMap != null &&
 				getDescriptor().folderMap.get(m_folder) != null) {
-			String folder = StringEscapeUtils.unescapeHtml(
+			String folder = StringEscapeUtils.unescapeHtml4(
 					getDescriptor().folderMap.get(m_folder));
 			return folder;
 		}
@@ -192,7 +192,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// configuration. 
 		if (getDescriptor().templateMap != null &&
 				getDescriptor().templateMap.get(m_template) != null) {
-        	String template = StringEscapeUtils.unescapeHtml(
+        	String template = StringEscapeUtils.unescapeHtml4(
         			getDescriptor().templateMap.get(m_template));
         	return template;
 		}
@@ -217,7 +217,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		// configuration. 
 		if (getDescriptor().applicationMap != null &&
 				getDescriptor().applicationMap.get(m_application) != null) {
-			String appName = StringEscapeUtils.unescapeHtml(
+			String appName = StringEscapeUtils.unescapeHtml4(
 					getDescriptor().applicationMap.get(m_application));
 			return appName;
 		}
@@ -475,7 +475,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
     	private String getUpdatedApplicationId(Map<String, String> application){
         	if(application != null) {
             	for(Map.Entry<String, String> entry : application.entrySet()){
-                	String appName = StringEscapeUtils.unescapeHtml(entry.getValue());
+                	String appName = StringEscapeUtils.unescapeHtml4(entry.getValue());
                 	if(appName != null && appName.equals(m_application)) {
                     	return entry.getKey();
                 		}
@@ -645,7 +645,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			AutoCompletionCandidates model = new AutoCompletionCandidates();
 			if (sortedApplicationList != null) {
 				for(Map.Entry<String, String> entry : sortedApplicationList) {
-					String appName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					String appName = StringEscapeUtils.unescapeHtml4(entry.getValue());
 					if (value.equals(SHOW_ALL)) {
 						model.add(appName);
 					}
@@ -664,7 +664,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			AutoCompletionCandidates model = new AutoCompletionCandidates();
 			if (sortedFolderList != null) {
 				for(Map.Entry<String, String> entry : sortedFolderList) {
-					String folderName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					String folderName = StringEscapeUtils.unescapeHtml4(entry.getValue());
 					if (value.equals(SHOW_ALL)) {
 						model.add(folderName);
 					}
@@ -701,7 +701,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			AutoCompletionCandidates model = new AutoCompletionCandidates();
 			if (sortedTemplateList != null) {
 				for(Map.Entry<String, String> entry : sortedTemplateList) {
-					String templateName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					String templateName = StringEscapeUtils.unescapeHtml4(entry.getValue());
 					if (value.equals(SHOW_ALL)) {
 						model.add(templateName);
 					}
@@ -794,7 +794,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		private String getApplicationId(String application) {
 			if (sortedApplicationList != null) {
 				for(Map.Entry<String, String> entry : sortedApplicationList) {
-					String appName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					String appName = StringEscapeUtils.unescapeHtml4(entry.getValue());
 					if (appName != null && appName.equals(application)) {
 						return entry.getKey();
 					}
@@ -812,7 +812,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		private String getFolderId(String folder) {
 			if (sortedFolderList != null) {
 				for(Map.Entry<String, String> entry : sortedFolderList) {
-					String folderName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					String folderName = StringEscapeUtils.unescapeHtml4(entry.getValue());
 					if(folderName != null && folderName.equals(folder)) {
 						return entry.getKey();
 					}
@@ -830,7 +830,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 		private String getTemplateId(String template) {
 			if (sortedTemplateList != null) {
 				for(Map.Entry<String, String> entry : sortedTemplateList) {
-					String templateName = StringEscapeUtils.unescapeHtml(entry.getValue());
+					String templateName = StringEscapeUtils.unescapeHtml4(entry.getValue());
 					if(templateName != null && templateName.equals(template)) {
 						return entry.getKey();
 					}
