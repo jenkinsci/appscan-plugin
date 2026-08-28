@@ -5,7 +5,6 @@ import com.hcl.appscan.sdk.CoreConstants;
 public interface ScannerConstants {
 	
 	String EMPTY					= "";					//$NON-NLS-1$
-	String ENABLE_MAIL_NOTIFICATION			= "EnableMailNotification";		//$NON-NLS-1$
 	String EXTRA_FIELD				= "ExtraField";				//$NON-NLS-1$
 	String INCLUDE_VERIFIED_DOMAINS			= "IncludeVerifiedDomains";		//$NON-NLS-1$
 	String LOGIN_USER				= "LoginUser";				//$NON-NLS-1$
