@@ -322,7 +322,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
 		if(m_emailNotification) {
-			progress.setStatus(new Message(Message.WARNING, "The email notification setting for scans is obsolete, but the scan continues normally. Manage email notifications in your AppScan on Cloud notification settings. To learn more, see the AppScan on Cloud documentation: Email notifications [https://help.hcl-software.com/appscan/ASoC/r_email_notifications.html]"));
+			progress.setStatus(new Message(Message.WARNING, Messages.warning_mail_notification()));
 		}
 
         m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress, isAppScan360);
