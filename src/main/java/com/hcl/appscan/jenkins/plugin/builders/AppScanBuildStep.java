@@ -322,7 +322,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
 
 		if(m_emailNotification) {
-			progress.setStatus(new Message(Message.WARNING, Messages.warning_mail_notification()));
+			progress.setStatus(new Message(Message.INFO, Messages.warning_mail_notification()));
 		}
 
         m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress, isAppScan360);
