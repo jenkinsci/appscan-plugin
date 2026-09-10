@@ -124,7 +124,7 @@ public class JenkinsAuthenticationProvider implements IAuthenticationProvider, S
 	}
 	
 	public void configureCredentials(String id, ItemGroup<?> context) throws Descriptor.FormException {
-		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentials(ASoCCredentials.class, context,
+		List<ASoCCredentials> credentialsList = CredentialsProvider.lookupCredentialsInItemGroup(ASoCCredentials.class, context,
 				null, Collections.<DomainRequirement>emptyList());
 		for(ASoCCredentials creds : credentialsList) {
 			if(creds.getId().equals(id)) {

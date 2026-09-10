@@ -422,8 +422,6 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
                 properties.put("testPolicyId", m_testPolicy);
                 properties.put("agentServer", m_agent);
                 properties.put("testOptimization", m_testOptimization);
-                properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_email));
-                
                 if(resolver == null) {
                     properties.put("application", m_application);
                     properties.put("startingURL", m_target);
@@ -641,6 +639,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
     		return model.includeCurrentValue(credentials);
     	}
 
+		@RequirePOST
 		public AutoCompletionCandidates doAutoCompleteApplication(@QueryParameter String value) {
 			AutoCompletionCandidates model = new AutoCompletionCandidates();
 			if (sortedApplicationList != null) {
@@ -660,6 +659,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			return model;
 		}
 
+		@RequirePOST
 		public AutoCompletionCandidates doAutoCompleteFolder(@QueryParameter String value) {
 			AutoCompletionCandidates model = new AutoCompletionCandidates();
 			if (sortedFolderList != null) {
@@ -679,6 +679,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			return model;
 		}
 
+		@RequirePOST
 		public ListBoxModel doFillTestPolicyItems(@QueryParameter String credentials,
 				@AncestorInPath ItemGroup<?> context) throws FormException { // $NON-NLS-1$
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
@@ -697,6 +698,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			return model;
 		}
 
+		@RequirePOST
 		public AutoCompletionCandidates doAutoCompleteTemplate(@QueryParameter String value) {
 			AutoCompletionCandidates model = new AutoCompletionCandidates();
 			if (sortedTemplateList != null) {
@@ -716,6 +718,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			return model;
 		}
 
+		@RequirePOST
 		public ListBoxModel doFillAgentItems(@QueryParameter String credentials,
 				@AncestorInPath ItemGroup<?> context) throws FormException { // $NON-NLS-1$
 			IASEAuthenticationProvider authProvider = new ASEJenkinsAuthenticationProvider(credentials, context);
@@ -744,6 +747,7 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			return list;
 		}
 
+		@RequirePOST
 		public FormValidation doCheckCredentials(@QueryParameter String credentials,
 				@AncestorInPath ItemGroup<?> context) throws FormException {
 			if (credentials.trim().equals("")) //$NON-NLS-1$
@@ -756,18 +760,22 @@ public class AppScanEnterpriseBuildStep extends Builder implements SimpleBuildSt
 			return FormValidation.ok();
 		}
 
+		@RequirePOST
 		public FormValidation doCheckTemplate(@QueryParameter String template) {
 			return FormValidation.validateRequired(template);
 		}
 		
+		@RequirePOST
 		public FormValidation doCheckFolder(@QueryParameter String folder) {
 			return FormValidation.validateRequired(folder);
 		}
 		
+		@RequirePOST
 		public FormValidation doCheckTestPolicy(@QueryParameter String testPolicy) {
 			return FormValidation.validateRequired(testPolicy);
 		}
 		
+		@RequirePOST
 		public FormValidation doCheckJobName(@QueryParameter String jobName) {
 			return FormValidation.validateRequired(jobName);
 		}

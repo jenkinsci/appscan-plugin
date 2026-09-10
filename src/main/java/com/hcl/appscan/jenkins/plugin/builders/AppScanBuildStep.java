@@ -278,7 +278,6 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 			properties.put(CoreConstants.SCANNER_TYPE, m_scanner.getType());
 			properties.put(CoreConstants.APP_ID, m_application);
 			properties.put(CoreConstants.SCAN_NAME, resolver == null ? m_name : Util.replaceMacro(m_name, resolver) + "_" + SystemUtil.getTimeStamp()); //$NON-NLS-1$
-			properties.put(CoreConstants.EMAIL_NOTIFICATION, Boolean.toString(m_emailNotification));
 			properties.put(CoreConstants.PERSONAL_SCAN, Boolean.toString(m_personalScan));
 			properties.put("FullyAutomatic", Boolean.toString(!m_intervention));
 			properties.put("APPSCAN_IRGEN_CLIENT", "Jenkins");
@@ -321,6 +320,10 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
         Map<String, String> properties = getScanProperties(build,listener);
         String reportName = properties.get(CoreConstants.SCAN_NAME);
         boolean isAppScan360 = ((JenkinsAuthenticationProvider) m_authProvider).isAppScan360();
+
+		if(m_emailNotification) {
+			progress.setStatus(new Message(Message.INFO, Messages.warning_mail_notification()));
+		}
 
         m_scanner.validateSettings((JenkinsAuthenticationProvider) m_authProvider,properties, progress, isAppScan360);
 
@@ -464,7 +467,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     				.includeCurrentValue(credentials);
     	}
     	
-    	public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
+    	@RequirePOST
+		public ListBoxModel doFillApplicationItems(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
     		IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
     		Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
     		ListBoxModel model = new ListBoxModel();
@@ -492,7 +496,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
 		return list;
     	}
     	
-    	public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
+    	@RequirePOST
+		public FormValidation doCheckCredentials(@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
     		if(credentials.trim().equals("")) //$NON-NLS-1$
     			return FormValidation.errorWithMarkup(Messages.error_no_creds("/credentials")); //$NON-NLS-1$
     		
@@ -503,7 +508,8 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
     		return FormValidation.ok();
     	}
     	
-    	public FormValidation doCheckApplication(@QueryParameter String application, @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
+    	@RequirePOST
+		public FormValidation doCheckApplication(@QueryParameter String application, @QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
             IAuthenticationProvider authProvider = new JenkinsAuthenticationProvider(credentials, context);
             Map<String, String> applications = new CloudApplicationProvider(authProvider).getApplications();
             if((applications==null || applications.isEmpty()) && !credentials.equals("")){
@@ -513,6 +519,7 @@ public class AppScanBuildStep extends Builder implements SimpleBuildStep, Serial
             }
     	}
 
+	@RequirePOST
 	public FormValidation doCheckIntervention(@QueryParameter Boolean intervention,@QueryParameter String credentials, @AncestorInPath ItemGroup<?> context) throws FormException {
 		JenkinsAuthenticationProvider checkAppScan360Connection = new JenkinsAuthenticationProvider(credentials,context);
 		if((intervention && checkAppScan360Connection.isAppScan360())){
