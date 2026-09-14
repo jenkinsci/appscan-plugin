@@ -32,11 +32,11 @@
   </parent>
 
   <properties>
-        <slf4jVersion>1.7.26</slf4jVersion>
-        <jenkins.baseline>2.479</jenkins.baseline>
-        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
-        <findbugs.failOnError>false</findbugs.failOnError>
-        <spotbugs.failOnError>false</spotbugs.failOnError>
+    <slf4jVersion>1.7.26</slf4jVersion>
+    <jenkins.baseline>2.479</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
+    <findbugs.failOnError>false</findbugs.failOnError>
+    <spotbugs.failOnError>false</spotbugs.failOnError>
   </properties>
 	
   <groupId>com.hcl.security</groupId>
@@ -44,23 +44,41 @@
   <version>1.8.5-SNAPSHOT</version>
   <description>This plugin allows you to execute security scans with HCL AppScan</description>
   <packaging>hpi</packaging>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-${jenkins.baseline}.x</artifactId>
-                <version>4023.va_eeb_b_4e45f07</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+
+  <dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>io.jenkins.tools.bom</groupId>
+            <artifactId>bom-${jenkins.baseline}.x</artifactId>
+            <version>4023.va_eeb_b_4e45f07</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hcl</groupId>
+            <artifactId>appscan.sdk</artifactId>
+            <version>1.1.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wink</groupId>
+            <artifactId>wink-json4j</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>credentials</artifactId>
+        </dependency>
+    </dependencies>
 
   <repositories>
-    	<repository>
-      		<id>repo.jenkins-ci.org</id>
-      		<url>https://repo.jenkins-ci.org/public/</url>
-    	</repository>
+    <repository>
+        <id>repo.jenkins-ci.org</id>
+        <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
   </repositories>
 
   <pluginRepositories>
@@ -71,38 +89,86 @@
   </pluginRepositories>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <release>17</release>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-  	    <groupId>org.jenkins-ci.tools</groupId>
-    	<artifactId>maven-hpi-plugin</artifactId>
-      </plugin>
-    </plugins>
+    <!-- SCVS-4.18: Centralize and lock down all plugin versions -->
+    <pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jenkins-ci.tools</groupId>
+                <artifactId>maven-hpi-plugin</artifactId>
+                <version>3.57</version>
+            </plugin>
+            <!-- SCAL-PKGDEP-2: Enforcer plugin for locked plugin versions -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-artifact-plugin</artifactId>
+                <version>3.5.1</version>
+            </plugin>
+        </plugins>
+    </pluginManagement>
+
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <release>17</release>
+              </configuration>
+          </plugin>
+
+          <plugin>
+              <groupId>org.jenkins-ci.tools</groupId>
+              <artifactId>maven-hpi-plugin</artifactId>
+          </plugin>
+
+          <!-- SCAL-PKGDEP-2: Enforce fixed plugin versions & ban dynamic version ranges -->
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-enforcer-plugin</artifactId>
+              <executions>
+                  <execution>
+                      <id>enforce-security-rules</id>
+                      <goals>
+                          <goal>enforce</goal>
+                      </goals>
+                      <configuration>
+                          <rules>
+                              <requirePluginVersions>
+                                  <message>All Maven plugins must have explicit, fixed versions defined!</message>
+                              </requirePluginVersions>
+                              <banDynamicVersions>
+                                  <message>Dynamic versions (ranges, LATEST, RELEASE) are strictly prohibited!</message>
+                                  <allowSnapshots>false</allowSnapshots>
+                              </banDynamicVersions>
+                          </rules>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-artifact-plugin</artifactId>
+              <version>3.5.1</version>
+              <executions>
+                  <execution>
+                      <id>build-checksums</id>
+                      <goals>
+                          <goal>buildinfo</goal>
+                      </goals>
+                  </execution>
+              </executions>
+          </plugin>
+      </plugins>
   </build>
-  
-  <dependencies>
-	<dependency>
-		<groupId>com.hcl</groupId>
-		<artifactId>appscan.sdk</artifactId>
-		<version>1.1.11</version>
-  	</dependency>
-	<dependency>
-  	  	<groupId>org.apache.wink</groupId>
-  		<artifactId>wink-json4j</artifactId>
-  		<version>1.4</version>
-  	</dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>credentials</artifactId>
-        </dependency>
-  </dependencies>
   
   <scm>
   	<connection>scm:git:https://github.com/jenkinsci/appscan-plugin.git</connection>
