@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019, 2024, 2025.
+ * @ Copyright HCL Technologies Ltd. 2019, 2026.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -9,6 +9,7 @@ package com.hcl.appscan.jenkins.plugin.actions;
 import com.hcl.appscan.sdk.utils.FileUtil;
 import hudson.model.Action;
 import hudson.model.Run;
+import hudson.model.Job;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,8 +32,7 @@ import com.hcl.appscan.jenkins.plugin.Messages;
 public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBuildAction {
 
 	private static final String REPORT_SUFFIX = "_report"; //$NON-NLS-1$
-	
-	private final Run<?,?> m_build;	
+
 	private IResultsProvider m_provider;
 	private String m_name;
 	private String m_status;
@@ -46,10 +46,9 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	private int m_infoCount;
 	
 	@DataBoundConstructor
-	public ScanResults(Run<?,?> build, IResultsProvider provider, String name, String status,
+	public ScanResults(Run<?,?> run, IResultsProvider provider, String name, String status,
 			int totalFindings, int criticalCount, int highCount, int mediumCount, int lowCount, int infoCount, String scanServerUrl, String label) {
-		super(build.getParent());
-		m_build = build;
+		super(run);
 		m_provider = provider;
 		m_name = name;
 		m_status = status;
@@ -64,8 +63,14 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
                 getReport();
 	}
 
-	public ScanResults(Run<?,?> build, IResultsProvider provider, String name, String serverUrl, String label) {
-		this(build, provider, name, provider.getStatus(), provider.getFindingsCount(), provider.getCriticalCount(), provider.getHighCount(), provider.getMediumCount(), provider.getLowCount(), provider.getInfoCount(), serverUrl, label);
+	public ScanResults(Run<?,?> run, IResultsProvider provider, String name, String serverUrl, String label) {
+		this(run, provider, name, provider.getStatus(), provider.getFindingsCount(), provider.getCriticalCount(), provider.getHighCount(), provider.getMediumCount(), provider.getLowCount(), provider.getInfoCount(), serverUrl, label);
+	}
+
+	// Helper to get project name safely without breaking serialization
+	public String getProjectName() {
+		Job<?, ?> project = getProject();
+		return project != null ? project.getFullName() : "Unknown Project";
 	}
 	
 	@Override
@@ -81,12 +86,12 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	@Override
 	public Collection<? extends Action> getProjectActions() {
 		HashSet<Action> actions = new HashSet<Action>();
-		actions.add(new ScanResultsTrend(m_build, m_provider.getType(), m_name));
+		actions.add(new ScanResultsTrend(getRun(), m_provider.getType(), m_name));
 		return actions;
 	}
 	
 	public Run<?,?> getBuild() {
-		return m_build;
+		return getRun();
 	}
 	
 	public String getName() {
@@ -148,7 +153,12 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	}
 	
 	public File getReport() {
-		File report = new File(m_build.getRootDir(), getReportName());
+		Run<?, ?> currentRun = getRun();
+		if (currentRun == null) {
+			return new File("");
+		}
+
+		File report = new File(currentRun.getRootDir(), getReportName());
 		if(!report.isFile())
 			m_provider.getResultsFile(report, null);
 		return report;
@@ -160,8 +170,10 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 	}
 	
 	private int getLastFindingsCount() {
-		if(m_project.getLastSuccessfulBuild() != null && m_project.getLastSuccessfulBuild().getAction(ScanResults.class) != null)
-			return m_project.getLastSuccessfulBuild().getAction(ScanResults.class).getTotalFindings();
+		Job<?, ?> project = getProject();
+		if (project != null && project.getLastSuccessfulBuild() != null && project.getLastSuccessfulBuild().getAction(ScanResults.class) != null) {
+			return project.getLastSuccessfulBuild().getAction(ScanResults.class).getTotalFindings();
+		}
 		return Integer.MAX_VALUE;
 	}
 }

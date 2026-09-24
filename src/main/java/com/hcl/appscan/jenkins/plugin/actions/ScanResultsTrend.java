@@ -1,12 +1,13 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019.
+ * @ Copyright HCL Technologies Ltd. 2019, 2026.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
 package com.hcl.appscan.jenkins.plugin.actions;
 
 import hudson.model.Run;
+import hudson.model.Job;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +29,8 @@ public class ScanResultsTrend extends AppScanAction {
 	private String m_name;
 	
 	@DataBoundConstructor
-	public ScanResultsTrend(Run<?,?> project, String type, String name) {
-		super(project.getParent());
+	public ScanResultsTrend(Run<?,?> run, String type, String name) {
+		super(run);
 		m_type = type;
 		m_name = name;
 	}
@@ -70,7 +71,12 @@ public class ScanResultsTrend extends AppScanAction {
 	 */
 	public int getBuildCount() {
 		int count = 0;
-		for(Run<?,?> run : m_project.getBuilds()) {
+		Job<?, ?> project = getProject();
+		if (project == null) {
+			return count;
+		}
+
+		for(Run<?,?> run : project.getBuilds()) {
 			for(ResultsRetriever retriever : run.getActions(ResultsRetriever.class))
 				retriever.checkResults(run);
 	
@@ -88,9 +94,14 @@ public class ScanResultsTrend extends AppScanAction {
 	 */
 	public JSONObject getBuildFindingCounts() {
 		JSONObject builds = new JSONObject();
-		
+
+		Job<?, ?> project = getProject();
+		if (project == null) {
+			return builds;
+		}
+
 		//Loop through the builds to find those with ScanResults.
-		for(Run<?,?> run : m_project.getBuilds()) {			
+		for(Run<?,?> run : project.getBuilds()) {
 			//Loop through the ScanResults to get each set.
 			for(ScanResults results : run.getActions(ScanResults.class)) {
 				String scanType = results.getScanType() + "-" + results.getName();
@@ -125,7 +136,12 @@ public class ScanResultsTrend extends AppScanAction {
 	}
 	
 	private ScanResults getLatestResults() {
-		for(Run<?,?> run : m_project.getBuilds()) {
+		Job<?, ?> project = getProject();
+		if (project == null) {
+			return null;
+		}
+
+		for(Run<?,?> run : project.getBuilds()) {
 			for(ScanResults results : run.getActions(ScanResults.class)) {
 				if(results.getScanType().equalsIgnoreCase(m_type) && results.getName().equalsIgnoreCase(m_name)) {
 					return results;
