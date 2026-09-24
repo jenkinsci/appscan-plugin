@@ -16,7 +16,7 @@ public abstract class AppScanAction implements RunAction2 {
 	protected static final String URL = "https://cloud.appscan.com"; //$NON-NLS-1$
 	protected transient Run<?, ?> run;
 
-	//Update the constructor to accept the Run instead of the Job
+	//Updated the constructor to accept the Run instead of the Job
 	public AppScanAction(Run<?, ?> run) {
 		this.run = run;
 	}
@@ -33,12 +33,12 @@ public abstract class AppScanAction implements RunAction2 {
 		this.run = r;
 	}
 
-	//Provide a safe getter to replace all previous 'm_project' direct accesses
+	//getter to replace all previous 'm_project' direct accesses
 	public Job<?, ?> getProject() {
 		return this.run != null ? this.run.getParent() : null;
 	}
 
-	//Provide a getter for the build itself, which is often needed by subclasses
+	//getter for the build itself, which is often needed by subclasses
 	public Run<?, ?> getRun() {
 		return this.run;
 	}

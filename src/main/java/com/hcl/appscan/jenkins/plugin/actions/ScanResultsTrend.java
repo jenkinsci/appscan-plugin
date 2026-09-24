@@ -140,7 +140,6 @@ public class ScanResultsTrend extends AppScanAction {
 		if (project == null) {
 			return null;
 		}
-
 		for(Run<?,?> run : project.getBuilds()) {
 			for(ScanResults results : run.getActions(ScanResults.class)) {
 				if(results.getScanType().equalsIgnoreCase(m_type) && results.getName().equalsIgnoreCase(m_name)) {

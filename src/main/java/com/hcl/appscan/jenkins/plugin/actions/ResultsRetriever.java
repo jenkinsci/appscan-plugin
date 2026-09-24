@@ -157,7 +157,6 @@ public class ResultsRetriever extends AppScanAction implements SimpleBuildStep.L
 		if (currentRun == null) {
 			return;
 		}
-
 		File file = new File(currentRun.getRootDir(), "ScanLogs_" + m_name + "_" + SystemUtil.getTimeStamp() + ".zip");
 		if (m_provider instanceof NonCompliantIssuesResultProvider) {
 			((NonCompliantIssuesResultProvider) m_provider).getScanLogs(file);

@@ -67,7 +67,7 @@ public class ScanResults extends AppScanAction implements SimpleBuildStep.LastBu
 		this(run, provider, name, provider.getStatus(), provider.getFindingsCount(), provider.getCriticalCount(), provider.getHighCount(), provider.getMediumCount(), provider.getLowCount(), provider.getInfoCount(), serverUrl, label);
 	}
 
-	// Helper to get project name safely without breaking serialization
+	//Helper to get project name safely without breaking serialization
 	public String getProjectName() {
 		Job<?, ?> project = getProject();
 		return project != null ? project.getFullName() : "Unknown Project";
