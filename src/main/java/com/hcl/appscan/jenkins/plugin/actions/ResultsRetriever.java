@@ -1,6 +1,6 @@
 /**
  * © Copyright IBM Corporation 2016.
- * @ Copyright HCL Technologies Ltd. 2019, 2025.
+ * @ Copyright HCL Technologies Ltd. 2019, 2026.
  * LICENSE: Apache License, Version 2.0 https://www.apache.org/licenses/LICENSE-2.0
  */
 
@@ -30,9 +30,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import com.hcl.appscan.sdk.results.IResultsProvider;
 import com.hcl.appscan.jenkins.plugin.Messages;
 
-public class ResultsRetriever extends AppScanAction implements RunAction2, SimpleBuildStep.LastBuildAction {
+public class ResultsRetriever extends AppScanAction implements SimpleBuildStep.LastBuildAction {
 
-	private final Run<?,?> m_build;	
 	private IResultsProvider m_provider;
 	private String m_name;
 	private String m_status;
@@ -44,8 +43,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 
 	@DataBoundConstructor
 	public ResultsRetriever(Run<?,?> build, IResultsProvider provider, String scanName, String scanServerUrl, String label) {
-		super(build.getParent());
-		m_build = build;
+		super(build);
 		m_provider = provider;
 		m_name = scanName;
 		m_resultsAvailable = false;
@@ -65,22 +63,24 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 
 	@Override
 	public void onAttached(Run<?, ?> r) {
+		super.onAttached(r);
 	}
 
 	@Override
 	public void onLoad(Run<?, ?> r) {
+		super.onLoad(r);
 		checkResults(r);
 	}
 	
 	@Override
 	public Collection<? extends Action> getProjectActions() {
 		HashSet<Action> actions = new HashSet<Action>();
-		actions.add(new ScanResultsTrend(m_build, m_provider.getType(), m_name));
+		actions.add(new ScanResultsTrend(getRun(), m_provider.getType(), m_name));
 		return actions;
 	}
 	
 	public boolean getHasResults() {
-		return checkResults(m_build);
+		return checkResults(getRun());
 	}
 
 	public boolean getFailed() {
@@ -122,7 +122,7 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 						return true;
 					} else if (rTemp.getAllActions().contains(ResultsRetriever.this) && m_provider.hasResults()) {
 						rTemp.getActions().remove(ResultsRetriever.this); //We need to remove this action from the build, but getAllActions() returns a read-only list.
-						ScanResultsFactory.createResult(rTemp, m_build, m_provider, m_name, m_scanServerUrl, m_label);
+						ScanResultsFactory.createResult(rTemp, getRun(), m_provider, m_name, m_scanServerUrl, m_label);
 
 						m_status = m_provider.getStatus();
 						//Scan logs are available only for DAST and SAST scans
@@ -153,7 +153,11 @@ public class ResultsRetriever extends AppScanAction implements RunAction2, Simpl
 	}
 
 	private void downloadScanLogs() {
-		File file = new File(m_build.getRootDir(), "ScanLogs_" + m_name + "_" + SystemUtil.getTimeStamp() + ".zip");
+		Run<?, ?> currentRun = getRun();
+		if (currentRun == null) {
+			return;
+		}
+		File file = new File(currentRun.getRootDir(), "ScanLogs_" + m_name + "_" + SystemUtil.getTimeStamp() + ".zip");
 		if (m_provider instanceof NonCompliantIssuesResultProvider) {
 			((NonCompliantIssuesResultProvider) m_provider).getScanLogs(file);
 		} else if (m_provider instanceof CloudCombinedResultsProvider) {
