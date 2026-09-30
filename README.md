@@ -122,7 +122,6 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
                     -   **Additional Options**: If selected, the following options are available:
                         -   **Include SCA**:  Applicable only for IRX files.
                             -   Include analysis of open source packages. Include SCA creates an SCA scan in addition to a SAST scan.
-    -   **Email notification:** Send the user an email when analysis is complete.
     -   **Run as a personal scan:** A personal scan does not affect the application data and compliance until it is promoted.
     -   **Allow intervention by scan enablement team:** Available for AppScan on Cloud only.
         -   When selected (default), our scan enablement team will step in if the scan fails, or if 
@@ -147,6 +146,7 @@ HCL AppScan Jenkins plug-in supports integration with HCL AppScan Enterprise for
 **Notes:**
 - AppScan on Cloud (ASoC) now performs SAST and SCA analysis as separate scans. To execute an open-source only scan, use the Software Composition Analysis (SCA) scan type.
 - Scan logs are now automatically downloaded to the Jenkins job directory after completing dynamic or static scans for HCL AppScan on Cloud and HCL AppScan 360°.
+- Notifications are now managed via application-level profiles in your account settings. To ensure you receive alerts for this scan, verify your notification rules for this application or your global preferences. [Manage email notifications](https://help.hcl-software.com/appscan/ASoC/r_email_notifications.html).
 
  For more information on adding security analysis to Jenkins automation server, please visit this [link](https://help.hcl-software.com/appscan/ASoC/appseccloud_jenkins.html?query=jenkins).
 

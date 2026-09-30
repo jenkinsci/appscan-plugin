@@ -1,5 +1,15 @@
 CHANGELOG
 =========
+1.8.5 (October, 2026)
+------
+- Supply chain security updates. 
+- Removal of per scan Email notification feature.
+- Bug fixes and minor enhancements.
+
+1.8.4 (July, 2026)
+------
+- Bug fixes.
+
 1.8.3 (June, 2026)
 ------
 - Bug fixes and minor enhancements.
