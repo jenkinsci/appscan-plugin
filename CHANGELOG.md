@@ -2,9 +2,8 @@ CHANGELOG
 =========
 1.8.5 (October, 2026)
 ------
-- Supply chain security updates. 
-- Removal of per scan Email notification feature.
-- Bug fixes and minor enhancements.
+- Removal of per-scan email notification feature for both HCL AppScan on Cloud and AppScan 360°.
+- Security updates and minor enhancements.
 
 1.8.4 (July, 2026)
 ------
