@@ -1,5 +1,14 @@
 CHANGELOG
 =========
+1.8.5 (October, 2026)
+------
+- Removal of per-scan email notification feature for both HCL AppScan on Cloud and AppScan 360°.
+- Security updates and minor enhancements.
+
+1.8.4 (July, 2026)
+------
+- Bug fixes.
+
 1.8.3 (June, 2026)
 ------
 - Bug fixes and minor enhancements.
